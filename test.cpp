@@ -34,6 +34,7 @@
 #include <string>
 
 // Includes for the GLTexture class.
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <utility>
@@ -75,6 +76,7 @@ using nanogui::Button;
 using nanogui::CheckBox;
 using nanogui::Vector2f;
 using nanogui::Vector2i;
+using nanogui::Vector3f;
 using nanogui::MatrixXu;
 using nanogui::MatrixXf;
 using nanogui::Label;
@@ -566,12 +568,23 @@ public:
         performLayout();
     }
 
+    virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) override {
+        // Right button down
+        if (button == 1 && down == false) {
+            lastMouseX = currentMouseX = p.x();
+            lastMouseY = currentMouseY = p.y();
+            return true;
+        }
+        return false;
+    }
+
     //This is how you capture mouse events in the screen. If you want to implement the arcball instead of using
     //sliders, then you need to map the right click drag motions to suitable rotation matrices
     virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Vector2i &rel, int button, int modifiers) override {
+        // Right click drag mouse event
         if (button == GLFW_MOUSE_BUTTON_3 ) {
-	    //Get right click drag mouse event, print x and y coordinates only if right button pressed
-	    cout << p.x() << "     " << p.y() << "\n";
+            currentMouseX = p.x();
+            currentMouseY = p.y();
             return true;
         }
         return false;
@@ -579,6 +592,21 @@ public:
 
     virtual void drawContents() override {
         // ... put your rotation code here if you use dragging the mouse, updating either your model points, the mvp matrix or the V matrix, depending on the approach used
+        if (currentMouseX != lastMouseX || currentMouseY != lastMouseY) {
+            Vector3f lastArcballVector = getArcballVector(lastMouseX, lastMouseY);
+            Vector3f currentArcballVecotr = getArcballVector(currentMouseX, currentMouseY);
+            float angle = acos(min(1.0f, glm::dot(va, vb)));
+            float 
+    glm::vec3 va = get_arcball_vector(last_mx, last_my);
+    glm::vec3 vb = get_arcball_vector( cur_mx,  cur_my);
+    float angle = acos(min(1.0f, glm::dot(va, vb)));
+    glm::vec3 axis_in_camera_coord = glm::cross(va, vb);
+    glm::mat3 camera2object = glm::inverse(glm::mat3(transforms[MODE_CAMERA]) * glm::mat3(mesh.object2world));
+    glm::vec3 axis_in_object_coord = camera2object * axis_in_camera_coord;
+    mesh.object2world = glm::rotate(mesh.object2world, glm::degrees(angle), axis_in_object_coord);
+    last_mx = cur_mx;
+    last_my = cur_my;
+  }
     }
 
     virtual void draw(NVGcontext *ctx) {
@@ -589,10 +617,25 @@ public:
         Screen::draw(ctx);
     }
 
-
 private:
     nanogui::ProgressBar *mProgress;
     MyGLCanvas *mCanvas;
+    int lastMouseX, lastMouseY, currentMouseX, currentMouseY;
+
+    Vector3f getArcballVector(int x, int y) {
+        Vector2i topLeft = mCanvas->absolutePosition();
+        int width = mCanvas->width();
+        int height = mCanvas->height();
+        Vector3f p = Vector3f(1.0 * (x - topLeft.x()) / width * 2 - 1.0,
+                        -1.0 * (y - topLeft.y()) / height * 2 + 1.0,
+			0);
+        float p_squared = p.x() * p.x() + p.y() * p.y();
+        if (p_squared <= 1)
+            p[2] = sqrt(1 * 1 - p_squared);
+        else
+            p.normalize();
+        return p;
+    }
 };
 
 int main(int /* argc */, char ** /* argv */) {
