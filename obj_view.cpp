@@ -352,6 +352,10 @@ public:
         mTranslation = vTranslation;
     }
 
+    void setZooming(float fZooming) {
+        mZooming = fZooming;
+    }
+
     //Method to update the mesh itself, can change the size of it dynamically, as shown later
     void updateMeshPositions(MatrixXf newPositions){
         positions = newPositions;
@@ -374,7 +378,7 @@ public:
         mvp.setIdentity();
         mvp.topLeftCorner<3,3>() = Eigen::Matrix3f(Eigen::AngleAxisf(mRotation[0], Vector3f::UnitX()) *
                                                    Eigen::AngleAxisf(mRotation[1],  Vector3f::UnitY()) *
-                                                   Eigen::AngleAxisf(mRotation[2], Vector3f::UnitZ())) * 0.25f;
+                                                   Eigen::AngleAxisf(mRotation[2], Vector3f::UnitZ())) * mZooming;
         mvp.topRightCorner<3,1>() = Eigen::Vector3f(mTranslation[0],mTranslation[1],mTranslation[2])* 0.25f;
        
         mShader.setUniform("MVP", mvp);
@@ -406,6 +410,7 @@ private:
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
+    float mZooming = 0.25f;
 };
 
 
@@ -498,7 +503,6 @@ public:
             float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;
 	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
         //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
-
         });
 
 	//Rotation along Z axis
@@ -524,17 +528,6 @@ public:
         new Label(panelTrans, "Translation on Y axis", "sans-bold");
 	Slider *tranSlider_Z = new Slider(panelTrans);
 	new Label(panelTrans, "Translation on Z axis", "sans-bold");
-
-        //Translation along X axis
-        tranSlider_X->setValue(0.5f);
-        tranSlider_X->setFixedWidth(120);
-        tranSlider_X->setCallback([&, rotSlider_X, rotSlider_Z](float value) {
-            float trans_X = (value - 0.5f)*2*4;
-            float trans_Y = (rotSlider_Y->value() - 0.5f)*2*4;
-            float trans_Z = (rotSlider_Z->value() - 0.5f)*2*4;          
-	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
-        //     cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
-        });
 
         //Translation along X axis
         tranSlider_X->setValue(0.5f);
@@ -567,6 +560,17 @@ public:
             float trans_Z = (value - 0.5f)*2*4;        
 	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
             cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
+        });
+
+        mCanvas->setTranslation(nanogui::Vector3f(0, 0, 0));
+
+        // Initiate zooming slider
+	Slider *zoom = new Slider(panelTrans);
+        new Label(panelTrans, "Zooming", "sans-bold");
+        zoom->setValue(0.5f);
+        zoom->setFixedWidth(120);
+        zoom->setCallback([&](float value) {
+	    mCanvas->setZooming(value / 2.0f);
         });
 
 	//Message dialog demonstration, it should be pretty straightforward
