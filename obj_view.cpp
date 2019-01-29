@@ -446,34 +446,15 @@ public:
         //widgets demonstration
         nanogui::GLShader mShader;
 
-	//Then, we can create another window and insert other widgets into it
-	Window *anotherWindow = new Window(this, "Basic widgets");
-        anotherWindow->setPosition(Vector2i(500, 15));
-        anotherWindow->setLayout(new GroupLayout());
+        // Control widgets
+        Window *controlWindow = new Window(this, "Controls");
+        controlWindow->setPosition(Vector2i(470, 15));
+        controlWindow->setLayout(new GroupLayout());
 
-	// Demonstrates how a button called "New Mesh" can update the positions matrix.
-	// This is just a demonstration, you actually need to bind mesh updates with the open file interface
-	Button *button = new Button(anotherWindow, "New Mesh");
-	button->setCallback([&] {
-		//MatrixXf has dynamic size, so you can actually change its dimensions on the fly here
-		//Make sure that the new mesh is not overblown by scaling it to a proper size and centering at origin
-		//If you do not do that, the object may not appear at all, impacting the tests
-		MatrixXf newPositions = MatrixXf(3, 8);
-		newPositions.col(0) << -2,  1,  1;
-        	newPositions.col(1) << -2,  1, -1;
-        	newPositions.col(2) <<  1,  1, -1;
-        	newPositions.col(3) <<  1,  1,  1;
-        	newPositions.col(4) << -1, -2,  1;
-        	newPositions.col(5) << -1, -2, -1;
-        	newPositions.col(6) <<  1, -1, -2;
-        	newPositions.col(7) <<  1, -1,  2;
-		mCanvas->updateMeshPositions(newPositions);
-	});
-	button->setTooltip("Demonstrates how a button can update the positions matrix.");
-
-	Widget *panelRot = new Widget(anotherWindow);
+        // Rotation panel
+	Widget *panelRot = new Widget(controlWindow);
         panelRot->setLayout(new BoxLayout(Orientation::Vertical,
-                                       Alignment::Middle, 0, 0));
+                                       Alignment::Middle, 6, 2));
 
         // Initiate rotation slider
 	Slider *rotSlider_X = new Slider(panelRot);
@@ -516,10 +497,10 @@ public:
         //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
         });
 
-
-	Widget *panelTrans = new Widget(anotherWindow);
+        // Translation panel
+	Widget *panelTrans = new Widget(controlWindow);
         panelTrans->setLayout(new BoxLayout(Orientation::Vertical,
-                                       Alignment::Middle, 0, 0));
+                                       Alignment::Middle, 6, 2));
 
         // Initiate translation slider
 	Slider *tranSlider_X = new Slider(panelTrans);
@@ -564,14 +545,44 @@ public:
 
         mCanvas->setTranslation(nanogui::Vector3f(0, 0, 0));
 
+        // Zomming panel
+	Widget *panelZoom = new Widget(controlWindow);
+        panelZoom->setLayout(new BoxLayout(Orientation::Vertical,
+                                       Alignment::Middle, 6, 2));
+
         // Initiate zooming slider
-	Slider *zoom = new Slider(panelTrans);
-        new Label(panelTrans, "Zooming", "sans-bold");
+	Slider *zoom = new Slider(panelZoom);
+        new Label(panelZoom, "Zooming", "sans-bold");
         zoom->setValue(0.5f);
         zoom->setFixedWidth(120);
         zoom->setCallback([&](float value) {
 	    mCanvas->setZooming(value / 2.0f);
         });
+
+	//Then, we can create another window and insert other widgets into it
+	Window *anotherWindow = new Window(this, "Basic widgets");
+        anotherWindow->setPosition(Vector2i(650, 15));
+        anotherWindow->setLayout(new GroupLayout());
+
+	// Demonstrates how a button called "New Mesh" can update the positions matrix.
+	// This is just a demonstration, you actually need to bind mesh updates with the open file interface
+	Button *button = new Button(anotherWindow, "New Mesh");
+	button->setCallback([&] {
+		//MatrixXf has dynamic size, so you can actually change its dimensions on the fly here
+		//Make sure that the new mesh is not overblown by scaling it to a proper size and centering at origin
+		//If you do not do that, the object may not appear at all, impacting the tests
+		MatrixXf newPositions = MatrixXf(3, 8);
+		newPositions.col(0) << -2,  1,  1;
+        	newPositions.col(1) << -2,  1, -1;
+        	newPositions.col(2) <<  1,  1, -1;
+        	newPositions.col(3) <<  1,  1,  1;
+        	newPositions.col(4) << -1, -2,  1;
+        	newPositions.col(5) << -1, -2, -1;
+        	newPositions.col(6) <<  1, -1, -2;
+        	newPositions.col(7) <<  1, -1,  2;
+		mCanvas->updateMeshPositions(newPositions);
+	});
+	button->setTooltip("Demonstrates how a button can update the positions matrix.");
 
 	//Message dialog demonstration, it should be pretty straightforward
         new Label(anotherWindow, "Message dialog", "sans-bold");
