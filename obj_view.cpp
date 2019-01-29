@@ -88,8 +88,7 @@ public:
         using namespace nanogui;
 
 	mShader.initFromFiles("a_smooth_shader", "StandardShading.vertexshader", "StandardShading.fragmentshader");
-
-	/* MatrixXf is just a dynamic sized matrix of floats initialized as 3 x 8 */
+ 
 	/* which are the 3 dimensions and 8 possible vertice positions */
         positions.col(0) <<  1,  1, -1; //top right back
         positions.col(1) << -1,  1, -1; //bottom right back
@@ -324,7 +323,7 @@ public:
 	// change your rotation to work on the camera instead of rotating the entire world with the MVP matrix
 	Matrix4f V;
 	V.setIdentity();
-	//V = lookAt(Vector3f(0,12,0), Vector3f(0,0,0), Vector3f(0,1,0));
+	V = lookAt(Vector3f(0,12,0), Vector3f(0,0,0), Vector3f(0,1,0));
 	mShader.setUniform("V", V);
 
 	//ModelMatrixID
@@ -348,6 +347,11 @@ public:
         mRotation = vRotation;
     }
 
+    //Method to update the rotation on each axis
+    void setTranslation(nanogui::Vector3f vTranslation) {
+        mTranslation = vTranslation;
+    }
+
     //Method to update the mesh itself, can change the size of it dynamically, as shown later
     void updateMeshPositions(MatrixXf newPositions){
         positions = newPositions;
@@ -363,15 +367,16 @@ public:
 
 	//this simple command updates the positions matrix. You need to do the same for color and indices matrices too
 	mShader.uploadAttrib("vertexPosition_modelspace", positions);
-
-	//This is a way to perform a simple rotation using a 4x4 rotation matrix represented by rmat
+	
+        //This is a way to perform a simple rotation using a 4x4 rotation matrix represented by rmat
 	//mvp stands for ModelViewProjection matrix
         Matrix4f mvp;
         mvp.setIdentity();
         mvp.topLeftCorner<3,3>() = Eigen::Matrix3f(Eigen::AngleAxisf(mRotation[0], Vector3f::UnitX()) *
                                                    Eigen::AngleAxisf(mRotation[1],  Vector3f::UnitY()) *
                                                    Eigen::AngleAxisf(mRotation[2], Vector3f::UnitZ())) * 0.25f;
-
+        mvp.topRightCorner<3,1>() = Eigen::Vector3f(mTranslation[0],mTranslation[1],mTranslation[2])* 0.25f;
+       
         mShader.setUniform("MVP", mvp);
 
 	// If enabled, does depth comparisons and update the depth buffer.
@@ -400,6 +405,7 @@ private:
     MatrixXf positions = MatrixXf(3, 48);
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
+    Eigen::Vector3f mTranslation;
 };
 
 
@@ -460,26 +466,107 @@ public:
 	});
 	button->setTooltip("Demonstrates how a button can update the positions matrix.");
 
-	//this is how we write captions on the window, if you do not want to write inside a button	
-	new Label(window, "Rotation on the first axis", "sans-bold");
-	
 	Widget *panelRot = new Widget(anotherWindow);
-        panelRot->setLayout(new BoxLayout(Orientation::Horizontal,
+        panelRot->setLayout(new BoxLayout(Orientation::Vertical,
                                        Alignment::Middle, 0, 0));
 
-	//Demonstration of rotation along one axis of the mesh using a simple slider, you can have three of these, one for each dimension
-	Slider *rotSlider = new Slider(panelRot);
-        rotSlider->setValue(0.5f);
-        rotSlider->setFixedWidth(150);
-        rotSlider->setCallback([&](float value) {
-	    // the middle point should be 0 rad
-	    // then we need to multiply by 2 to make it go from -1. to 1.
-	    // then we make it go from -2*M_PI to 2*M_PI
-	    float radians = (value - 0.5f)*2*2*M_PI;
-	    //then use this to rotate on just one axis
-	    mCanvas->setRotation(nanogui::Vector3f(radians, 0.0f, 0.0f ));
-	    //when you implement the other sliders and/or the Arcball, you need to keep track
-	    //of the other rotations used for the second and third axis... It will not stay as 0.0f
+        // Initiate rotation slider
+	Slider *rotSlider_X = new Slider(panelRot);
+        new Label(panelRot, "Rotation on X axis", "sans-bold");
+        Slider *rotSlider_Y = new Slider(panelRot);
+        new Label(panelRot, "Rotation on Y axis", "sans-bold");
+	Slider *rotSlider_Z = new Slider(panelRot);
+	new Label(panelRot, "Rotation on Z axis", "sans-bold");
+
+        //Rotation along X axis
+        rotSlider_X->setValue(0.5f);
+        rotSlider_X->setFixedWidth(120);
+        rotSlider_X->setCallback([&, rotSlider_Y, rotSlider_Z](float value) {
+	    float radians_X = (value - 0.5f)*2*2*M_PI;
+            float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
+            float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;          
+	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
+        //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
+        });
+
+	//Rotation along Y axis
+        rotSlider_Y->setValue(0.5f);
+        rotSlider_Y->setFixedWidth(120);
+        rotSlider_Y->setCallback([&, rotSlider_X, rotSlider_Z](float value) {
+            float radians_X = (rotSlider_X->value() - 0.5f)*2*2*M_PI;
+	    float radians_Y = (value - 0.5f)*2*2*M_PI;
+            float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;
+	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
+        //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
+
+        });
+
+	//Rotation along Z axis
+        rotSlider_Z->setValue(0.5f);
+        rotSlider_Z->setFixedWidth(120);
+        rotSlider_Z->setCallback([&, rotSlider_X, rotSlider_Y](float value) {
+            float radians_X = (rotSlider_X->value() - 0.5f)*2*2*M_PI;
+            float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
+	    float radians_Z = (value - 0.5f)*2*2*M_PI;
+	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
+        //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
+        });
+
+
+	Widget *panelTrans = new Widget(anotherWindow);
+        panelTrans->setLayout(new BoxLayout(Orientation::Vertical,
+                                       Alignment::Middle, 0, 0));
+
+        // Initiate translation slider
+	Slider *tranSlider_X = new Slider(panelTrans);
+        new Label(panelTrans, "Translation on X axis", "sans-bold");
+        Slider *tranSlider_Y = new Slider(panelTrans);
+        new Label(panelTrans, "Translation on Y axis", "sans-bold");
+	Slider *tranSlider_Z = new Slider(panelTrans);
+	new Label(panelTrans, "Translation on Z axis", "sans-bold");
+
+        //Translation along X axis
+        tranSlider_X->setValue(0.5f);
+        tranSlider_X->setFixedWidth(120);
+        tranSlider_X->setCallback([&, rotSlider_X, rotSlider_Z](float value) {
+            float trans_X = (value - 0.5f)*2*4;
+            float trans_Y = (rotSlider_Y->value() - 0.5f)*2*4;
+            float trans_Z = (rotSlider_Z->value() - 0.5f)*2*4;          
+	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+        //     cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
+        });
+
+        //Translation along X axis
+        tranSlider_X->setValue(0.5f);
+        tranSlider_X->setFixedWidth(120);
+        tranSlider_X->setCallback([&, tranSlider_Y, tranSlider_Z](float value) {
+            float trans_X = (value - 0.5f)*2*4;
+            float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
+            float trans_Z = (tranSlider_Z->value() - 0.5f)*2*4;          
+	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+        //     cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
+        });
+
+        //Translation along Y axis
+        tranSlider_Y->setValue(0.5f);
+        tranSlider_Y->setFixedWidth(120);
+        tranSlider_Y->setCallback([&, tranSlider_X, tranSlider_Z](float value) {
+            float trans_X = (tranSlider_X->value() - 0.5f)*2*4;
+            float trans_Y = (value - 0.5f)*2*4;
+            float trans_Z = (tranSlider_Z->value() - 0.5f)*2*4;          
+	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+        //     cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
+        });
+
+        //Translation along Z axis
+        tranSlider_Z->setValue(0.5f);
+        tranSlider_Z->setFixedWidth(120);
+        tranSlider_Z->setCallback([&, tranSlider_X, tranSlider_Y](float value) {
+            float trans_X = (tranSlider_X->value() - 0.5f)*2*4; 
+            float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
+            float trans_Z = (value - 0.5f)*2*4;        
+	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+            cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
         });
 
 	//Message dialog demonstration, it should be pretty straightforward
@@ -522,7 +609,7 @@ public:
 
 	//This is how to implement a combo box, which is important in A1
         new Label(anotherWindow, "Combo box", "sans-bold");
-        ComboBox *combo = new ComboBox(anotherWindow, { "Combo box item 1", "Combo box item 2", "Combo box item 3"} );
+        ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded in wireframe", "shaded with mesh edges"} );
         combo->setCallback([&](int value) {
             cout << "Combo box selected: " << value << endl;
         });	
@@ -564,70 +651,21 @@ public:
 
 	//Method to assemble the interface defined before it is called
         performLayout();
-
-        mArcball = Arcball(2.0f);
-        mArcball.setSize({400, 400});
-    }
-
-    virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) override {
-        // Right button down
-        if (button == 1 && down == false) {
-            mArcball.button(p, down);
-            return true;
-        }
-        return false;
-
-        // // Right button down
-        // if (button == 1 && down == false) {
-        //     lastMouseX = currentMouseX = p.x();
-        //     lastMouseY = currentMouseY = p.y();
-        //     return true;
-        // }
-        // return false;
     }
 
     //This is how you capture mouse events in the screen. If you want to implement the arcball instead of using
     //sliders, then you need to map the right click drag motions to suitable rotation matrices
     virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Vector2i &rel, int button, int modifiers) override {
-        // Right click drag mouse event
         if (button == GLFW_MOUSE_BUTTON_3 ) {
-            mArcball.motion(p);
+	    //Get right click drag mouse event, print x and y coordinates only if right button pressed
+	    cout << p.x() << "     " << p.y() << "\n";
             return true;
         }
         return false;
-
-        // // Right click drag mouse event
-        // if (button == GLFW_MOUSE_BUTTON_3 ) {
-        //     currentMouseX = p.x();
-        //     currentMouseY = p.y();
-        //     return true;
-        // }
-        // return false;
     }
 
     virtual void drawContents() override {
-        // Option 1: acquire a 4x4 homogeneous rotation matrix
-        nanogui::Matrix4f rotation = mArcball.matrix();
-        cout << rotation << endl;
-        //// Option 2: acquire an equivalent quaternion
-        //Quaternionf rotation = mArcball.activeState();
-        // ... do some drawing with the current rotation ...
         // ... put your rotation code here if you use dragging the mouse, updating either your model points, the mvp matrix or the V matrix, depending on the approach used
-        // if (currentMouseX != lastMouseX || currentMouseY != lastMouseY) {
-        //     Vector3f lastArcballVector = getArcballVector(lastMouseX, lastMouseY);
-        //     Vector3f currentArcballVecotr = getArcballVector(currentMouseX, currentMouseY);
-//             float angle = acos(min(1.0f, glm::dot(va, vb)));
-//             float 
-//     glm::vec3 va = get_arcball_vector(last_mx, last_my);
-//     glm::vec3 vb = get_arcball_vector( cur_mx,  cur_my);
-//     float angle = acos(min(1.0f, glm::dot(va, vb)));
-//     glm::vec3 axis_in_camera_coord = glm::cross(va, vb);
-//     glm::mat3 camera2object = glm::inverse(glm::mat3(transforms[MODE_CAMERA]) * glm::mat3(mesh.object2world));
-//     glm::vec3 axis_in_object_coord = camera2object * axis_in_camera_coord;
-//     mesh.object2world = glm::rotate(mesh.object2world, glm::degrees(angle), axis_in_object_coord);
-//     last_mx = cur_mx;
-//     last_my = cur_my;
-//   }
     }
 
     virtual void draw(NVGcontext *ctx) {
@@ -638,27 +676,10 @@ public:
         Screen::draw(ctx);
     }
 
+
 private:
     nanogui::ProgressBar *mProgress;
     MyGLCanvas *mCanvas;
-    Arcball mArcball;
-
-    int lastMouseX, lastMouseY, currentMouseX, currentMouseY;
-
-    Vector3f getArcballVector(int x, int y) {
-        Vector2i topLeft = mCanvas->absolutePosition();
-        int width = mCanvas->width();
-        int height = mCanvas->height();
-        Vector3f p = Vector3f(1.0 * (x - topLeft.x()) / width * 2 - 1.0,
-                        -1.0 * (y - topLeft.y()) / height * 2 + 1.0,
-			0);
-        float p_squared = p.x() * p.x() + p.y() * p.y();
-        if (p_squared <= 1)
-            p[2] = sqrt(1 * 1 - p_squared);
-        else
-            p.normalize();
-        return p;
-    }
 };
 
 int main(int /* argc */, char ** /* argv */) {
@@ -685,3 +706,216 @@ int main(int /* argc */, char ** /* argv */) {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+// 	//Message dialog demonstration, it should be pretty straightforward
+//         new Label(anotherWindow, "Message dialog", "sans-bold");
+//         tools = new Widget(anotherWindow);
+//         tools->setLayout(new BoxLayout(Orientation::Horizontal,
+//                                        Alignment::Middle, 0, 6));
+//         Button *b = new Button(tools, "Info");
+//         b->setCallback([&] {
+//             auto dlg = new MessageDialog(this, MessageDialog::Type::Information, "Title", "This is an information message");
+//             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+//         });
+//         b = new Button(tools, "Warn");
+//         b->setCallback([&] {
+//             auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a warning message");
+//             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+//         });
+//         b = new Button(tools, "Ask");
+//         b->setCallback([&] {
+//             auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true);
+//             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
+//         });
+
+// 	//Here is how you can get the string that represents file paths both for opening and for saving.
+// 	//you need to implement the rest of the parser logic.
+//         new Label(anotherWindow, "File dialog", "sans-bold");
+//         tools = new Widget(anotherWindow);
+//         tools->setLayout(new BoxLayout(Orientation::Horizontal,
+//                                        Alignment::Middle, 0, 6));
+//         b = new Button(tools, "Open");
+//         b->setCallback([&] {
+//             cout << "File dialog result: " << file_dialog(
+//                     { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, false) << endl;
+//         });
+//         b = new Button(tools, "Save");
+//         b->setCallback([&] {
+//             cout << "File dialog result: " << file_dialog(
+//                     { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
+//         });
+
+// 	//This is how to implement a combo box, which is important in A1
+//         new Label(anotherWindow, "Combo box", "sans-bold");
+//         ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded in wireframe", "shaded with mesh edges"} );
+//         combo->setCallback([&](int value) {
+//             cout << "Combo box selected: " << value << endl;
+//         });	
+
+//         new Label(anotherWindow, "Check box", "sans-bold");
+//         CheckBox *cb = new CheckBox(anotherWindow, "Flag 1",
+//             [](bool state) { cout << "Check box 1 state: " << state << endl; }
+//         );
+//         cb->setChecked(true);
+//         cb = new CheckBox(anotherWindow, "Flag 2",
+//             [](bool state) { cout << "Check box 2 state: " << state << endl; }
+//         );
+//         new Label(anotherWindow, "Progress bar", "sans-bold");
+//         mProgress = new ProgressBar(anotherWindow);
+
+//         new Label(anotherWindow, "Slider and text box", "sans-bold");
+
+//         Widget *panel = new Widget(anotherWindow);
+//         panel->setLayout(new BoxLayout(Orientation::Horizontal,
+//                                        Alignment::Middle, 0, 20));
+
+// 	//Fancy slider that has a callback function to update another interface element
+//         Slider *slider = new Slider(panel);
+//         slider->setValue(0.5f);
+//         slider->setFixedWidth(80);
+//         TextBox *textBox = new TextBox(panel);
+//         textBox->setFixedSize(Vector2i(60, 25));
+//         textBox->setValue("50");
+//         textBox->setUnits("%");
+//         slider->setCallback([textBox](float value) {
+//             textBox->setValue(std::to_string((int) (value * 100)));
+//         });
+//         slider->setFinalCallback([&](float value) {
+//             cout << "Final slider value: " << (int) (value * 100) << endl;
+//         });
+//         textBox->setFixedSize(Vector2i(60,25));
+//         textBox->setFontSize(20);
+//         textBox->setAlignment(TextBox::Alignment::Right);
+
+// 	//Method to assemble the interface defined before it is called
+//         performLayout();
+
+//         mArcball = Arcball(2.0f);
+//         mArcball.setSize({400, 400});
+//     }
+
+//     virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) override {
+//         // Right button down
+//         if (button == 1 && down == false) {
+//             mArcball.button(p, down);
+//             return true;
+//         }
+//         return false;
+
+//         // // Right button down
+//         // if (button == 1 && down == false) {
+//         //     lastMouseX = currentMouseX = p.x();
+//         //     lastMouseY = currentMouseY = p.y();
+//         //     return true;
+//         // }
+//         // return false;
+//     }
+
+//     //This is how you capture mouse events in the screen. If you want to implement the arcball instead of using
+//     //sliders, then you need to map the right click drag motions to suitable rotation matrices
+//     virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Vector2i &rel, int button, int modifiers) override {
+//         // Right click drag mouse event
+//         if (button == GLFW_MOUSE_BUTTON_3 ) {
+//             mArcball.motion(p);
+//             return true;
+//         }
+//         return false;
+
+//         // // Right click drag mouse event
+//         // if (button == GLFW_MOUSE_BUTTON_3 ) {
+//         //     currentMouseX = p.x();
+//         //     currentMouseY = p.y();
+//         //     return true;
+//         // }
+//         // return false;
+//     }
+
+//     virtual void drawContents() override {
+//         // Option 1: acquire a 4x4 homogeneous rotation matrix
+//         nanogui::Matrix4f rotation = mArcball.matrix();
+//         // cout << rotation << endl;
+//         //// Option 2: acquire an equivalent quaternion
+//         //Quaternionf rotation = mArcball.activeState();
+//         // ... do some drawing with the current rotation ...
+//         // ... put your rotation code here if you use dragging the mouse, updating either your model points, the mvp matrix or the V matrix, depending on the approach used
+//         // if (currentMouseX != lastMouseX || currentMouseY != lastMouseY) {
+//         //     Vector3f lastArcballVector = getArcballVector(lastMouseX, lastMouseY);
+//         //     Vector3f currentArcballVecotr = getArcballVector(currentMouseX, currentMouseY);
+// //             float angle = acos(min(1.0f, glm::dot(va, vb)));
+// //             float 
+// //     glm::vec3 va = get_arcball_vector(last_mx, last_my);
+// //     glm::vec3 vb = get_arcball_vector( cur_mx,  cur_my);
+// //     float angle = acos(min(1.0f, glm::dot(va, vb)));
+// //     glm::vec3 axis_in_camera_coord = glm::cross(va, vb);
+// //     glm::mat3 camera2object = glm::inverse(glm::mat3(transforms[MODE_CAMERA]) * glm::mat3(mesh.object2world));
+// //     glm::vec3 axis_in_object_coord = camera2object * axis_in_camera_coord;
+// //     mesh.object2world = glm::rotate(mesh.object2world, glm::degrees(angle), axis_in_object_coord);
+// //     last_mx = cur_mx;
+// //     last_my = cur_my;
+// //   }
+//     }
+
+//     virtual void draw(NVGcontext *ctx) {
+// 	/* Animate the scrollbar */
+//         mProgress->setValue(std::fmod((float) glfwGetTime() / 10, 1.0f));
+
+//         /* Draw the user interface */
+//         Screen::draw(ctx);
+//     }
+
+// private:
+//     nanogui::ProgressBar *mProgress;
+//     MyGLCanvas *mCanvas;
+//     Arcball mArcball;
+
+//     int lastMouseX, lastMouseY, currentMouseX, currentMouseY;
+
+//     Vector3f getArcballVector(int x, int y) {
+//         Vector2i topLeft = mCanvas->absolutePosition();
+//         int width = mCanvas->width();
+//         int height = mCanvas->height();
+//         Vector3f p = Vector3f(1.0 * (x - topLeft.x()) / width * 2 - 1.0,
+//                         -1.0 * (y - topLeft.y()) / height * 2 + 1.0,
+// 			0);
+//         float p_squared = p.x() * p.x() + p.y() * p.y();
+//         if (p_squared <= 1)
+//             p[2] = sqrt(1 * 1 - p_squared);
+//         else
+//             p.normalize();
+//         return p;
+//     }
+// };
+
+// int main(int /* argc */, char ** /* argv */) {
+//     try {
+//         nanogui::init();
+
+//             /* scoped variables */ {
+//             nanogui::ref<ExampleApplication> app = new ExampleApplication();
+//             app->drawAll();
+//             app->setVisible(true);
+//             nanogui::mainloop();
+//         }
+
+//         nanogui::shutdown();
+//     } catch (const std::runtime_error &e) {
+//         std::string error_msg = std::string("Caught a fatal error: ") + std::string(e.what());
+//         #if defined(_WIN32)
+//             MessageBoxA(nullptr, error_msg.c_str(), NULL, MB_ICONERROR | MB_OK);
+//         #else
+//             std::cerr << error_msg << endl;
+//         #endif
+//         return -1;
+//     }
+
+//     return 0;
+// }

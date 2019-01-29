@@ -8,7 +8,7 @@ include_directories(lib/nanogui/include)
 include_directories(${NANOGUI_EXTRA_INCS})
 add_definitions(${NANOGUI_EXTRA_DEFS})
 
-include_directories(lib/embed-resource)./
+include_directories(lib/embed-resource)
 add_subdirectory(lib/embed-resource)
 
 embed_resources(MyResources shader/vert.glsl shader/frag.glsl)
