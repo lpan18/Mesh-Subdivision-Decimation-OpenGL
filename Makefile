@@ -56,16 +56,38 @@ CMAKE_BINARY_DIR = /media/lei/TOU/2019SpringTerm/GeometricModelling/Assignments/
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
 
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
 
-.PHONY : edit_cache/fast
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: install/local
+
+.PHONY : install/local/fast
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
@@ -77,6 +99,17 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -111,17 +144,170 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named WingedEdge
+# Target rules for targets named obj_view
 
 # Build rule for target.
-WingedEdge: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 WingedEdge
-.PHONY : WingedEdge
+obj_view: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 obj_view
+.PHONY : obj_view
 
 # fast build rule for target.
-WingedEdge/fast:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/build
-.PHONY : WingedEdge/fast
+obj_view/fast:
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/build
+.PHONY : obj_view/fast
+
+#=============================================================================
+# Target rules for targets named example2
+
+# Build rule for target.
+example2: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example2
+.PHONY : example2
+
+# fast build rule for target.
+example2/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/example2.dir/build.make lib/nanogui/CMakeFiles/example2.dir/build
+.PHONY : example2/fast
+
+#=============================================================================
+# Target rules for targets named example1
+
+# Build rule for target.
+example1: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example1
+.PHONY : example1
+
+# fast build rule for target.
+example1/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/example1.dir/build.make lib/nanogui/CMakeFiles/example1.dir/build
+.PHONY : example1/fast
+
+#=============================================================================
+# Target rules for targets named nanogui-obj
+
+# Build rule for target.
+nanogui-obj: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 nanogui-obj
+.PHONY : nanogui-obj
+
+# fast build rule for target.
+nanogui-obj/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/nanogui-obj.dir/build.make lib/nanogui/CMakeFiles/nanogui-obj.dir/build
+.PHONY : nanogui-obj/fast
+
+#=============================================================================
+# Target rules for targets named example3
+
+# Build rule for target.
+example3: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example3
+.PHONY : example3
+
+# fast build rule for target.
+example3/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/example3.dir/build.make lib/nanogui/CMakeFiles/example3.dir/build
+.PHONY : example3/fast
+
+#=============================================================================
+# Target rules for targets named nanogui
+
+# Build rule for target.
+nanogui: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 nanogui
+.PHONY : nanogui
+
+# fast build rule for target.
+nanogui/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/nanogui.dir/build.make lib/nanogui/CMakeFiles/nanogui.dir/build
+.PHONY : nanogui/fast
+
+# Manual pre-install relink rule for target.
+nanogui/preinstall:
+	$(MAKE) -f lib/nanogui/CMakeFiles/nanogui.dir/build.make lib/nanogui/CMakeFiles/nanogui.dir/preinstall
+.PHONY : nanogui/preinstall
+
+#=============================================================================
+# Target rules for targets named example_icons
+
+# Build rule for target.
+example_icons: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example_icons
+.PHONY : example_icons
+
+# fast build rule for target.
+example_icons/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/example_icons.dir/build.make lib/nanogui/CMakeFiles/example_icons.dir/build
+.PHONY : example_icons/fast
+
+#=============================================================================
+# Target rules for targets named example4
+
+# Build rule for target.
+example4: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 example4
+.PHONY : example4
+
+# fast build rule for target.
+example4/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/example4.dir/build.make lib/nanogui/CMakeFiles/example4.dir/build
+.PHONY : example4/fast
+
+#=============================================================================
+# Target rules for targets named nanogui-python
+
+# Build rule for target.
+nanogui-python: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 nanogui-python
+.PHONY : nanogui-python
+
+# fast build rule for target.
+nanogui-python/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/nanogui-python.dir/build.make lib/nanogui/CMakeFiles/nanogui-python.dir/build
+.PHONY : nanogui-python/fast
+
+# Manual pre-install relink rule for target.
+nanogui-python/preinstall:
+	$(MAKE) -f lib/nanogui/CMakeFiles/nanogui-python.dir/build.make lib/nanogui/CMakeFiles/nanogui-python.dir/preinstall
+.PHONY : nanogui-python/preinstall
+
+#=============================================================================
+# Target rules for targets named nanogui-python-obj
+
+# Build rule for target.
+nanogui-python-obj: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 nanogui-python-obj
+.PHONY : nanogui-python-obj
+
+# fast build rule for target.
+nanogui-python-obj/fast:
+	$(MAKE) -f lib/nanogui/CMakeFiles/nanogui-python-obj.dir/build.make lib/nanogui/CMakeFiles/nanogui-python-obj.dir/build
+.PHONY : nanogui-python-obj/fast
+
+#=============================================================================
+# Target rules for targets named glfw_objects
+
+# Build rule for target.
+glfw_objects: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 glfw_objects
+.PHONY : glfw_objects
+
+# fast build rule for target.
+glfw_objects/fast:
+	$(MAKE) -f lib/nanogui/ext_build/glfw/src/CMakeFiles/glfw_objects.dir/build.make lib/nanogui/ext_build/glfw/src/CMakeFiles/glfw_objects.dir/build
+.PHONY : glfw_objects/fast
+
+#=============================================================================
+# Target rules for targets named glfw
+
+# Build rule for target.
+glfw: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 glfw
+.PHONY : glfw
+
+# fast build rule for target.
+glfw/fast:
+	$(MAKE) -f lib/nanogui/ext_build/glfw/src/CMakeFiles/glfw.dir/build.make lib/nanogui/ext_build/glfw/src/CMakeFiles/glfw.dir/build
+.PHONY : glfw/fast
 
 #=============================================================================
 # Target rules for targets named embed-resource
@@ -142,7 +328,7 @@ WingedEdge.o: WingedEdge.cpp.o
 
 # target to build an object file
 WingedEdge.cpp.o:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/WingedEdge.cpp.o
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/WingedEdge.cpp.o
 .PHONY : WingedEdge.cpp.o
 
 WingedEdge.i: WingedEdge.cpp.i
@@ -151,7 +337,7 @@ WingedEdge.i: WingedEdge.cpp.i
 
 # target to preprocess a source file
 WingedEdge.cpp.i:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/WingedEdge.cpp.i
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/WingedEdge.cpp.i
 .PHONY : WingedEdge.cpp.i
 
 WingedEdge.s: WingedEdge.cpp.s
@@ -160,8 +346,35 @@ WingedEdge.s: WingedEdge.cpp.s
 
 # target to generate assembly for a file
 WingedEdge.cpp.s:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/WingedEdge.cpp.s
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/WingedEdge.cpp.s
 .PHONY : WingedEdge.cpp.s
+
+obj_view.o: obj_view.cpp.o
+
+.PHONY : obj_view.o
+
+# target to build an object file
+obj_view.cpp.o:
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/obj_view.cpp.o
+.PHONY : obj_view.cpp.o
+
+obj_view.i: obj_view.cpp.i
+
+.PHONY : obj_view.i
+
+# target to preprocess a source file
+obj_view.cpp.i:
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/obj_view.cpp.i
+.PHONY : obj_view.cpp.i
+
+obj_view.s: obj_view.cpp.s
+
+.PHONY : obj_view.s
+
+# target to generate assembly for a file
+obj_view.cpp.s:
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/obj_view.cpp.s
+.PHONY : obj_view.cpp.s
 
 shader/frag.glsl.o: shader/frag.glsl.c.o
 
@@ -169,7 +382,7 @@ shader/frag.glsl.o: shader/frag.glsl.c.o
 
 # target to build an object file
 shader/frag.glsl.c.o:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/shader/frag.glsl.c.o
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.o
 .PHONY : shader/frag.glsl.c.o
 
 shader/frag.glsl.i: shader/frag.glsl.c.i
@@ -178,7 +391,7 @@ shader/frag.glsl.i: shader/frag.glsl.c.i
 
 # target to preprocess a source file
 shader/frag.glsl.c.i:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/shader/frag.glsl.c.i
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.i
 .PHONY : shader/frag.glsl.c.i
 
 shader/frag.glsl.s: shader/frag.glsl.c.s
@@ -187,7 +400,7 @@ shader/frag.glsl.s: shader/frag.glsl.c.s
 
 # target to generate assembly for a file
 shader/frag.glsl.c.s:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/shader/frag.glsl.c.s
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.s
 .PHONY : shader/frag.glsl.c.s
 
 shader/vert.glsl.o: shader/vert.glsl.c.o
@@ -196,7 +409,7 @@ shader/vert.glsl.o: shader/vert.glsl.c.o
 
 # target to build an object file
 shader/vert.glsl.c.o:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/shader/vert.glsl.c.o
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.o
 .PHONY : shader/vert.glsl.c.o
 
 shader/vert.glsl.i: shader/vert.glsl.c.i
@@ -205,7 +418,7 @@ shader/vert.glsl.i: shader/vert.glsl.c.i
 
 # target to preprocess a source file
 shader/vert.glsl.c.i:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/shader/vert.glsl.c.i
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.i
 .PHONY : shader/vert.glsl.c.i
 
 shader/vert.glsl.s: shader/vert.glsl.c.s
@@ -214,7 +427,7 @@ shader/vert.glsl.s: shader/vert.glsl.c.s
 
 # target to generate assembly for a file
 shader/vert.glsl.c.s:
-	$(MAKE) -f CMakeFiles/WingedEdge.dir/build.make CMakeFiles/WingedEdge.dir/shader/vert.glsl.c.s
+	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.s
 .PHONY : shader/vert.glsl.c.s
 
 # Help Target
@@ -223,13 +436,30 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... list_install_components"
+	@echo "... obj_view"
+	@echo "... install/local"
 	@echo "... rebuild_cache"
-	@echo "... WingedEdge"
+	@echo "... edit_cache"
+	@echo "... example2"
+	@echo "... example1"
+	@echo "... nanogui-obj"
+	@echo "... example3"
+	@echo "... nanogui"
+	@echo "... example_icons"
+	@echo "... example4"
+	@echo "... nanogui-python"
+	@echo "... nanogui-python-obj"
+	@echo "... glfw_objects"
+	@echo "... glfw"
 	@echo "... embed-resource"
 	@echo "... WingedEdge.o"
 	@echo "... WingedEdge.i"
 	@echo "... WingedEdge.s"
+	@echo "... obj_view.o"
+	@echo "... obj_view.i"
+	@echo "... obj_view.s"
 	@echo "... shader/frag.glsl.o"
 	@echo "... shader/frag.glsl.i"
 	@echo "... shader/frag.glsl.s"

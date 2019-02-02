@@ -61,6 +61,8 @@
 #  include <windows.h>
 #endif
 
+#include "WingedEdge.h"
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -613,8 +615,8 @@ public:
                                        Alignment::Middle, 0, 6));
         b = new Button(tools, "Open");
         b->setCallback([&] {
-            cout << "File dialog result: " << file_dialog(
-                    { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, false) << endl;
+            string fileName = file_dialog({ {"obj", "obj file"} }, false);
+            WingedEdge* w = new WingedEdge(fileName);
         });
         b = new Button(tools, "Save");
         b->setCallback([&] {

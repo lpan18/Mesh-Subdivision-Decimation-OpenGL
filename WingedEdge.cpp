@@ -32,7 +32,7 @@ bool sortByStartVertexThenByEndVertex(const W_edge & edge1, const W_edge &edge2)
 		return edge1.end < edge2.end;
 }
 
-void WingedEdge::readObj(char * filename) {
+void WingedEdge::readObj(string filename) {
 	string line;
 	int vn;
 
@@ -170,10 +170,10 @@ void WingedEdge::constructLeftRange(int starti, int endi) {
 	}
 }
 
-int main() {
-	const char * path = "testfiles/venus.obj";
+// int main() {
+// 	const char * path = "testfiles/venus.obj";
 
-	WingedEdge we = WingedEdge();
-	we.readObj((char*)path);
-	we.constructLeft();
-}
+// 	WingedEdge we = WingedEdge((char*)path);
+
+// 	cout << "Read Obj Complete" << endl;
+// }

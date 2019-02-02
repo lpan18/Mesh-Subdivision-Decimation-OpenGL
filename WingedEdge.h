@@ -1,3 +1,5 @@
+#include <string>
+
 #ifndef WINGEDEDGE_H
 #define WINGEDEDGE_H
 
@@ -24,10 +26,16 @@ struct Face
 class WingedEdge
 {
 public:
-	WingedEdge() {}
-	~WingedEdge() {}
-	void readObj(char * filename);
-	void constructLeft();
+	WingedEdge(std::string fileName) {
+		readObj(fileName);
+		constructLeft();
+	}
+	~WingedEdge() {
+		delete []vertices;
+		delete []faces;
+		delete []edges;
+	}
+
 private:
 	int nVertices = 0;
 	int mFaces = 0;
@@ -37,6 +45,8 @@ private:
 	Face* faces;
 	W_edge* edges;
 
+	void readObj(std::string filename);
+	void constructLeft();
 	void constructLeftRange(int starti, int endi);
 };
 #endif //WINGEDEDGE_H
