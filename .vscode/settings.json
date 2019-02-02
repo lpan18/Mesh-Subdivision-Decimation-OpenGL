@@ -5,6 +5,7 @@
         "functional": "cpp",
         "ratio": "cpp",
         "system_error": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "*.tcc": "cpp"
     }
 }
