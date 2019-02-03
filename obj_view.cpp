@@ -186,7 +186,6 @@ public:
 	/* these are the vertex normals, normally you need to calculate this using face normals*/
 	/* in turn, to calculate a face normal you need the cross product of face points*/
 	/* this trick only works because it is a simple cube centered at the origin */
-	MatrixXf normals(3, 48);
         normals.col( 0) << Vector3f(1,1,-1).normalized();
         normals.col( 1) << Vector3f(-1,1,-1).normalized();
         normals.col( 2) << Vector3f(-1,1,1).normalized();
@@ -256,8 +255,6 @@ public:
 
         /* Each vertice can have a color too (rgb in this case) */
 	/* the face will interpolate the color of its vertices to create a gradient */
-        MatrixXf colors(3, 48);
-
 	//just a red cube by default
 	colors.col( 0) << 1, 0, 0;
         colors.col( 1) << 1, 0, 0;
@@ -376,7 +373,9 @@ public:
         mShader.bind();
 
 	//this simple command updates the positions matrix. You need to do the same for color and indices matrices too
-	mShader.uploadAttrib("vertexPosition_modelspace", positions);
+        mShader.uploadAttrib("vertexPosition_modelspace", positions);
+        mShader.uploadAttrib("color", colors);
+	mShader.uploadAttrib("vertexNormal_modelspace", normals);
 	
         //This is a way to perform a simple rotation using a 4x4 rotation matrix represented by rmat
 	//mvp stands for ModelViewProjection matrix
@@ -413,6 +412,8 @@ public:
 //Need to be updated if a interface element is interacting with something that is inside the scope of MyGLCanvas
 private:
     MatrixXf positions = MatrixXf(3, 48);
+    MatrixXf normals = MatrixXf(3, 48);
+    MatrixXf colors = MatrixXf(3, 48);
     WingedEdge *mWe;
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
@@ -579,6 +580,9 @@ public:
 		//Make sure that the new mesh is not overblown by scaling it to a proper size and centering at origin
 		//If you do not do that, the object may not appear at all, impacting the tests
 		MatrixXf newPositions = MatrixXf(3, 8);
+        	newPositions.col(5) << -1, -2, -1;
+        	newPositions.col(6) <<  1, -1, -2;
+        	newPositions.col(7) <<  1, -1,  2;
 		newPositions.col(0) << -2,  1,  1;
         	newPositions.col(1) << -2,  1, -1;
         	newPositions.col(2) <<  1,  1, -1;
@@ -728,216 +732,3 @@ int main(int /* argc */, char ** /* argv */) {
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-// 	//Message dialog demonstration, it should be pretty straightforward
-//         new Label(anotherWindow, "Message dialog", "sans-bold");
-//         tools = new Widget(anotherWindow);
-//         tools->setLayout(new BoxLayout(Orientation::Horizontal,
-//                                        Alignment::Middle, 0, 6));
-//         Button *b = new Button(tools, "Info");
-//         b->setCallback([&] {
-//             auto dlg = new MessageDialog(this, MessageDialog::Type::Information, "Title", "This is an information message");
-//             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-//         });
-//         b = new Button(tools, "Warn");
-//         b->setCallback([&] {
-//             auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a warning message");
-//             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-//         });
-//         b = new Button(tools, "Ask");
-//         b->setCallback([&] {
-//             auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true);
-//             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-//         });
-
-// 	//Here is how you can get the string that represents file paths both for opening and for saving.
-// 	//you need to implement the rest of the parser logic.
-//         new Label(anotherWindow, "File dialog", "sans-bold");
-//         tools = new Widget(anotherWindow);
-//         tools->setLayout(new BoxLayout(Orientation::Horizontal,
-//                                        Alignment::Middle, 0, 6));
-//         b = new Button(tools, "Open");
-//         b->setCallback([&] {
-//             cout << "File dialog result: " << file_dialog(
-//                     { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, false) << endl;
-//         });
-//         b = new Button(tools, "Save");
-//         b->setCallback([&] {
-//             cout << "File dialog result: " << file_dialog(
-//                     { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
-//         });
-
-// 	//This is how to implement a combo box, which is important in A1
-//         new Label(anotherWindow, "Combo box", "sans-bold");
-//         ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded in wireframe", "shaded with mesh edges"} );
-//         combo->setCallback([&](int value) {
-//             cout << "Combo box selected: " << value << endl;
-//         });	
-
-//         new Label(anotherWindow, "Check box", "sans-bold");
-//         CheckBox *cb = new CheckBox(anotherWindow, "Flag 1",
-//             [](bool state) { cout << "Check box 1 state: " << state << endl; }
-//         );
-//         cb->setChecked(true);
-//         cb = new CheckBox(anotherWindow, "Flag 2",
-//             [](bool state) { cout << "Check box 2 state: " << state << endl; }
-//         );
-//         new Label(anotherWindow, "Progress bar", "sans-bold");
-//         mProgress = new ProgressBar(anotherWindow);
-
-//         new Label(anotherWindow, "Slider and text box", "sans-bold");
-
-//         Widget *panel = new Widget(anotherWindow);
-//         panel->setLayout(new BoxLayout(Orientation::Horizontal,
-//                                        Alignment::Middle, 0, 20));
-
-// 	//Fancy slider that has a callback function to update another interface element
-//         Slider *slider = new Slider(panel);
-//         slider->setValue(0.5f);
-//         slider->setFixedWidth(80);
-//         TextBox *textBox = new TextBox(panel);
-//         textBox->setFixedSize(Vector2i(60, 25));
-//         textBox->setValue("50");
-//         textBox->setUnits("%");
-//         slider->setCallback([textBox](float value) {
-//             textBox->setValue(std::to_string((int) (value * 100)));
-//         });
-//         slider->setFinalCallback([&](float value) {
-//             cout << "Final slider value: " << (int) (value * 100) << endl;
-//         });
-//         textBox->setFixedSize(Vector2i(60,25));
-//         textBox->setFontSize(20);
-//         textBox->setAlignment(TextBox::Alignment::Right);
-
-// 	//Method to assemble the interface defined before it is called
-//         performLayout();
-
-//         mArcball = Arcball(2.0f);
-//         mArcball.setSize({400, 400});
-//     }
-
-//     virtual bool mouseButtonEvent(const Vector2i &p, int button, bool down, int modifiers) override {
-//         // Right button down
-//         if (button == 1 && down == false) {
-//             mArcball.button(p, down);
-//             return true;
-//         }
-//         return false;
-
-//         // // Right button down
-//         // if (button == 1 && down == false) {
-//         //     lastMouseX = currentMouseX = p.x();
-//         //     lastMouseY = currentMouseY = p.y();
-//         //     return true;
-//         // }
-//         // return false;
-//     }
-
-//     //This is how you capture mouse events in the screen. If you want to implement the arcball instead of using
-//     //sliders, then you need to map the right click drag motions to suitable rotation matrices
-//     virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Vector2i &rel, int button, int modifiers) override {
-//         // Right click drag mouse event
-//         if (button == GLFW_MOUSE_BUTTON_3 ) {
-//             mArcball.motion(p);
-//             return true;
-//         }
-//         return false;
-
-//         // // Right click drag mouse event
-//         // if (button == GLFW_MOUSE_BUTTON_3 ) {
-//         //     currentMouseX = p.x();
-//         //     currentMouseY = p.y();
-//         //     return true;
-//         // }
-//         // return false;
-//     }
-
-//     virtual void drawContents() override {
-//         // Option 1: acquire a 4x4 homogeneous rotation matrix
-//         nanogui::Matrix4f rotation = mArcball.matrix();
-//         // cout << rotation << endl;
-//         //// Option 2: acquire an equivalent quaternion
-//         //Quaternionf rotation = mArcball.activeState();
-//         // ... do some drawing with the current rotation ...
-//         // ... put your rotation code here if you use dragging the mouse, updating either your model points, the mvp matrix or the V matrix, depending on the approach used
-//         // if (currentMouseX != lastMouseX || currentMouseY != lastMouseY) {
-//         //     Vector3f lastArcballVector = getArcballVector(lastMouseX, lastMouseY);
-//         //     Vector3f currentArcballVecotr = getArcballVector(currentMouseX, currentMouseY);
-// //             float angle = acos(min(1.0f, glm::dot(va, vb)));
-// //             float 
-// //     glm::vec3 va = get_arcball_vector(last_mx, last_my);
-// //     glm::vec3 vb = get_arcball_vector( cur_mx,  cur_my);
-// //     float angle = acos(min(1.0f, glm::dot(va, vb)));
-// //     glm::vec3 axis_in_camera_coord = glm::cross(va, vb);
-// //     glm::mat3 camera2object = glm::inverse(glm::mat3(transforms[MODE_CAMERA]) * glm::mat3(mesh.object2world));
-// //     glm::vec3 axis_in_object_coord = camera2object * axis_in_camera_coord;
-// //     mesh.object2world = glm::rotate(mesh.object2world, glm::degrees(angle), axis_in_object_coord);
-// //     last_mx = cur_mx;
-// //     last_my = cur_my;
-// //   }
-//     }
-
-//     virtual void draw(NVGcontext *ctx) {
-// 	/* Animate the scrollbar */
-//         mProgress->setValue(std::fmod((float) glfwGetTime() / 10, 1.0f));
-
-//         /* Draw the user interface */
-//         Screen::draw(ctx);
-//     }
-
-// private:
-//     nanogui::ProgressBar *mProgress;
-//     MyGLCanvas *mCanvas;
-//     Arcball mArcball;
-
-//     int lastMouseX, lastMouseY, currentMouseX, currentMouseY;
-
-//     Vector3f getArcballVector(int x, int y) {
-//         Vector2i topLeft = mCanvas->absolutePosition();
-//         int width = mCanvas->width();
-//         int height = mCanvas->height();
-//         Vector3f p = Vector3f(1.0 * (x - topLeft.x()) / width * 2 - 1.0,
-//                         -1.0 * (y - topLeft.y()) / height * 2 + 1.0,
-// 			0);
-//         float p_squared = p.x() * p.x() + p.y() * p.y();
-//         if (p_squared <= 1)
-//             p[2] = sqrt(1 * 1 - p_squared);
-//         else
-//             p.normalize();
-//         return p;
-//     }
-// };
-
-// int main(int /* argc */, char ** /* argv */) {
-//     try {
-//         nanogui::init();
-
-//             /* scoped variables */ {
-//             nanogui::ref<ExampleApplication> app = new ExampleApplication();
-//             app->drawAll();
-//             app->setVisible(true);
-//             nanogui::mainloop();
-//         }
-
-//         nanogui::shutdown();
-//     } catch (const std::runtime_error &e) {
-//         std::string error_msg = std::string("Caught a fatal error: ") + std::string(e.what());
-//         #if defined(_WIN32)
-//             MessageBoxA(nullptr, error_msg.c_str(), NULL, MB_ICONERROR | MB_OK);
-//         #else
-//             std::cerr << error_msg << endl;
-//         #endif
-//         return -1;
-//     }
-
-//     return 0;
-// }
