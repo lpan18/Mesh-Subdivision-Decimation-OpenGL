@@ -42,7 +42,7 @@ public:
 		delete []edges;
 	}
 	MatrixXf getPositions();
-	MatrixXf getNormals();
+	MatrixXf getNormals(MatrixXf positions);
 	MatrixXf getColors();
 private:
 	int nVertices = 0;

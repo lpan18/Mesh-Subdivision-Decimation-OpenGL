@@ -344,7 +344,7 @@ public:
     void loadObj(string fileName) {
         mWe = new WingedEdge(fileName);
         positions = mWe->getPositions();
-        normals = mWe->getNormals();
+        normals = mWe->getNormals(positions);
         colors = mWe->getColors();
     }
 
@@ -401,7 +401,7 @@ public:
 	/* https://www.khronos.org/opengl/wiki/Primitive */
 
 	//12 triangles, each has three vertices
-	mShader.drawArray(GL_TRIANGLES, 0, 12*3);
+	mShader.drawArray(GL_TRIANGLES, 0, positions.size());
 
 	//2 triangles, each has 3 lines, each line has 2 vertices
 	//mShader.drawArray(GL_LINES, 12*3, 2*3*2);

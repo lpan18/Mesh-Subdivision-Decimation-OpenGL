@@ -8,6 +8,7 @@
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <Eigen/Geometry>
 
 #include "WingedEdge.h"
 
@@ -34,33 +35,22 @@ bool sortByStartVertexThenByEndVertex(const W_edge & edge1, const W_edge &edge2)
 MatrixXf WingedEdge::getPositions() {
 	MatrixXf positions = MatrixXf(3, mFaces * 3);
 	for (int i = 0; i < mFaces; i++) {
-		positions.col(i * 3) << faces[i].edge->end->p * scale;
-		positions.col(i * 3 + 1) << faces[i].edge->start->p * scale;
-		positions.col(i * 3 + 2) << faces[i].edge->right_prev->start->p * scale;
-
-		if (i == 0) {
-			cout << faces[i].edge->end->p << endl;
-			cout << faces[i].edge->start->p << endl;
-			cout << faces[i].edge->right_prev->start->p << endl;
-
-			cout << positions(0) << endl;
-			cout << positions(1) << endl;
-			cout << positions(2) << endl;
-
-
-			cout << faces[i].edge->end - vertices << "  ";
-			cout << faces[i].edge->start - vertices << "  ";
-			cout << faces[i].edge->right_prev->start - vertices << "  " << endl;
-		}
-
+		positions.col(i * 3) << (faces[i].edge->end->p - center) * scale;
+		positions.col(i * 3 + 1) << (faces[i].edge->start->p - center) * scale;
+		positions.col(i * 3 + 2) << (faces[i].edge->right_prev->start->p - center) * scale;
 	}
 	return positions;
 }
 
-MatrixXf WingedEdge::getNormals() {
+MatrixXf WingedEdge::getNormals(MatrixXf positions) {
 	MatrixXf normals = MatrixXf(3, mFaces * 3);
-	for (int i = 0; i < mFaces * 3; i++) {
-		normals.col(i) << 0, 1, 0;
+
+	for (int i = 0; i < mFaces; i++) {
+		Vector3f e1 = positions.col(i * 3 + 1) - positions.col(i * 3);
+		Vector3f e2 = positions.col(i * 3 + 2) - positions.col(i * 3 + 1);
+		Vector3f normal = (e2.cross(e1)).normalized();
+
+		normals.col(i * 3) = normals.col(i * 3 + 1) = normals.col(i * 3 + 2) = normal;
 	}
 	return normals;
 }
@@ -111,7 +101,6 @@ void WingedEdge::readObj(string filename) {
 			if (line[0] == 'v' && line[1] == ' ') {
 				string str = line.substr(2, line.size() - 1);
 				istringstream iss(str);
-				
 				float x;
 				float y;
 				float z;
@@ -119,7 +108,6 @@ void WingedEdge::readObj(string filename) {
 				iss >> y;
 				iss >> z;
 				vertices[vertexi].p = Vector3f(x,y,z);
-
 				vertexi++;
 			} else if (line[0] == 'f' && line[1] == ' ') {
 				string str = line.substr(2, line.size() - 1);
