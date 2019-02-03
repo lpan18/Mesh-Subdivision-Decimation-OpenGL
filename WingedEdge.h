@@ -1,6 +1,9 @@
+#include <nanogui/common.h>
 #include <string>
 
 using namespace std;
+using nanogui::Vector3f;
+using nanogui::MatrixXf;
 
 #ifndef WINGEDEDGE_H
 #define WINGEDEDGE_H
@@ -16,7 +19,7 @@ struct W_edge
 
 struct Vertex
 {
-	float x, y, z = 0;
+	Vector3f p;
 	W_edge *edge;
 };
 
@@ -31,14 +34,14 @@ public:
 	WingedEdge(string fileName) {
 		readObj(fileName);
 		constructLeft();
-		findMinMax();
+		findCenterScale();
 	}
 	~WingedEdge() {
 		delete []vertices;
 		delete []faces;
 		delete []edges;
 	}
-
+	MatrixXf getPositions();
 private:
 	int nVertices = 0;
 	int mFaces = 0;
@@ -47,17 +50,13 @@ private:
 	Vertex* vertices;
 	Face* faces;
 	W_edge* edges;
-
-	float maxX = numeric_limits<float>::min();
-	float maxY = numeric_limits<float>::min();
-	float maxZ = numeric_limits<float>::min();
-	float minX = numeric_limits<float>::max();
-	float minY = numeric_limits<float>::max();
-	float minZ = numeric_limits<float>::max();
+    
+	Vector3f center;
+	float scale;
 
 	void readObj(string filename);
 	void constructLeft();
 	void constructLeftRange(int starti, int endi);
-	void findMinMax();
+	void findCenterScale();
 };
 #endif //WINGEDEDGE_H

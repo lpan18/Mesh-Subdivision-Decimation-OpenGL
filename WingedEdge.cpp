@@ -8,7 +8,6 @@
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 
 #include "WingedEdge.h"
 
@@ -30,6 +29,15 @@ bool sortByStartVertexThenByEndVertex(const W_edge & edge1, const W_edge &edge2)
 		return false;
 	else
 		return edge1.end < edge2.end;
+}
+
+MatrixXf WingedEdge::getPositions() {
+	MatrixXf positions = MatrixXf(3, lW_edges);
+	for (int j = 0; j < mFaces; j++) {
+		positions.col(j * 3) << faces[j].edge->end->p;
+		positions.col(j * 3 + 1) << faces[j].edge->start->p;
+		positions.col(j * 3 + 2) << faces[j].edge->right_prev->start->p;
+	}
 }
 
 void WingedEdge::readObj(string filename) {
@@ -70,10 +78,14 @@ void WingedEdge::readObj(string filename) {
 			if (line[0] == 'v' && line[1] == ' ') {
 				string str = line.substr(2, line.size() - 1);
 				istringstream iss(str);
-
-				iss >> vertices[vertexi].x;
-				iss >> vertices[vertexi].y;
-				iss >> vertices[vertexi].z;
+				
+				float x;
+				float y;
+				float z;
+				iss >> x;
+				iss >> y;
+				iss >> z;
+				vertices[vertexi].p = Vector3f(x,y,z);
 
 				vertexi++;
 			} else if (line[0] == 'f' && line[1] == ' ') {
@@ -170,15 +182,28 @@ void WingedEdge::constructLeftRange(int starti, int endi) {
 	}
 }
 
-void WingedEdge::findMinMax() {
+void WingedEdge::findCenterScale() {
+	float maxX = numeric_limits<float>::min();
+	float maxY = numeric_limits<float>::min();
+	float maxZ = numeric_limits<float>::min();
+	float minX = numeric_limits<float>::max();
+	float minY = numeric_limits<float>::max();
+	float minZ = numeric_limits<float>::max();
+
 	for (int i = 0; i < nVertices; i++) {
-		if (vertices[i].x > maxX) maxX = vertices[i].x;
-		if (vertices[i].y > maxY) maxY = vertices[i].y;
-		if (vertices[i].z > maxZ) maxZ = vertices[i].z;
-		if (vertices[i].x < minX) minX = vertices[i].x;
-		if (vertices[i].y < minY) minY = vertices[i].y;
-		if (vertices[i].z < minZ) minZ = vertices[i].z;
+		if (vertices[i].p.x > maxX) maxX = vertices[i].p.x;
+		if (vertices[i].p.y > maxY) maxY = vertices[i].p.y;
+		if (vertices[i].p.z > maxZ) maxZ = vertices[i].p.z;
+		if (vertices[i].p.x < minX) minX = vertices[i].p.x;
+		if (vertices[i].p.y < minY) minY = vertices[i].p.y;
+		if (vertices[i].p.z < minZ) minZ = vertices[i].p.z;
 	}
+
+	center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
+	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
+	scale = 1.0f / maxOffset.maxCoeff();
+	cout << center << endl;
+	cout << scale << endl;
 }
 
 // int main() {
