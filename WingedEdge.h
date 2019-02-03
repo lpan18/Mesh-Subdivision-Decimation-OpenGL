@@ -42,6 +42,8 @@ public:
 		delete []edges;
 	}
 	MatrixXf getPositions();
+	MatrixXf getNormals();
+	MatrixXf getColors();
 private:
 	int nVertices = 0;
 	int mFaces = 0;

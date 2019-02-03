@@ -32,12 +32,45 @@ bool sortByStartVertexThenByEndVertex(const W_edge & edge1, const W_edge &edge2)
 }
 
 MatrixXf WingedEdge::getPositions() {
-	MatrixXf positions = MatrixXf(3, lW_edges);
-	for (int j = 0; j < mFaces; j++) {
-		positions.col(j * 3) << faces[j].edge->end->p;
-		positions.col(j * 3 + 1) << faces[j].edge->start->p;
-		positions.col(j * 3 + 2) << faces[j].edge->right_prev->start->p;
+	MatrixXf positions = MatrixXf(3, mFaces * 3);
+	for (int i = 0; i < mFaces; i++) {
+		positions.col(i * 3) << faces[i].edge->end->p * scale;
+		positions.col(i * 3 + 1) << faces[i].edge->start->p * scale;
+		positions.col(i * 3 + 2) << faces[i].edge->right_prev->start->p * scale;
+
+		if (i == 0) {
+			cout << faces[i].edge->end->p << endl;
+			cout << faces[i].edge->start->p << endl;
+			cout << faces[i].edge->right_prev->start->p << endl;
+
+			cout << positions(0) << endl;
+			cout << positions(1) << endl;
+			cout << positions(2) << endl;
+
+
+			cout << faces[i].edge->end - vertices << "  ";
+			cout << faces[i].edge->start - vertices << "  ";
+			cout << faces[i].edge->right_prev->start - vertices << "  " << endl;
+		}
+
 	}
+	return positions;
+}
+
+MatrixXf WingedEdge::getNormals() {
+	MatrixXf normals = MatrixXf(3, mFaces * 3);
+	for (int i = 0; i < mFaces * 3; i++) {
+		normals.col(i) << 0, 1, 0;
+	}
+	return normals;
+}
+
+MatrixXf WingedEdge::getColors() {
+	MatrixXf colors = MatrixXf(3, mFaces * 3);
+	for (int i = 0; i < mFaces * 3; i++) {
+		colors.col(i) << 1, 0, 0;
+	}
+	return colors;
 }
 
 void WingedEdge::readObj(string filename) {
@@ -115,13 +148,15 @@ void WingedEdge::readObj(string filename) {
 				edges[start_w_edgei].right_next = edges + w_edgei - 1;
 				edges[w_edgei - 1].right_prev = edges + start_w_edgei;
 
-				// Find the edge with the smallest start vertex
 				faces[facei].edge = edges + start_w_edgei;
-				for (int i = start_w_edgei; i < w_edgei; i++) {
-					if (edges[i].start - faces[facei].edge->start < 0) {
-						faces[facei].edge = edges + i;
-					}
-				}
+
+				// // Find the edge with the smallest start vertex
+				// faces[facei].edge = edges + start_w_edgei;
+				// for (int i = start_w_edgei; i < w_edgei; i++) {
+				// 	if (edges[i].start - faces[facei].edge->start < 0) {
+				// 		faces[facei].edge = edges + i;
+				// 	}
+				// }
 
 				facei++;
 			}
@@ -191,19 +226,17 @@ void WingedEdge::findCenterScale() {
 	float minZ = numeric_limits<float>::max();
 
 	for (int i = 0; i < nVertices; i++) {
-		if (vertices[i].p.x > maxX) maxX = vertices[i].p.x;
-		if (vertices[i].p.y > maxY) maxY = vertices[i].p.y;
-		if (vertices[i].p.z > maxZ) maxZ = vertices[i].p.z;
-		if (vertices[i].p.x < minX) minX = vertices[i].p.x;
-		if (vertices[i].p.y < minY) minY = vertices[i].p.y;
-		if (vertices[i].p.z < minZ) minZ = vertices[i].p.z;
+		if (vertices[i].p.x() > maxX) maxX = vertices[i].p.x();
+		if (vertices[i].p.y() > maxY) maxY = vertices[i].p.y();
+		if (vertices[i].p.z() > maxZ) maxZ = vertices[i].p.z();
+		if (vertices[i].p.x() < minX) minX = vertices[i].p.x();
+		if (vertices[i].p.y() < minY) minY = vertices[i].p.y();
+		if (vertices[i].p.z() < minZ) minZ = vertices[i].p.z();
 	}
 
 	center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
 	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
 	scale = 1.0f / maxOffset.maxCoeff();
-	cout << center << endl;
-	cout << scale << endl;
 }
 
 // int main() {

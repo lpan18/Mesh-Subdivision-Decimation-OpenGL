@@ -343,7 +343,9 @@ public:
 
     void loadObj(string fileName) {
         mWe = new WingedEdge(fileName);
-        UpdatePNC();
+        positions = mWe->getPositions();
+        normals = mWe->getNormals();
+        colors = mWe->getColors();
     }
 
     //Method to update the rotation on each axis
@@ -420,15 +422,6 @@ private:
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
     float mZooming = 0.25f;
-
-    void UpdatePNC() {
-        float maxX = 0;
-        float maxY = 0;
-        float maxZ = 0;
-        float minX = 0;
-        float minY = 0;
-        float minZ = 0;
-    }
 };
 
 
