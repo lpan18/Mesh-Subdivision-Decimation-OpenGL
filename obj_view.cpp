@@ -401,7 +401,7 @@ public:
 	/* https://www.khronos.org/opengl/wiki/Primitive */
 
 	//12 triangles, each has three vertices
-	mShader.drawArray(GL_TRIANGLES, 0, positions.size());
+	mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
 
 	//2 triangles, each has 3 lines, each line has 2 vertices
 	//mShader.drawArray(GL_LINES, 12*3, 2*3*2);
@@ -668,7 +668,10 @@ public:
         textBox->setFixedSize(Vector2i(60,25));
         textBox->setFontSize(20);
         textBox->setAlignment(TextBox::Alignment::Right);
-
+        Button *quitBtn = new Button(anotherWindow, "QUIT");
+        quitBtn->setCallback([&] {
+            nanogui::shutdown();
+        });
 	//Method to assemble the interface defined before it is called
         performLayout();
     }
