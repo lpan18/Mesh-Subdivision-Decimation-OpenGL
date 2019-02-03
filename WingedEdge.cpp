@@ -14,22 +14,13 @@
 
 using namespace std;
 
-// bool sortByStartVertexThenByEndVertex(const Face &face1, const Face &face2) {
-// 	if (face1.edge->start < face2.edge->start)
-// 		return true;
-// 	else if (face1.edge->start > face2.edge->start)
-// 		return false;
-// 	else
-// 		return face1.edge->end < face2.edge->end;
-// }
-
-bool sortByStartVertexThenByEndVertex(const W_edge & edge1, const W_edge &edge2) {
-	if (edge1.start < edge2.start)
+bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) {
+	if (edge1->start < edge2->start)
 		return true;
-	else if (edge1.start > edge2.start)
+	else if (edge1->start > edge2->start)
 		return false;
 	else
-		return edge1.end < edge2.end;
+		return edge1->end < edge2->end;
 }
 
 MatrixXf WingedEdge::getPositions() {
@@ -101,12 +92,8 @@ void WingedEdge::readObj(string filename) {
 			if (line[0] == 'v' && line[1] == ' ') {
 				string str = line.substr(2, line.size() - 1);
 				istringstream iss(str);
-				float x;
-				float y;
-				float z;
-				iss >> x;
-				iss >> y;
-				iss >> z;
+				float x, y, z;
+				iss >> x >> y >> z;
 				vertices[vertexi].p = Vector3f(x,y,z);
 				vertexi++;
 			} else if (line[0] == 'f' && line[1] == ' ') {
@@ -122,8 +109,7 @@ void WingedEdge::readObj(string filename) {
 
 					if (start_vn == 0) {
 						start_vn = vn;
-					}
-					else {
+					} else {
 						edges[w_edgei - 1].start = vertices + vn - 1;
 						edges[w_edgei].right_next = edges + w_edgei - 1;
 						edges[w_edgei - 1].right_prev = edges + w_edgei;
@@ -153,54 +139,30 @@ void WingedEdge::readObj(string filename) {
 }
 
 void WingedEdge::constructLeft() {
+	W_edge** w_edgeP = new W_edge*[lW_edges];
 	for (int i = 0; i < lW_edges; i++) {
-		for (int j = 0; j < lW_edges; j++) {
-			if (edges[i].start == edges[j].end && edges[i].end == edges[j].start) {
-				edges[i].left_prev = edges[j].right_prev;
-				edges[i].left_next = edges[j].right_next;
-				edges[i].left = edges[j].right;
-				edges[j].left_prev = edges[i].right_prev;
-				edges[j].left_next = edges[i].right_next;
-				edges[j].left = edges[i].right;
-			}
-		}
+		w_edgeP[i] = edges + i;
 	}
 
-	// sort(edges, edges + lW_edges, sortByStartVertexThenByEndVertex);
+	sort(w_edgeP, w_edgeP + lW_edges, sortByStartVertexThenByEndVertex);
 
-	// int bi = 0;
-	// for (int i = 0; i < lW_edges; i++) {
-	// 	if (i == lW_edges - 1 || edges[i + 1].start != edges[i].start) {
-	// 		constructLeftRange(bi, i + 1);
-	// 		bi = i + 1;
-	// 	}
-	// }
-
-	// cout << nVertices << " " << mFaces << " " << lW_edges << " " << endl;
-	// sort(faces, faces + mFaces, sortByStartVertexThenByEndVertex);
-
-	// int starti = 0;
-	// int endi = 0;
-
-	// for (int i = 0; i < mFaces; i++) {
-	// 	if (i == mFaces - 1 || faces[i + 1].edge->start != faces[i].edge->start) {
-	// 		endi = i;
-	// 		cout << "Boundary " << i << endl;
-
-	// 		starti = i + 1;
-	// 		endi = i + 1;
-	// 	}
-
-
-	// }
-}
-
-void WingedEdge::constructLeftRange(int starti, int endi) {
-	for (int i = starti; i < endi; i++) {
-		for (int j = starti; j < endi; j++) {
-			if (edges[i].start == edges[j].right_prev->end && edges[i].end == edges[j].right_prev->start) {
-				cout << "match" << i << "  " << j << endl;
+	int bi = 0;
+	for (int i = 0; i < lW_edges; i++) {
+		if (i == lW_edges - 1 || w_edgeP[i + 1]->start != w_edgeP[i]->start) {
+			for (int j = bi; j < i + 1; j++) {
+				for (int k = bi; k < i + 1; k++) {
+					// This is a match
+					if (w_edgeP[j]->start == w_edgeP[k]->right_prev->end && w_edgeP[j]->end == w_edgeP[k]->right_prev->start) {
+						w_edgeP[i]->left_prev = w_edgeP[j]->right_prev;
+						w_edgeP[i]->left_next = w_edgeP[j]->right_next;
+						w_edgeP[i]->left = w_edgeP[j]->right;
+						w_edgeP[j]->left_prev = w_edgeP[i]->right_prev;
+						w_edgeP[j]->left_next = w_edgeP[i]->right_next;
+						w_edgeP[j]->left = w_edgeP[i]->right;
+					}
+				}
 			}
+			bi = i + 1;
 		}
 	}
 }
