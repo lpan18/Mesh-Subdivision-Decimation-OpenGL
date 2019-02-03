@@ -8,7 +8,6 @@ using nanogui::MatrixXf;
 #ifndef WINGEDEDGE_H
 #define WINGEDEDGE_H
 
-// TODO: add headers that you want to pre-compile here
 struct W_edge
 {
 	struct Vertex* start; Vertex* end;
@@ -39,7 +38,7 @@ public:
 	~WingedEdge() {
 		delete []vertices;
 		delete []faces;
-		delete []edges;
+		delete []w_edges;
 	}
 	MatrixXf getPositions();
 	MatrixXf getNormals(MatrixXf positions);
@@ -51,14 +50,13 @@ private:
 
 	Vertex* vertices;
 	Face* faces;
-	W_edge* edges;
+	W_edge* w_edges;
     
 	Vector3f center;
 	float scale;
 
 	void readObj(string filename);
 	void constructLeft();
-	void constructLeftRange(int starti, int endi);
 	void findCenterScale();
 };
 #endif //WINGEDEDGE_H

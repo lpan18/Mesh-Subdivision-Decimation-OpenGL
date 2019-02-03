@@ -39,7 +39,7 @@ MatrixXf WingedEdge::getNormals(MatrixXf positions) {
 	for (int i = 0; i < mFaces; i++) {
 		Vector3f e1 = positions.col(i * 3 + 1) - positions.col(i * 3);
 		Vector3f e2 = positions.col(i * 3 + 2) - positions.col(i * 3 + 1);
-		Vector3f normal = (e2.cross(e1)).normalized();
+		Vector3f normal = (e1.cross(e2)).normalized();
 
 		normals.col(i * 3) = normals.col(i * 3 + 1) = normals.col(i * 3 + 2) = normal;
 	}
@@ -79,7 +79,7 @@ void WingedEdge::readObj(string filename) {
 	// Generate vertex, face, and w_edge arrays
 	vertices = new Vertex[nVertices];
 	faces = new Face[mFaces];
-	edges = new W_edge[lW_edges];
+	w_edges = new W_edge[lW_edges];
 
 	// read the file again and initialize vertices, faces, and w_edges.
 	ifstream fin1(filename);
@@ -103,35 +103,26 @@ void WingedEdge::readObj(string filename) {
 				int start_vn = 0;
 				while (iss >> vn) {
 					// obj file is counterclockwise, while winged-edge structure is clock wise
-					edges[w_edgei].end = vertices + vn - 1;
-					edges[w_edgei].right = faces + facei;
-					vertices[vn - 1].edge = edges + w_edgei;
+					w_edges[w_edgei].end = vertices + vn - 1;
+					w_edges[w_edgei].right = faces + facei;
+					vertices[vn - 1].edge = w_edges + w_edgei;
 
 					if (start_vn == 0) {
 						start_vn = vn;
 					} else {
-						edges[w_edgei - 1].start = vertices + vn - 1;
-						edges[w_edgei].right_next = edges + w_edgei - 1;
-						edges[w_edgei - 1].right_prev = edges + w_edgei;
+						w_edges[w_edgei - 1].start = vertices + vn - 1;
+						w_edges[w_edgei].right_next = w_edges + w_edgei - 1;
+						w_edges[w_edgei - 1].right_prev = w_edges + w_edgei;
 					}
 
 					w_edgei++;
 				}
 
-				edges[w_edgei - 1].start = vertices + start_vn - 1;
-				edges[start_w_edgei].right_next = edges + w_edgei - 1;
-				edges[w_edgei - 1].right_prev = edges + start_w_edgei;
+				w_edges[w_edgei - 1].start = vertices + start_vn - 1;
+				w_edges[start_w_edgei].right_next = w_edges + w_edgei - 1;
+				w_edges[w_edgei - 1].right_prev = w_edges + start_w_edgei;
 
-				faces[facei].edge = edges + start_w_edgei;
-
-				// // Find the edge with the smallest start vertex
-				// faces[facei].edge = edges + start_w_edgei;
-				// for (int i = start_w_edgei; i < w_edgei; i++) {
-				// 	if (edges[i].start - faces[facei].edge->start < 0) {
-				// 		faces[facei].edge = edges + i;
-				// 	}
-				// }
-
+				faces[facei].edge = w_edges + start_w_edgei;
 				facei++;
 			}
 		}
@@ -141,7 +132,7 @@ void WingedEdge::readObj(string filename) {
 void WingedEdge::constructLeft() {
 	W_edge** w_edgeP = new W_edge*[lW_edges];
 	for (int i = 0; i < lW_edges; i++) {
-		w_edgeP[i] = edges + i;
+		w_edgeP[i] = w_edges + i;
 	}
 
 	sort(w_edgeP, w_edgeP + lW_edges, sortByStartVertexThenByEndVertex);
@@ -151,8 +142,8 @@ void WingedEdge::constructLeft() {
 		if (i == lW_edges - 1 || w_edgeP[i + 1]->start != w_edgeP[i]->start) {
 			for (int j = bi; j < i + 1; j++) {
 				for (int k = bi; k < i + 1; k++) {
-					// This is a match
 					if (w_edgeP[j]->start == w_edgeP[k]->right_prev->end && w_edgeP[j]->end == w_edgeP[k]->right_prev->start) {
+						// This is a match
 						w_edgeP[i]->left_prev = w_edgeP[j]->right_prev;
 						w_edgeP[i]->left_next = w_edgeP[j]->right_next;
 						w_edgeP[i]->left = w_edgeP[j]->right;
@@ -168,12 +159,8 @@ void WingedEdge::constructLeft() {
 }
 
 void WingedEdge::findCenterScale() {
-	float maxX = numeric_limits<float>::min();
-	float maxY = numeric_limits<float>::min();
-	float maxZ = numeric_limits<float>::min();
-	float minX = numeric_limits<float>::max();
-	float minY = numeric_limits<float>::max();
-	float minZ = numeric_limits<float>::max();
+	float maxX, maxY, maxZ = numeric_limits<float>::min();
+	float minX, minY, minZ = numeric_limits<float>::max();
 
 	for (int i = 0; i < nVertices; i++) {
 		if (vertices[i].p.x() > maxX) maxX = vertices[i].p.x();
@@ -188,11 +175,3 @@ void WingedEdge::findCenterScale() {
 	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
 	scale = 1.0f / maxOffset.maxCoeff();
 }
-
-// int main() {
-// 	const char * path = "testfiles/venus.obj";
-
-// 	WingedEdge we = WingedEdge((char*)path);
-
-// 	cout << "Read Obj Complete" << endl;
-// }
