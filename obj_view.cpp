@@ -344,6 +344,10 @@ public:
         mShader.free();
     }
 
+    void loadObj(string fileName) {
+        mWe = new WingedEdge(fileName);
+    }
+
     //Method to update the rotation on each axis
     void setRotation(nanogui::Vector3f vRotation) {
         mRotation = vRotation;
@@ -409,6 +413,7 @@ public:
 //Need to be updated if a interface element is interacting with something that is inside the scope of MyGLCanvas
 private:
     MatrixXf positions = MatrixXf(3, 48);
+    WingedEdge *mWe;
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
@@ -616,7 +621,7 @@ public:
         b = new Button(tools, "Open");
         b->setCallback([&] {
             string fileName = file_dialog({ {"obj", "obj file"} }, false);
-            WingedEdge* w = new WingedEdge(fileName);
+            mCanvas->loadObj(fileName);
         });
         b = new Button(tools, "Save");
         b->setCallback([&] {
