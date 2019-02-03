@@ -343,6 +343,7 @@ public:
 
     void loadObj(string fileName) {
         mWe = new WingedEdge(fileName);
+        UpdatePNC();
     }
 
     //Method to update the rotation on each axis
@@ -419,6 +420,15 @@ private:
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
     float mZooming = 0.25f;
+
+    void UpdatePNC() {
+        float maxX = 0;
+        float maxY = 0;
+        float maxZ = 0;
+        float minX = 0;
+        float minY = 0;
+        float minZ = 0;
+    }
 };
 
 
@@ -480,7 +490,6 @@ public:
             float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
             float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;          
 	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
-        //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
         });
 
 	//Rotation along Y axis
@@ -491,7 +500,6 @@ public:
 	    float radians_Y = (value - 0.5f)*2*2*M_PI;
             float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;
 	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
-        //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
         });
 
 	//Rotation along Z axis
@@ -502,7 +510,6 @@ public:
             float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
 	    float radians_Z = (value - 0.5f)*2*2*M_PI;
 	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
-        //     cout<<"radians_X = "<<radians_X<<" radians_Y = "<<radians_Y<<" radians_Z = "<<radians_Z<< endl;
         });
 
         // Translation panel
@@ -526,7 +533,6 @@ public:
             float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
             float trans_Z = (tranSlider_Z->value() - 0.5f)*2*4;          
 	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
-        //     cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
         });
 
         //Translation along Y axis
@@ -537,7 +543,6 @@ public:
             float trans_Y = (value - 0.5f)*2*4;
             float trans_Z = (tranSlider_Z->value() - 0.5f)*2*4;          
 	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
-        //     cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
         });
 
         //Translation along Z axis
@@ -548,7 +553,6 @@ public:
             float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
             float trans_Z = (value - 0.5f)*2*4;        
 	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
-            cout<<"trans_X = "<<trans_X<<" trans_Y = "<<trans_Y<<" trans_Z = "<<trans_Z<< endl;
         });
 
         mCanvas->setTranslation(nanogui::Vector3f(0, 0, 0));
@@ -580,9 +584,6 @@ public:
 		//Make sure that the new mesh is not overblown by scaling it to a proper size and centering at origin
 		//If you do not do that, the object may not appear at all, impacting the tests
 		MatrixXf newPositions = MatrixXf(3, 8);
-        	newPositions.col(5) << -1, -2, -1;
-        	newPositions.col(6) <<  1, -1, -2;
-        	newPositions.col(7) <<  1, -1,  2;
 		newPositions.col(0) << -2,  1,  1;
         	newPositions.col(1) << -2,  1, -1;
         	newPositions.col(2) <<  1,  1, -1;

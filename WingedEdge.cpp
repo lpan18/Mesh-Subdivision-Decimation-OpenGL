@@ -170,6 +170,17 @@ void WingedEdge::constructLeftRange(int starti, int endi) {
 	}
 }
 
+void WingedEdge::findMinMax() {
+	for (int i = 0; i < nVertices; i++) {
+		if (vertices[i].x > maxX) maxX = vertices[i].x;
+		if (vertices[i].y > maxY) maxY = vertices[i].y;
+		if (vertices[i].z > maxZ) maxZ = vertices[i].z;
+		if (vertices[i].x < minX) minX = vertices[i].x;
+		if (vertices[i].y < minY) minY = vertices[i].y;
+		if (vertices[i].z < minZ) minZ = vertices[i].z;
+	}
+}
+
 // int main() {
 // 	const char * path = "testfiles/venus.obj";
 

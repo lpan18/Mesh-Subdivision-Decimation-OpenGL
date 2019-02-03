@@ -1,5 +1,7 @@
 #include <string>
 
+using namespace std;
+
 #ifndef WINGEDEDGE_H
 #define WINGEDEDGE_H
 
@@ -26,9 +28,10 @@ struct Face
 class WingedEdge
 {
 public:
-	WingedEdge(std::string fileName) {
+	WingedEdge(string fileName) {
 		readObj(fileName);
 		constructLeft();
+		findMinMax();
 	}
 	~WingedEdge() {
 		delete []vertices;
@@ -45,8 +48,16 @@ private:
 	Face* faces;
 	W_edge* edges;
 
-	void readObj(std::string filename);
+	float maxX = numeric_limits<float>::min();
+	float maxY = numeric_limits<float>::min();
+	float maxZ = numeric_limits<float>::min();
+	float minX = numeric_limits<float>::max();
+	float minY = numeric_limits<float>::max();
+	float minZ = numeric_limits<float>::max();
+
+	void readObj(string filename);
 	void constructLeft();
 	void constructLeftRange(int starti, int endi);
+	void findMinMax();
 };
 #endif //WINGEDEDGE_H
