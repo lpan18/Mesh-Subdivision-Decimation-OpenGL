@@ -63,9 +63,9 @@ MatrixXf WingedEdge::getSmoothNormals(MatrixXf normals) {
 		Vertex* v2 = faces[i].edge->start;
 		Vertex* v3 = faces[i].edge->right_prev->start;
 
-		smoothNormals.col(mFaces * 3) << getVertexSN(v1, normals);
-		smoothNormals.col(mFaces * 3 + 1) << getVertexSN(v2, normals);
-		smoothNormals.col(mFaces * 3 + 2) << getVertexSN(v3, normals);
+		smoothNormals.col(i * 3) << getVertexSN(v1, normals);
+		smoothNormals.col(i * 3 + 1) << getVertexSN(v2, normals);
+		smoothNormals.col(i * 3 + 2) << getVertexSN(v3, normals);
 	}
 	for (int i = mFaces * 3; i < mFaces * 9; i++) {
 		smoothNormals.col(i) << normals.col(i);

@@ -387,7 +387,7 @@ public:
 	mShader.drawArray(GL_TRIANGLES, 0, 12*3);
 
 	//2 triangles, each has 3 lines, each line has 2 vertices
-	//mShader.drawArray(GL_LINES, 12*3, 2*3*2);
+	mShader.drawArray(GL_LINES, 12*3, 2*3*2);
 
         //mShader.drawIndexed(GL_TRIANGLES, 0, 12);
 	//mShader.drawIndexed(GL_LINES, 12, 12);

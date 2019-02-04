@@ -153,7 +153,7 @@ public:
 	    //this simple command updates the positions matrix. You need to do the same for color and indices matrices too
         mShader.uploadAttrib("vertexPosition_modelspace", positions);
         mShader.uploadAttrib("color", colors);
-	    mShader.uploadAttrib("vertexNormal_modelspace", normals);
+	    mShader.uploadAttrib("vertexNormal_modelspace", smoothNormals);
 	
         //This is a way to perform a simple rotation using a 4x4 rotation matrix represented by rmat
 	    //mvp stands for ModelViewProjection matrix

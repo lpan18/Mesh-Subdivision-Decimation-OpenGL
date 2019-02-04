@@ -68,16 +68,17 @@ install/strip/fast: preinstall/fast
 	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
 .PHONY : install/strip/fast
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
 
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
@@ -100,17 +101,16 @@ list_install_components/fast: list_install_components
 
 .PHONY : list_install_components/fast
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
 
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # Special rule for the target install
 install: preinstall
@@ -168,6 +168,19 @@ obj_view: cmake_check_build_system
 obj_view/fast:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/build
 .PHONY : obj_view/fast
+
+#=============================================================================
+# Target rules for targets named mytest
+
+# Build rule for target.
+mytest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 mytest
+.PHONY : mytest
+
+# fast build rule for target.
+mytest/fast:
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/build
+.PHONY : mytest/fast
 
 #=============================================================================
 # Target rules for targets named nanogui-python
@@ -386,6 +399,7 @@ shader/frag.glsl.o: shader/frag.glsl.c.o
 # target to build an object file
 shader/frag.glsl.c.o:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.o
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/shader/frag.glsl.c.o
 .PHONY : shader/frag.glsl.c.o
 
 shader/frag.glsl.i: shader/frag.glsl.c.i
@@ -395,6 +409,7 @@ shader/frag.glsl.i: shader/frag.glsl.c.i
 # target to preprocess a source file
 shader/frag.glsl.c.i:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.i
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/shader/frag.glsl.c.i
 .PHONY : shader/frag.glsl.c.i
 
 shader/frag.glsl.s: shader/frag.glsl.c.s
@@ -404,6 +419,7 @@ shader/frag.glsl.s: shader/frag.glsl.c.s
 # target to generate assembly for a file
 shader/frag.glsl.c.s:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.s
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/shader/frag.glsl.c.s
 .PHONY : shader/frag.glsl.c.s
 
 shader/vert.glsl.o: shader/vert.glsl.c.o
@@ -413,6 +429,7 @@ shader/vert.glsl.o: shader/vert.glsl.c.o
 # target to build an object file
 shader/vert.glsl.c.o:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.o
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/shader/vert.glsl.c.o
 .PHONY : shader/vert.glsl.c.o
 
 shader/vert.glsl.i: shader/vert.glsl.c.i
@@ -422,6 +439,7 @@ shader/vert.glsl.i: shader/vert.glsl.c.i
 # target to preprocess a source file
 shader/vert.glsl.c.i:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.i
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/shader/vert.glsl.c.i
 .PHONY : shader/vert.glsl.c.i
 
 shader/vert.glsl.s: shader/vert.glsl.c.s
@@ -431,7 +449,35 @@ shader/vert.glsl.s: shader/vert.glsl.c.s
 # target to generate assembly for a file
 shader/vert.glsl.c.s:
 	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.s
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/shader/vert.glsl.c.s
 .PHONY : shader/vert.glsl.c.s
+
+test.o: test.cpp.o
+
+.PHONY : test.o
+
+# target to build an object file
+test.cpp.o:
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/test.cpp.o
+.PHONY : test.cpp.o
+
+test.i: test.cpp.i
+
+.PHONY : test.i
+
+# target to preprocess a source file
+test.cpp.i:
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/test.cpp.i
+.PHONY : test.cpp.i
+
+test.s: test.cpp.s
+
+.PHONY : test.s
+
+# target to generate assembly for a file
+test.cpp.s:
+	$(MAKE) -f CMakeFiles/mytest.dir/build.make CMakeFiles/mytest.dir/test.cpp.s
+.PHONY : test.cpp.s
 
 # Help Target
 help:
@@ -440,11 +486,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... install/strip"
-	@echo "... edit_cache"
+	@echo "... install/local"
 	@echo "... obj_view"
 	@echo "... rebuild_cache"
+	@echo "... mytest"
 	@echo "... list_install_components"
-	@echo "... install/local"
+	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... nanogui-python"
 	@echo "... nanogui-python-obj"
@@ -470,6 +517,9 @@ help:
 	@echo "... shader/vert.glsl.o"
 	@echo "... shader/vert.glsl.i"
 	@echo "... shader/vert.glsl.s"
+	@echo "... test.o"
+	@echo "... test.i"
+	@echo "... test.s"
 .PHONY : help
 
 
