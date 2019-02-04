@@ -44,6 +44,7 @@ public:
 	MatrixXf getNormals(MatrixXf positions);
 	MatrixXf getSmoothNormals(MatrixXf normals);
 	MatrixXf getColors();
+	void writeObj(string fileName);
 private:
 	int nVertices = 0;
 	int mFaces = 0;

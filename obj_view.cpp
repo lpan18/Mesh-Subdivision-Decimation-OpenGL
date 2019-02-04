@@ -128,6 +128,14 @@ public:
         colors = mWe->getColors();
     }
 
+    void writeObj(string fileName) {
+        if (mWe != NULL) {
+            mWe->writeObj(fileName);
+        } else {
+            cout << "No object in scene" << endl;
+        }
+    }
+
     //Method to update the rotation on each axis
     void setRotation(nanogui::Vector3f vRotation) {
         mRotation = vRotation;
@@ -392,8 +400,8 @@ public:
         });
         b = new Button(tools, "Save");
         b->setCallback([&] {
-            cout << "File dialog result: " << file_dialog(
-                { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
+            string fileName = file_dialog({ {"obj", "obj file"} }, true);
+            mCanvas->writeObj(fileName);
         });
 
     	//This is how to implement a combo box, which is important in A1

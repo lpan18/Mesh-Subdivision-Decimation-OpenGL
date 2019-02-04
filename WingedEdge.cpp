@@ -84,6 +84,40 @@ MatrixXf WingedEdge::getColors() {
 	return colors;
 }
 
+void WingedEdge::writeObj(string fileName) {
+	stringstream ss;
+	ss << "# " << nVertices << " " << mFaces << endl;
+	for (int i = 0; i < nVertices; i++) {
+		ss << "v " << vertices[i].p.x() << " " << vertices[i].p.y() << " " << vertices[i].p.z() << endl;
+	}
+	for (int i = 0; i < mFaces; i++) {
+		ss << "f " << faces[i].edge->end - vertices + 1 << " " << faces[i].edge->start - vertices + 1 << " " << faces[i].edge->right_prev->start - vertices + 1 << endl;
+	}
+	// for(int i = 0; i < NOFF; i ++)
+	// {
+	// 	output = output + "f";
+	// 	for(int j = 0; j < NVONF; j++)
+	// 	{
+	// 		if(FACES[i][j] != 0)
+	// 		{
+	// 			char tempbuf[16];
+	// 			sprintf(tempbuf, "%d", FACES[i][j] + 1);
+	// 			strdup(tempbuf);
+	// 			output = output + " " + tempbuf + "//" + tempbuf;
+	// 		}
+	// 	}
+	// 	output = output + "\n";
+	// }
+
+	ofstream outputFile(fileName);
+	if (outputFile.is_open())
+	{
+		outputFile << ss.str();
+		outputFile.close();
+	}
+}
+
+
 void WingedEdge::readObj(string filename) {
 	string line;
 	int vn;
