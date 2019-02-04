@@ -34,3 +34,7 @@
 lib
 CMakeFiles
 testfiles
+CMakeCache
+Makefile
+cmake_install.cmake
+mytest

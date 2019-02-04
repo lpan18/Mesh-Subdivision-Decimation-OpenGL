@@ -217,14 +217,14 @@ private:
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
-    float mZooming = 0.25f;
+    float mZooming = 0.5f;
     int mShadingMode = 0;
 };
 
 
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication() : nanogui::Screen(Eigen::Vector2i(900, 600), "NanoGUI Cube and Menus", false) {
+    ExampleApplication() : nanogui::Screen(Eigen::Vector2i(1100, 600), "NanoGUI Assignment1", false) {
         using namespace nanogui;
 
 	    //OpenGL canvas demonstration
@@ -254,27 +254,41 @@ public:
         //widgets demonstration
         nanogui::GLShader mShader;
 
-        // Control widgets
-        Window *controlWindow = new Window(this, "Controls");
-        controlWindow->setPosition(Vector2i(470, 15));
-        controlWindow->setLayout(new GroupLayout());
+    	//Then, we can create another window and insert other widgets into it
+	    Window *anotherWindow = new Window(this, "Basic widgets");
+        anotherWindow->setPosition(Vector2i(500, 15));
+        anotherWindow->setLayout(new GroupLayout());
+
+	    //Here is how you can get the string that represents file paths both for opening and for saving.
+        new Label(anotherWindow, "File dialog", "sans-bold");
+        Button *openBtn  = new Button(anotherWindow, "Open");
+        openBtn->setCallback([&] {
+            string fileName = file_dialog({ {"obj", "obj file"} }, false);
+            mCanvas->loadObj(fileName);
+        });
+        Button *saveBtn = new Button(anotherWindow, "Save");
+        saveBtn->setCallback([&] {
+            string fileName = file_dialog({ {"obj", "obj file"} }, true);
+            mCanvas->writeObj(fileName);
+        });
 
         // Rotation panel
-	    Widget *panelRot = new Widget(controlWindow);
-        panelRot->setLayout(new BoxLayout(Orientation::Vertical,
-                                       Alignment::Middle, 6, 2));
+        new Label(anotherWindow, "Rotation", "sans-bold");
+	    Widget *panelRot = new Widget(anotherWindow);
+        panelRot->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 2));
 
         // Initiate rotation slider
 	    Slider *rotSlider_X = new Slider(panelRot);
-        new Label(panelRot, "Rotation on X axis", "sans-bold");
+	    new Label(panelRot, "X");
         Slider *rotSlider_Y = new Slider(panelRot);
-        new Label(panelRot, "Rotation on Y axis", "sans-bold");
+	    new Label(panelRot, "Y");
 	    Slider *rotSlider_Z = new Slider(panelRot);
-	    new Label(panelRot, "Rotation on Z axis", "sans-bold");
+	    new Label(panelRot, "Z");
 
         //Rotation along X axis
         rotSlider_X->setValue(0.5f);
-        rotSlider_X->setFixedWidth(120);
+        rotSlider_X->setFixedWidth(80);
         rotSlider_X->setCallback([&, rotSlider_Y, rotSlider_Z](float value) {
 	        float radians_X = (value - 0.5f)*2*2*M_PI;
             float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
@@ -284,7 +298,7 @@ public:
 
 	    //Rotation along Y axis
         rotSlider_Y->setValue(0.5f);
-        rotSlider_Y->setFixedWidth(120);
+        rotSlider_Y->setFixedWidth(80);
         rotSlider_Y->setCallback([&, rotSlider_X, rotSlider_Z](float value) {
             float radians_X = (rotSlider_X->value() - 0.5f)*2*2*M_PI;
 	        float radians_Y = (value - 0.5f)*2*2*M_PI;
@@ -294,7 +308,7 @@ public:
 
 	    //Rotation along Z axis
         rotSlider_Z->setValue(0.5f);
-        rotSlider_Z->setFixedWidth(120);
+        rotSlider_Z->setFixedWidth(80);
         rotSlider_Z->setCallback([&, rotSlider_X, rotSlider_Y](float value) {
             float radians_X = (rotSlider_X->value() - 0.5f)*2*2*M_PI;
             float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
@@ -303,21 +317,22 @@ public:
         });
 
         // Translation panel
-	    Widget *panelTrans = new Widget(controlWindow);
-        panelTrans->setLayout(new BoxLayout(Orientation::Vertical,
-                                       Alignment::Middle, 6, 2));
+        new Label(anotherWindow, "Translation", "sans-bold");
+	    Widget *panelTrans = new Widget(anotherWindow);
+        panelTrans->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 2));
 
         // Initiate translation slider
 	    Slider *tranSlider_X = new Slider(panelTrans);
-        new Label(panelTrans, "Translation on X axis", "sans-bold");
+	    new Label(panelTrans, "X");
         Slider *tranSlider_Y = new Slider(panelTrans);
-        new Label(panelTrans, "Translation on Y axis", "sans-bold");
+	    new Label(panelTrans, "Y");
 	    Slider *tranSlider_Z = new Slider(panelTrans);
-	    new Label(panelTrans, "Translation on Z axis", "sans-bold");
+	    new Label(panelTrans, "Z");
 
         //Translation along X axis
         tranSlider_X->setValue(0.5f);
-        tranSlider_X->setFixedWidth(120);
+        tranSlider_X->setFixedWidth(80);
         tranSlider_X->setCallback([&, tranSlider_Y, tranSlider_Z](float value) {
             float trans_X = (value - 0.5f)*2*4;
             float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
@@ -327,7 +342,7 @@ public:
 
         //Translation along Y axis
         tranSlider_Y->setValue(0.5f);
-        tranSlider_Y->setFixedWidth(120);
+        tranSlider_Y->setFixedWidth(80);
         tranSlider_Y->setCallback([&, tranSlider_X, tranSlider_Z](float value) {
             float trans_X = (tranSlider_X->value() - 0.5f)*2*4;
             float trans_Y = (value - 0.5f)*2*4;
@@ -337,7 +352,7 @@ public:
 
         //Translation along Z axis
         tranSlider_Z->setValue(0.5f);
-        tranSlider_Z->setFixedWidth(120);
+        tranSlider_Z->setFixedWidth(80);
         tranSlider_Z->setCallback([&, tranSlider_X, tranSlider_Y](float value) {
             float trans_X = (tranSlider_X->value() - 0.5f)*2*4; 
             float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
@@ -348,106 +363,53 @@ public:
         mCanvas->setTranslation(nanogui::Vector3f(0, 0, 0));
 
         // Zomming panel
-	    Widget *panelZoom = new Widget(controlWindow);
-        panelZoom->setLayout(new BoxLayout(Orientation::Vertical,
-                                       Alignment::Middle, 6, 2));
+	    new Label(anotherWindow, "Zoom", "sans-bold");
+	    Widget *panelZoom = new Widget(anotherWindow);
+        panelZoom->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 2));
 
         // Initiate zooming slider
-	    Slider *zoom = new Slider(panelZoom);
-        new Label(panelZoom, "Zooming", "sans-bold");
-        zoom->setValue(0.25f);
-        zoom->setFixedWidth(120);
-        zoom->setCallback([&](float value) {
+        Slider *zoom = new Slider(panelZoom);
+        zoom->setValue(0.5f);
+        zoom->setFixedWidth(150);
+        // zoom->setCallback([&](float value) {
+	    //     mCanvas->setZooming(value);
+        // });
+
+        TextBox *zoomTxt = new TextBox(panelZoom);
+        zoomTxt->setFixedSize(Vector2i(60, 25));
+        zoomTxt->setValue("50");
+        zoomTxt->setUnits("%");
+        zoom->setCallback([&, zoomTxt](float value) {
 	        mCanvas->setZooming(value);
+            zoomTxt->setValue(std::to_string((int) (value * 100)));
         });
+        zoomTxt->setFixedSize(Vector2i(60,25));
+        zoomTxt->setFontSize(20);
+        zoomTxt->setAlignment(TextBox::Alignment::Right);
 
-    	//Then, we can create another window and insert other widgets into it
-	    Window *anotherWindow = new Window(this, "Basic widgets");
-        anotherWindow->setPosition(Vector2i(650, 15));
-        anotherWindow->setLayout(new GroupLayout());
-
-	    //Message dialog demonstration, it should be pretty straightforward
-        new Label(anotherWindow, "Message dialog", "sans-bold");
-        tools = new Widget(anotherWindow);
-        tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 6));
-        Button *b = new Button(tools, "Info");
-        b->setCallback([&] {
-            auto dlg = new MessageDialog(this, MessageDialog::Type::Information, "Title", "This is an information message");
-            dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-        });
-        b = new Button(tools, "Warn");
-        b->setCallback([&] {
-            auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a warning message");
-            dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-        });
-        b = new Button(tools, "Ask");
-        b->setCallback([&] {
-            auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Title", "This is a question message", "Yes", "No", true);
-            dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
-        });
-
-	    //Here is how you can get the string that represents file paths both for opening and for saving.
-	    //you need to implement the rest of the parser logic.
-        new Label(anotherWindow, "File dialog", "sans-bold");
-        tools = new Widget(anotherWindow);
-        tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 6));
-        b = new Button(tools, "Open");
-        b->setCallback([&] {
-            string fileName = file_dialog({ {"obj", "obj file"} }, false);
-            mCanvas->loadObj(fileName);
-        });
-        b = new Button(tools, "Save");
-        b->setCallback([&] {
-            string fileName = file_dialog({ {"obj", "obj file"} }, true);
-            mCanvas->writeObj(fileName);
-        });
 
     	//This is how to implement a combo box, which is important in A1
         new Label(anotherWindow, "Shading Mode", "sans-bold");
-        ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded", "wireframe", "flat + wireframe", "smooth + wireframe"} );
+        Widget *panelCombo = new Widget(anotherWindow);
+        panelCombo->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 2));
+
+        ComboBox *combo = new ComboBox(anotherWindow, { "Flat", "Smooth", "Wireframe", "Flat+Wireframe", "Smooth+Wireframe"} );
         combo->setCallback([&](int value) {
             mCanvas->setShadingMode(value);
         });	
 
-        new Label(anotherWindow, "Check box", "sans-bold");
-        CheckBox *cb = new CheckBox(anotherWindow, "Flag 1",
-            [](bool state) { cout << "Check box 1 state: " << state << endl; }
-        );
-        cb->setChecked(true);
-        cb = new CheckBox(anotherWindow, "Flag 2",
-            [](bool state) { cout << "Check box 2 state: " << state << endl; }
-        );
         new Label(anotherWindow, "Progress bar", "sans-bold");
         mProgress = new ProgressBar(anotherWindow);
 
-        new Label(anotherWindow, "Slider and text box", "sans-bold");
-
-        Widget *panel = new Widget(anotherWindow);
-        panel->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 20));
-
-	    //Fancy slider that has a callback function to update another interface element
-        Slider *slider = new Slider(panel);
-        slider->setValue(0.5f);
-        slider->setFixedWidth(80);
-        TextBox *textBox = new TextBox(panel);
-        textBox->setFixedSize(Vector2i(60, 25));
-        textBox->setValue("50");
-        textBox->setUnits("%");
-        slider->setCallback([textBox](float value) {
-            textBox->setValue(std::to_string((int) (value * 100)));
-        });
-        slider->setFinalCallback([&](float value) {
-            cout << "Final slider value: " << (int) (value * 100) << endl;
-        });
-        textBox->setFixedSize(Vector2i(60,25));
-        textBox->setFontSize(20);
-        textBox->setAlignment(TextBox::Alignment::Right);
-        Button *quitBtn = new Button(anotherWindow, "QUIT");
+        Button *quitBtn = new Button(anotherWindow, "Quit");
         quitBtn->setCallback([&] {
-            nanogui::shutdown();
+            auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Quit", "Are you sure to shut down?", "No", "Yes", true);
+            dlg->setCallback([](int result) { 
+                if(result == 1){
+                    nanogui::shutdown();
+                }});
         });
 	    //Method to assemble the interface defined before it is called
         performLayout();
