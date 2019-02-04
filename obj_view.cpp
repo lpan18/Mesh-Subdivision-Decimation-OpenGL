@@ -90,233 +90,12 @@ public:
         using namespace nanogui;
 
 	mShader.initFromFiles("a_smooth_shader", "StandardShading.vertexshader", "StandardShading.fragmentshader");
- 
-	/* which are the 3 dimensions and 8 possible vertice positions */
-        positions.col(0) <<  1,  1, -1; //top right back
-        positions.col(1) << -1,  1, -1; //bottom right back
-        positions.col(2) << -1,  1, 1; //bottom right front
-
-	positions.col(3) <<  1,  1, -1; //top right back
-	positions.col(4) << -1,  1, 1; //bottom right front
-        positions.col(5) <<  1,  1, 1; //top right front
-
-	positions.col(6) <<  1,  1, -1; //top right back
-	positions.col(7) <<  1, -1, -1; //top left back
-        positions.col(8) << -1, -1, -1; //bottom left back
-
-	positions.col(9) <<  1,  1, -1; //top right back
-	positions.col(10) << -1, -1, -1; //bottom left back
-	positions.col(11) << -1,  1, -1; //bottom right back
-
-	positions.col(12) << -1,  1, -1; //bottom right back
-	positions.col(13) << -1, -1, -1; //bottom left back
-	positions.col(14) << -1, -1, 1; //bottom left front
-
-	positions.col(15) << -1,  1, -1; //bottom right back
-	positions.col(16) << -1, -1, 1; //bottom left front
-	positions.col(17) << -1,  1, 1; //bottom right front
-
-	positions.col(18) << -1,  1, 1; //bottom right front
-	positions.col(19) << -1, -1, 1; //bottom left front
-        positions.col(20) <<  1, -1, 1; //top left front
-
-	positions.col(21) << -1,  1, 1; //bottom right front
-        positions.col(22) <<  1, -1, 1; //top left front
-	positions.col(23) <<  1,  1, 1; //top right front
-
-	positions.col(24) <<  1,  1, 1; //top right front
-	positions.col(25) <<  1, -1, 1; //top left front
-	positions.col(26) <<  1, -1, -1; //top left back
-	
-	positions.col(27) <<  1,  1, 1; //top right front
-	positions.col(28) <<  1, -1, -1; //top left back
-	positions.col(29) <<  1,  1, -1; //top right back
-
-	positions.col(30) <<  1, -1, -1; //top left back
-	positions.col(31) <<  1, -1, 1; //top left front
-	positions.col(32) << -1, -1, 1; //bottom left front
-
-	positions.col(33) <<  1, -1, -1; //top left back
-	positions.col(34) << -1, -1, 1; //bottom left front
-	positions.col(35) << -1, -1, -1; //bottom left back
-
-	//lines
-	positions.col(36) <<  1,  1, -1; //top right back
-        positions.col(37) << -1,  1, -1; //bottom right back
-	
-	positions.col(38) << -1,  1, -1; //bottom right back
-        positions.col(39) << -1,  1, 1; //bottom right front
-
-	positions.col(40) << -1,  1, 1; //bottom right front
-	positions.col(41) <<  1,  1, -1; //top right back
-
-	positions.col(42) <<  1,  1, -1; //top right back
-	positions.col(43) << -1,  1, 1; //bottom right front
-
-	positions.col(44) << -1,  1, 1; //bottom right front
-        positions.col(45) <<  1,  1, 1; //top right front
-	
-	positions.col(46) <<  1,  1, -1; //top right back
-        positions.col(47) <<  1,  1, 1; //top right front
-	
-	
-	//notice that the line is jagged. You actually need to move them slightly out
-	//To do that on an arbitrary mesh, just use the surface normals to your advantage!
-	/*
-	positions.col(36) <<  1.005,  1.005, -1.005; //top right back
-        positions.col(37) << -1.005,  1.005, -1.005; //bottom right back
-	
-	positions.col(38) << -1.005,  1.005, -1.005; //bottom right back
-        positions.col(39) << -1.005,  1.005, 1.005; //bottom right front
-
-	positions.col(40) << -1.005,  1.005, 1.005; //bottom right front
-	positions.col(41) <<  1.005,  1.005, -1.005; //top right back
-
-	positions.col(42) <<  1.005,  1.005, -1.005; //top right back
-	positions.col(43) << -1.005,  1.005, 1.005; //bottom right front
-
-	positions.col(44) << -1.005,  1.005, 1.005; //bottom right front
-        positions.col(45) <<  1.005,  1.005, 1.005; //top right front
-	
-	positions.col(46) <<  1.005,  1.005, -1.005; //top right back
-        positions.col(47) <<  1.005,  1.005, 1.005; //top right front
-	*/
-	
-
-	/* these are the vertex normals, normally you need to calculate this using face normals*/
-	/* in turn, to calculate a face normal you need the cross product of face points*/
-	/* this trick only works because it is a simple cube centered at the origin */
-        normals.col( 0) << Vector3f(1,1,-1).normalized();
-        normals.col( 1) << Vector3f(-1,1,-1).normalized();
-        normals.col( 2) << Vector3f(-1,1,1).normalized();
-
-	normals.col( 3) << Vector3f(1,1,-1).normalized();
-        normals.col( 4) << Vector3f(-1,1,1).normalized();
-	normals.col( 5) << Vector3f(1,1,1).normalized();
-
-	normals.col( 6) << Vector3f(1,1,-1).normalized();
-	normals.col( 7) << Vector3f(1,-1,-1).normalized();
-        normals.col( 8) << Vector3f(-1,-1,-1).normalized();
-
-	normals.col( 9) << Vector3f(1,1,-1).normalized();
-        normals.col( 10) << Vector3f(-1,-1,-1).normalized();
-	normals.col( 11) << Vector3f(-1,1,-1).normalized();
-
-	normals.col( 12) << Vector3f(-1,1,-1).normalized();
-        normals.col( 13) << Vector3f(-1,-1,-1).normalized();
-	normals.col( 14) << Vector3f(-1,-1,1).normalized();
-
-	normals.col( 15) << Vector3f(-1,1,-1).normalized();
-	normals.col( 16) << Vector3f(-1,-1,1).normalized();
-        normals.col( 17) << Vector3f(-1,1,1).normalized();
-
-        normals.col( 18) << Vector3f(-1,1,1).normalized();
-	normals.col( 19) << Vector3f(-1,-1,1).normalized();
-	normals.col( 20) << Vector3f(1,-1,1).normalized();
-
-	normals.col( 21) << Vector3f(-1,1,1).normalized();
-	normals.col( 22) << Vector3f(1,-1,1).normalized();
-	normals.col( 23) << Vector3f(1,1,1).normalized();
-
-	normals.col( 24) << Vector3f(1,1,1).normalized();
-	normals.col( 25) << Vector3f(1,-1,1).normalized();
-	normals.col( 26) << Vector3f(1,-1,-1).normalized();
-
-	normals.col( 27) << Vector3f(1,1,1).normalized();
-	normals.col( 28) << Vector3f(1,-1,-1).normalized();
-	normals.col( 29) << Vector3f(1,1,-1).normalized();
-
-	normals.col( 30) << Vector3f(1,-1,-1).normalized();
-	normals.col( 31) << Vector3f(1,-1,1).normalized();
-	normals.col( 32) << Vector3f(-1,-1,1).normalized();
-
-	normals.col( 33) << Vector3f(1,-1,-1).normalized();
-	normals.col( 34) << Vector3f(-1,-1,1).normalized();
-	normals.col( 35) << Vector3f(-1,-1,-1).normalized();
-
-	//line normals
-	normals.col( 36) << Vector3f(1,1,-1).normalized();
-        normals.col( 37) << Vector3f(-1,1,-1).normalized();
-
-        normals.col( 38) << Vector3f(-1,1,-1).normalized();
-        normals.col( 39) << Vector3f(-1,1,1).normalized();
-
-	normals.col( 40) << Vector3f(1,1,-1).normalized();
-        normals.col( 41) << Vector3f(-1,1,1).normalized();
-
-	normals.col( 42) << Vector3f(1,1,-1).normalized();
-        normals.col( 43) << Vector3f(-1,1,1).normalized();
-
-	normals.col( 44) << Vector3f(-1,1,1).normalized();
-	normals.col( 45) << Vector3f(1,1,1).normalized();
-
-	normals.col( 46) << Vector3f(1,1,-1).normalized();
-	normals.col( 47) << Vector3f(1,1,1).normalized();
-
-        /* Each vertice can have a color too (rgb in this case) */
-	/* the face will interpolate the color of its vertices to create a gradient */
-	//just a red cube by default
-	colors.col( 0) << 1, 0, 0;
-        colors.col( 1) << 1, 0, 0;
-        colors.col( 2) << 1, 0, 0;
-        colors.col( 3) << 1, 0, 0;
-        colors.col( 4) << 1, 0, 0;
-        colors.col( 5) << 1, 0, 0;
-        colors.col( 6) << 1, 0, 0;
-        colors.col( 7) << 1, 0, 0;
-        colors.col( 8) << 1, 0, 0;
-        colors.col( 9) << 1, 0, 0;
-        colors.col(10) << 1, 0, 0;
-        colors.col(11) << 1, 0, 0;
-        colors.col(12) << 1, 0, 0;
-        colors.col(13) << 1, 0, 0;
-        colors.col(14) << 1, 0, 0;
-        colors.col(15) << 1, 0, 0;
-        colors.col(16) << 1, 0, 0;
-        colors.col(17) << 1, 0, 0;
-        colors.col(18) << 1, 0, 0;
-        colors.col(19) << 1, 0, 0;
-        colors.col(20) << 1, 0, 0;
-        colors.col(21) << 1, 0, 0;
-        colors.col(22) << 1, 0, 0;
-        colors.col(23) << 1, 0, 0;
-        colors.col(24) << 1, 0, 0;
-        colors.col(25) << 1, 0, 0;
-        colors.col(26) << 1, 0, 0;
-        colors.col(27) << 1, 0, 0;
-        colors.col(28) << 1, 0, 0;
-        colors.col(29) << 1, 0, 0;
-        colors.col(30) << 1, 0, 0;
-        colors.col(31) << 1, 0, 0;
-        colors.col(32) << 1, 0, 0;
-        colors.col(33) << 1, 0, 0;
-        colors.col(34) << 1, 0, 0;
-        colors.col(35) << 1, 0, 0;
-
-	//line colors
-        colors.col(36) << 0, 0, 0;
-        colors.col(37) << 0, 0, 0;
-        colors.col(38) << 0, 0, 0;
-        colors.col(39) << 0, 0, 0;
-        colors.col(40) << 0, 0, 0;
-        colors.col(41) << 0, 0, 0;
-        colors.col(42) << 0, 0, 0;
-        colors.col(43) << 0, 0, 0;
-        colors.col(44) << 0, 0, 0;
-        colors.col(45) << 0, 0, 0;
-        colors.col(46) << 0, 0, 0;
-        colors.col(47) << 0, 0, 0;
 
 	// After binding the shader to the current context we can send data to opengl that will be handled
 	// by the vertex shader and then by the fragment shader, in that order.
 	// if you want to know more about modern opengl pipeline take a look at this link
 	// https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview
         mShader.bind();
-
-        //mShader.uploadIndices(indices);
-        mShader.uploadAttrib("vertexPosition_modelspace", positions);
-        mShader.uploadAttrib("color", colors);
-	mShader.uploadAttrib("vertexNormal_modelspace", normals);
 
 	// ViewMatrixID
 	// change your rotation to work on the camera instead of rotating the entire world with the MVP matrix
@@ -333,12 +112,12 @@ public:
 	// This the light origin position in your environment, which is totally arbitrary
 	// however it is better if it is behind the observer
 	mShader.setUniform("LightPosition_worldspace", Vector3f(-2,6,-4));
-
     }
 
     //flush data on call
     ~MyGLCanvas() {
         mShader.free();
+        delete mWe;
     }
 
     void loadObj(string fileName) {
@@ -362,16 +141,11 @@ public:
         mZooming = fZooming;
     }
 
-    //Method to update the mesh itself, can change the size of it dynamically, as shown later
-    void updateMeshPositions(MatrixXf newPositions){
-        positions = newPositions;
-
-    }
-
     //OpenGL calls this method constantly to update the screen.
     virtual void drawGL() override {
         using namespace nanogui;
-
+        if (mWe == NULL) return;
+        
 	//refer to the previous explanation of mShader.bind();
         mShader.bind();
 
@@ -401,7 +175,9 @@ public:
 	/* https://www.khronos.org/opengl/wiki/Primitive */
 
 	//12 triangles, each has three vertices
-	mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
+	// mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
+        mShader.drawArray(GL_TRIANGLES, 0, positions.cols() / 3);
+        mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
 
 	//2 triangles, each has 3 lines, each line has 2 vertices
 	//mShader.drawArray(GL_LINES, 12*3, 2*3*2);
@@ -414,10 +190,10 @@ public:
 //Instantiation of the variables that can be acessed outside of this class to interact with the interface
 //Need to be updated if a interface element is interacting with something that is inside the scope of MyGLCanvas
 private:
-    MatrixXf positions = MatrixXf(3, 48);
-    MatrixXf normals = MatrixXf(3, 48);
-    MatrixXf colors = MatrixXf(3, 48);
     WingedEdge *mWe;
+    MatrixXf positions;
+    MatrixXf normals;
+    MatrixXf colors;
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
@@ -558,36 +334,16 @@ public:
         // Initiate zooming slider
 	Slider *zoom = new Slider(panelZoom);
         new Label(panelZoom, "Zooming", "sans-bold");
-        zoom->setValue(0.5f);
+        zoom->setValue(0.25f);
         zoom->setFixedWidth(120);
         zoom->setCallback([&](float value) {
-	    mCanvas->setZooming(value / 2.0f);
+	    mCanvas->setZooming(value);
         });
 
 	//Then, we can create another window and insert other widgets into it
 	Window *anotherWindow = new Window(this, "Basic widgets");
         anotherWindow->setPosition(Vector2i(650, 15));
         anotherWindow->setLayout(new GroupLayout());
-
-	// Demonstrates how a button called "New Mesh" can update the positions matrix.
-	// This is just a demonstration, you actually need to bind mesh updates with the open file interface
-	Button *button = new Button(anotherWindow, "New Mesh");
-	button->setCallback([&] {
-		//MatrixXf has dynamic size, so you can actually change its dimensions on the fly here
-		//Make sure that the new mesh is not overblown by scaling it to a proper size and centering at origin
-		//If you do not do that, the object may not appear at all, impacting the tests
-		MatrixXf newPositions = MatrixXf(3, 8);
-		newPositions.col(0) << -2,  1,  1;
-        	newPositions.col(1) << -2,  1, -1;
-        	newPositions.col(2) <<  1,  1, -1;
-        	newPositions.col(3) <<  1,  1,  1;
-        	newPositions.col(4) << -1, -2,  1;
-        	newPositions.col(5) << -1, -2, -1;
-        	newPositions.col(6) <<  1, -1, -2;
-        	newPositions.col(7) <<  1, -1,  2;
-		mCanvas->updateMeshPositions(newPositions);
-	});
-	button->setTooltip("Demonstrates how a button can update the positions matrix.");
 
 	//Message dialog demonstration, it should be pretty straightforward
         new Label(anotherWindow, "Message dialog", "sans-bold");

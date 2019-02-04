@@ -24,17 +24,24 @@ bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) 
 }
 
 MatrixXf WingedEdge::getPositions() {
-	MatrixXf positions = MatrixXf(3, mFaces * 3);
+	MatrixXf positions = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
 		positions.col(i * 3) << (faces[i].edge->end->p - center) * scale;
 		positions.col(i * 3 + 1) << (faces[i].edge->start->p - center) * scale;
 		positions.col(i * 3 + 2) << (faces[i].edge->right_prev->start->p - center) * scale;
+
+		positions.col(mFaces * 3 + i * 6) << positions.col(i * 3) * 1.005;
+		positions.col(mFaces * 3 + i * 6 + 1) << positions.col(i * 3 + 1) * 1.005;
+		positions.col(mFaces * 3 + i * 6 + 2) << positions.col(i * 3 + 1) * 1.005;
+		positions.col(mFaces * 3 + i * 6 + 3) << positions.col(i * 3 + 2) * 1.005;
+		positions.col(mFaces * 3 + i * 6 + 4) << positions.col(i * 3 + 2) * 1.005;
+		positions.col(mFaces * 3 + i * 6 + 5) << positions.col(i * 3) * 1.005;
 	}
 	return positions;
 }
 
 MatrixXf WingedEdge::getNormals(MatrixXf positions) {
-	MatrixXf normals = MatrixXf(3, mFaces * 3);
+	MatrixXf normals = MatrixXf(3, mFaces * 9);
 
 	for (int i = 0; i < mFaces; i++) {
 		Vector3f e1 = positions.col(i * 3 + 1) - positions.col(i * 3);
@@ -42,14 +49,20 @@ MatrixXf WingedEdge::getNormals(MatrixXf positions) {
 		Vector3f normal = (e1.cross(e2)).normalized();
 
 		normals.col(i * 3) = normals.col(i * 3 + 1) = normals.col(i * 3 + 2) = normal;
+		normals.col(mFaces * 3 + i * 6) = normals.col(mFaces * 3 + i * 6 + 1) = normals.col(mFaces * 3 + i * 6 + 2)
+		= normals.col(mFaces * 3 + i * 6 + 3) = normals.col(mFaces * 3 + i * 6 + 4) = normals.col(mFaces * 3 + i * 6 + 5)
+		= normal;
 	}
 	return normals;
 }
 
 MatrixXf WingedEdge::getColors() {
-	MatrixXf colors = MatrixXf(3, mFaces * 3);
+	MatrixXf colors = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces * 3; i++) {
 		colors.col(i) << 1, 0, 0;
+	}
+	for (int i = mFaces * 3; i < mFaces * 9; i++) {
+		colors.col(i) << 0, 0, 0;
 	}
 	return colors;
 }
