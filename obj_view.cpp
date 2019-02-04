@@ -87,31 +87,31 @@ using nanogui::Arcball;
 class MyGLCanvas : public nanogui::GLCanvas {
 public:
     MyGLCanvas(Widget *parent) : nanogui::GLCanvas(parent) {
+
         using namespace nanogui;
-
-	    mShader.initFromFiles("a_smooth_shader", "StandardShading.vertexshader", "StandardShading.fragmentshader");
-
-	    // After binding the shader to the current context we can send data to opengl that will be handled
-	    // by the vertex shader and then by the fragment shader, in that order.
-	    // if you want to know more about modern opengl pipeline take a look at this link
-	    // https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview
+        
+        mShader.initFromFiles("a_smooth_shader", "StandardShading.vertexshader", "StandardShading.fragmentshader");
+        
+        // After binding the shader to the current context we can send data to opengl that will be handled
+        // by the vertex shader and then by the fragment shader, in that order.
+        // if you want to know more about modern opengl pipeline take a look at this link
+        // https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview
         mShader.bind();
 
-	    // ViewMatrixID
-	    // change your rotation to work on the camera instead of rotating the entire world with the MVP matrix
-	    Matrix4f V;
-	    V.setIdentity();
-	    V = lookAt(Vector3f(0,12,0), Vector3f(0,0,0), Vector3f(0,1,0));
-	    mShader.setUniform("V", V);
-
-	    //ModelMatrixID
-	    Matrix4f M;
-	    M.setIdentity();
-	    mShader.setUniform("M", M);
-	
-	    // This the light origin position in your environment, which is totally arbitrary
-	    // however it is better if it is behind the observer
-	    mShader.setUniform("LightPosition_worldspace", Vector3f(-2,6,-4));
+        // ViewMatrixID
+        // change your rotation to work on the camera instead of rotating the entire world with the MVP matrix
+        Matrix4f V;
+        V.setIdentity();
+        mShader.setUniform("V", V);
+        
+        //ModelMatrixID
+        Matrix4f M;
+        M.setIdentity();
+        mShader.setUniform("M", M);
+        
+        // This the light origin position in your environment, which is totally arbitrary
+        // however it is better if it is behind the observer
+        mShader.setUniform("LightPosition_worldspace", Vector3f(-2,6,-4));
     }
 
     //flush data on call
@@ -178,7 +178,7 @@ public:
 	    //12 triangles, each has three vertices
 	    // mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
         mShader.drawArray(GL_TRIANGLES, 0, positions.cols() / 3);
-        mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
+        // mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
 
 	    //2 triangles, each has 3 lines, each line has 2 vertices
 	    //mShader.drawArray(GL_LINES, 12*3, 2*3*2);
