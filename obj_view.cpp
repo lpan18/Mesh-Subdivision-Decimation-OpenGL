@@ -142,6 +142,10 @@ public:
         mZooming = fZooming;
     }
 
+    void setShadingMode(float fShadingMode) {
+        mShadingMode = fShadingMode;
+    }
+
     //OpenGL calls this method constantly to update the screen.
     virtual void drawGL() override {
         using namespace nanogui;
@@ -150,10 +154,11 @@ public:
 	    //refer to the previous explanation of mShader.bind();
         mShader.bind();
 
+        MatrixXf shadingNormal = (mShadingMode == 1 || mShadingMode == 4)  ? smoothNormals : normals;
 	    //this simple command updates the positions matrix. You need to do the same for color and indices matrices too
         mShader.uploadAttrib("vertexPosition_modelspace", positions);
         mShader.uploadAttrib("color", colors);
-	    mShader.uploadAttrib("vertexNormal_modelspace", smoothNormals);
+	    mShader.uploadAttrib("vertexNormal_modelspace", shadingNormal);
 	
         //This is a way to perform a simple rotation using a 4x4 rotation matrix represented by rmat
 	    //mvp stands for ModelViewProjection matrix
@@ -177,7 +182,12 @@ public:
 
 	    //12 triangles, each has three vertices
 	    // mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
-        mShader.drawArray(GL_TRIANGLES, 0, positions.cols() / 3);
+        if (mShadingMode != 2) {
+            mShader.drawArray(GL_TRIANGLES, 0, positions.cols() / 3);
+        }
+        if (mShadingMode != 0 && mShadingMode != 1) {
+            mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
+        }
         // mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
 
 	    //2 triangles, each has 3 lines, each line has 2 vertices
@@ -200,6 +210,7 @@ private:
     Eigen::Vector3f mRotation;
     Eigen::Vector3f mTranslation;
     float mZooming = 0.25f;
+    int mShadingMode = 0;
 };
 
 
@@ -386,10 +397,10 @@ public:
         });
 
     	//This is how to implement a combo box, which is important in A1
-        new Label(anotherWindow, "Combo box", "sans-bold");
-        ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded in wireframe", "shaded with mesh edges"} );
+        new Label(anotherWindow, "Shading Mode", "sans-bold");
+        ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded", "wireframe", "flat + wireframe", "smooth + wireframe"} );
         combo->setCallback([&](int value) {
-            cout << "Combo box selected: " << value << endl;
+            mCanvas->setShadingMode(value);
         });	
 
         new Label(anotherWindow, "Check box", "sans-bold");
