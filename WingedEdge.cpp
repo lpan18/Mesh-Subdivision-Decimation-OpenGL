@@ -56,6 +56,23 @@ MatrixXf WingedEdge::getNormals(MatrixXf positions) {
 	return normals;
 }
 
+MatrixXf WingedEdge::getSmoothNormals(MatrixXf normals) {
+	MatrixXf smoothNormals = MatrixXf(3, mFaces * 9);
+	for (int i = 0; i < mFaces; i++) {
+		Vertex* v1 = faces[i].edge->end;
+		Vertex* v2 = faces[i].edge->start;
+		Vertex* v3 = faces[i].edge->right_prev->start;
+
+		smoothNormals.col(mFaces * 3) << getVertexSN(v1, normals);
+		smoothNormals.col(mFaces * 3 + 1) << getVertexSN(v2, normals);
+		smoothNormals.col(mFaces * 3 + 2) << getVertexSN(v3, normals);
+	}
+	for (int i = mFaces * 3; i < mFaces * 9; i++) {
+		smoothNormals.col(i) << normals.col(i);
+	}
+	return smoothNormals;
+}
+
 MatrixXf WingedEdge::getColors() {
 	MatrixXf colors = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces * 3; i++) {
@@ -157,12 +174,12 @@ void WingedEdge::constructLeft() {
 				for (int k = bi; k < i + 1; k++) {
 					if (w_edgeP[j]->start == w_edgeP[k]->right_prev->end && w_edgeP[j]->end == w_edgeP[k]->right_prev->start) {
 						// This is a match
-						w_edgeP[i]->left_prev = w_edgeP[j]->right_prev;
-						w_edgeP[i]->left_next = w_edgeP[j]->right_next;
-						w_edgeP[i]->left = w_edgeP[j]->right;
-						w_edgeP[j]->left_prev = w_edgeP[i]->right_prev;
-						w_edgeP[j]->left_next = w_edgeP[i]->right_next;
-						w_edgeP[j]->left = w_edgeP[i]->right;
+						w_edgeP[j]->left_prev = w_edgeP[k]->right_prev->right_prev;
+						w_edgeP[j]->left_next = w_edgeP[k]->right_prev->right_next;
+						w_edgeP[j]->left = w_edgeP[k]->right_prev->right;
+						w_edgeP[k]->right_prev->left_prev = w_edgeP[j]->right_prev;
+						w_edgeP[k]->right_prev->left_next = w_edgeP[j]->right_next;
+						w_edgeP[k]->right_prev->left = w_edgeP[j]->right;
 					}
 				}
 			}
@@ -187,4 +204,25 @@ void WingedEdge::findCenterScale() {
 	center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
 	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
 	scale = 1.0f / maxOffset.maxCoeff();
+}
+
+Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf normals) {
+
+    Vector3f vec(0, 0, 0);
+	int facei = -1;
+	W_edge *e0 = v->edge->end == v ? v->edge->right_next : v->edge;
+	W_edge *edge = e0;
+    
+	do {
+		if (edge->end == v) {
+			facei = edge->right - faces;
+			edge = edge->right_next;
+		} else {
+			facei = edge->left - faces;
+			edge = edge->left_next;
+		}
+		vec += normals.col(facei * 3);
+	} while (edge != e0);
+
+	return vec.normalized(); 
 }

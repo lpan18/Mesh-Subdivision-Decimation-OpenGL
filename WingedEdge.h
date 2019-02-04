@@ -42,6 +42,7 @@ public:
 	}
 	MatrixXf getPositions();
 	MatrixXf getNormals(MatrixXf positions);
+	MatrixXf getSmoothNormals(MatrixXf normals);
 	MatrixXf getColors();
 private:
 	int nVertices = 0;
@@ -58,5 +59,7 @@ private:
 	void readObj(string filename);
 	void constructLeft();
 	void findCenterScale();
+
+	Vector3f getVertexSN(Vertex* v, MatrixXf normals);
 };
 #endif //WINGEDEDGE_H

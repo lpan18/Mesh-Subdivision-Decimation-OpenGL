@@ -89,29 +89,29 @@ public:
     MyGLCanvas(Widget *parent) : nanogui::GLCanvas(parent) {
         using namespace nanogui;
 
-	mShader.initFromFiles("a_smooth_shader", "StandardShading.vertexshader", "StandardShading.fragmentshader");
+	    mShader.initFromFiles("a_smooth_shader", "StandardShading.vertexshader", "StandardShading.fragmentshader");
 
-	// After binding the shader to the current context we can send data to opengl that will be handled
-	// by the vertex shader and then by the fragment shader, in that order.
-	// if you want to know more about modern opengl pipeline take a look at this link
-	// https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview
+	    // After binding the shader to the current context we can send data to opengl that will be handled
+	    // by the vertex shader and then by the fragment shader, in that order.
+	    // if you want to know more about modern opengl pipeline take a look at this link
+	    // https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview
         mShader.bind();
 
-	// ViewMatrixID
-	// change your rotation to work on the camera instead of rotating the entire world with the MVP matrix
-	Matrix4f V;
-	V.setIdentity();
-	V = lookAt(Vector3f(0,12,0), Vector3f(0,0,0), Vector3f(0,1,0));
-	mShader.setUniform("V", V);
+	    // ViewMatrixID
+	    // change your rotation to work on the camera instead of rotating the entire world with the MVP matrix
+	    Matrix4f V;
+	    V.setIdentity();
+	    V = lookAt(Vector3f(0,12,0), Vector3f(0,0,0), Vector3f(0,1,0));
+	    mShader.setUniform("V", V);
 
-	//ModelMatrixID
-	Matrix4f M;
-	M.setIdentity();
-	mShader.setUniform("M", M);
+	    //ModelMatrixID
+	    Matrix4f M;
+	    M.setIdentity();
+	    mShader.setUniform("M", M);
 	
-	// This the light origin position in your environment, which is totally arbitrary
-	// however it is better if it is behind the observer
-	mShader.setUniform("LightPosition_worldspace", Vector3f(-2,6,-4));
+	    // This the light origin position in your environment, which is totally arbitrary
+	    // however it is better if it is behind the observer
+	    mShader.setUniform("LightPosition_worldspace", Vector3f(-2,6,-4));
     }
 
     //flush data on call
@@ -124,6 +124,7 @@ public:
         mWe = new WingedEdge(fileName);
         positions = mWe->getPositions();
         normals = mWe->getNormals(positions);
+        smoothNormals = mWe->getSmoothNormals(normals);
         colors = mWe->getColors();
     }
 
@@ -146,16 +147,16 @@ public:
         using namespace nanogui;
         if (mWe == NULL) return;
         
-	//refer to the previous explanation of mShader.bind();
+	    //refer to the previous explanation of mShader.bind();
         mShader.bind();
 
-	//this simple command updates the positions matrix. You need to do the same for color and indices matrices too
+	    //this simple command updates the positions matrix. You need to do the same for color and indices matrices too
         mShader.uploadAttrib("vertexPosition_modelspace", positions);
         mShader.uploadAttrib("color", colors);
-	mShader.uploadAttrib("vertexNormal_modelspace", normals);
+	    mShader.uploadAttrib("vertexNormal_modelspace", normals);
 	
         //This is a way to perform a simple rotation using a 4x4 rotation matrix represented by rmat
-	//mvp stands for ModelViewProjection matrix
+	    //mvp stands for ModelViewProjection matrix
         Matrix4f mvp;
         mvp.setIdentity();
         mvp.topLeftCorner<3,3>() = Eigen::Matrix3f(Eigen::AngleAxisf(mRotation[0], Vector3f::UnitX()) *
@@ -165,25 +166,25 @@ public:
        
         mShader.setUniform("MVP", mvp);
 
-	// If enabled, does depth comparisons and update the depth buffer.
-	// Avoid changing if you are unsure of what this means.
+	    // If enabled, does depth comparisons and update the depth buffer.
+	    // Avoid changing if you are unsure of what this means.
         glEnable(GL_DEPTH_TEST);
 	
         /* Draw 12 triangles starting at index 0 of your indices matrix */
-	/* Try changing the first input with GL_LINES, this will be useful in the assignment */
-	/* Take a look at this link to better understand OpenGL primitives */
-	/* https://www.khronos.org/opengl/wiki/Primitive */
+	    /* Try changing the first input with GL_LINES, this will be useful in the assignment */
+	    /* Take a look at this link to better understand OpenGL primitives */
+	    /* https://www.khronos.org/opengl/wiki/Primitive */
 
-	//12 triangles, each has three vertices
-	// mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
+	    //12 triangles, each has three vertices
+	    // mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
         mShader.drawArray(GL_TRIANGLES, 0, positions.cols() / 3);
         mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
 
-	//2 triangles, each has 3 lines, each line has 2 vertices
-	//mShader.drawArray(GL_LINES, 12*3, 2*3*2);
+	    //2 triangles, each has 3 lines, each line has 2 vertices
+	    //mShader.drawArray(GL_LINES, 12*3, 2*3*2);
 
         //mShader.drawIndexed(GL_TRIANGLES, 0, 12);
-	//mShader.drawIndexed(GL_LINES, 12, 12);
+	    //mShader.drawIndexed(GL_LINES, 12, 12);
         glDisable(GL_DEPTH_TEST);
     }
 
@@ -193,6 +194,7 @@ private:
     WingedEdge *mWe;
     MatrixXf positions;
     MatrixXf normals;
+    MatrixXf smoothNormals;
     MatrixXf colors;
     nanogui::GLShader mShader;
     Eigen::Vector3f mRotation;
@@ -206,24 +208,24 @@ public:
     ExampleApplication() : nanogui::Screen(Eigen::Vector2i(900, 600), "NanoGUI Cube and Menus", false) {
         using namespace nanogui;
 
-	//OpenGL canvas demonstration
+	    //OpenGL canvas demonstration
 
-	//First, we need to create a window context in which we will render both the interface and OpenGL canvas
+	    //First, we need to create a window context in which we will render both the interface and OpenGL canvas
         Window *window = new Window(this, "GLCanvas Demo");
         window->setPosition(Vector2i(15, 15));
         window->setLayout(new GroupLayout());
 	
-	//OpenGL canvas initialization, we can control the background color and also its size
+	    //OpenGL canvas initialization, we can control the background color and also its size
         mCanvas = new MyGLCanvas(window);
         mCanvas->setBackgroundColor({100, 100, 100, 255});
         mCanvas->setSize({400, 400});
 
-	//This is how we add widgets, in this case, they are connected to the same window as the OpenGL canvas
+	    //This is how we add widgets, in this case, they are connected to the same window as the OpenGL canvas
         Widget *tools = new Widget(window);
         tools->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 5));
 
-	//then we start adding elements one by one as shown below
+	    //then we start adding elements one by one as shown below
         Button *b0 = new Button(tools, "Random Color");
         b0->setCallback([this]() { mCanvas->setBackgroundColor(Vector4i(rand() % 256, rand() % 256, rand() % 256, 255)); });
 
@@ -239,60 +241,60 @@ public:
         controlWindow->setLayout(new GroupLayout());
 
         // Rotation panel
-	Widget *panelRot = new Widget(controlWindow);
+	    Widget *panelRot = new Widget(controlWindow);
         panelRot->setLayout(new BoxLayout(Orientation::Vertical,
                                        Alignment::Middle, 6, 2));
 
         // Initiate rotation slider
-	Slider *rotSlider_X = new Slider(panelRot);
+	    Slider *rotSlider_X = new Slider(panelRot);
         new Label(panelRot, "Rotation on X axis", "sans-bold");
         Slider *rotSlider_Y = new Slider(panelRot);
         new Label(panelRot, "Rotation on Y axis", "sans-bold");
-	Slider *rotSlider_Z = new Slider(panelRot);
-	new Label(panelRot, "Rotation on Z axis", "sans-bold");
+	    Slider *rotSlider_Z = new Slider(panelRot);
+	    new Label(panelRot, "Rotation on Z axis", "sans-bold");
 
         //Rotation along X axis
         rotSlider_X->setValue(0.5f);
         rotSlider_X->setFixedWidth(120);
         rotSlider_X->setCallback([&, rotSlider_Y, rotSlider_Z](float value) {
-	    float radians_X = (value - 0.5f)*2*2*M_PI;
+	        float radians_X = (value - 0.5f)*2*2*M_PI;
             float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
             float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;          
-	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
+	        mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
         });
 
-	//Rotation along Y axis
+	    //Rotation along Y axis
         rotSlider_Y->setValue(0.5f);
         rotSlider_Y->setFixedWidth(120);
         rotSlider_Y->setCallback([&, rotSlider_X, rotSlider_Z](float value) {
             float radians_X = (rotSlider_X->value() - 0.5f)*2*2*M_PI;
-	    float radians_Y = (value - 0.5f)*2*2*M_PI;
+	        float radians_Y = (value - 0.5f)*2*2*M_PI;
             float radians_Z = (rotSlider_Z->value() - 0.5f)*2*2*M_PI;
-	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
+	        mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
         });
 
-	//Rotation along Z axis
+	    //Rotation along Z axis
         rotSlider_Z->setValue(0.5f);
         rotSlider_Z->setFixedWidth(120);
         rotSlider_Z->setCallback([&, rotSlider_X, rotSlider_Y](float value) {
             float radians_X = (rotSlider_X->value() - 0.5f)*2*2*M_PI;
             float radians_Y = (rotSlider_Y->value() - 0.5f)*2*2*M_PI;
-	    float radians_Z = (value - 0.5f)*2*2*M_PI;
-	    mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
+	        float radians_Z = (value - 0.5f)*2*2*M_PI;
+	        mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
         });
 
         // Translation panel
-	Widget *panelTrans = new Widget(controlWindow);
+	    Widget *panelTrans = new Widget(controlWindow);
         panelTrans->setLayout(new BoxLayout(Orientation::Vertical,
                                        Alignment::Middle, 6, 2));
 
         // Initiate translation slider
-	Slider *tranSlider_X = new Slider(panelTrans);
+	    Slider *tranSlider_X = new Slider(panelTrans);
         new Label(panelTrans, "Translation on X axis", "sans-bold");
         Slider *tranSlider_Y = new Slider(panelTrans);
         new Label(panelTrans, "Translation on Y axis", "sans-bold");
-	Slider *tranSlider_Z = new Slider(panelTrans);
-	new Label(panelTrans, "Translation on Z axis", "sans-bold");
+	    Slider *tranSlider_Z = new Slider(panelTrans);
+	    new Label(panelTrans, "Translation on Z axis", "sans-bold");
 
         //Translation along X axis
         tranSlider_X->setValue(0.5f);
@@ -301,7 +303,7 @@ public:
             float trans_X = (value - 0.5f)*2*4;
             float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
             float trans_Z = (tranSlider_Z->value() - 0.5f)*2*4;          
-	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+	        mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
         });
 
         //Translation along Y axis
@@ -311,7 +313,7 @@ public:
             float trans_X = (tranSlider_X->value() - 0.5f)*2*4;
             float trans_Y = (value - 0.5f)*2*4;
             float trans_Z = (tranSlider_Z->value() - 0.5f)*2*4;          
-	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+	        mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
         });
 
         //Translation along Z axis
@@ -321,31 +323,31 @@ public:
             float trans_X = (tranSlider_X->value() - 0.5f)*2*4; 
             float trans_Y = (tranSlider_Y->value() - 0.5f)*2*4;
             float trans_Z = (value - 0.5f)*2*4;        
-	    mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
+	        mCanvas->setTranslation(nanogui::Vector3f(trans_X, trans_Y, trans_Z));
         });
 
         mCanvas->setTranslation(nanogui::Vector3f(0, 0, 0));
 
         // Zomming panel
-	Widget *panelZoom = new Widget(controlWindow);
+	    Widget *panelZoom = new Widget(controlWindow);
         panelZoom->setLayout(new BoxLayout(Orientation::Vertical,
                                        Alignment::Middle, 6, 2));
 
         // Initiate zooming slider
-	Slider *zoom = new Slider(panelZoom);
+	    Slider *zoom = new Slider(panelZoom);
         new Label(panelZoom, "Zooming", "sans-bold");
         zoom->setValue(0.25f);
         zoom->setFixedWidth(120);
         zoom->setCallback([&](float value) {
-	    mCanvas->setZooming(value);
+	        mCanvas->setZooming(value);
         });
 
-	//Then, we can create another window and insert other widgets into it
-	Window *anotherWindow = new Window(this, "Basic widgets");
+    	//Then, we can create another window and insert other widgets into it
+	    Window *anotherWindow = new Window(this, "Basic widgets");
         anotherWindow->setPosition(Vector2i(650, 15));
         anotherWindow->setLayout(new GroupLayout());
 
-	//Message dialog demonstration, it should be pretty straightforward
+	    //Message dialog demonstration, it should be pretty straightforward
         new Label(anotherWindow, "Message dialog", "sans-bold");
         tools = new Widget(anotherWindow);
         tools->setLayout(new BoxLayout(Orientation::Horizontal,
@@ -366,8 +368,8 @@ public:
             dlg->setCallback([](int result) { cout << "Dialog result: " << result << endl; });
         });
 
-	//Here is how you can get the string that represents file paths both for opening and for saving.
-	//you need to implement the rest of the parser logic.
+	    //Here is how you can get the string that represents file paths both for opening and for saving.
+	    //you need to implement the rest of the parser logic.
         new Label(anotherWindow, "File dialog", "sans-bold");
         tools = new Widget(anotherWindow);
         tools->setLayout(new BoxLayout(Orientation::Horizontal,
@@ -380,10 +382,10 @@ public:
         b = new Button(tools, "Save");
         b->setCallback([&] {
             cout << "File dialog result: " << file_dialog(
-                    { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
+                { {"png", "Portable Network Graphics"}, {"txt", "Text file"} }, true) << endl;
         });
 
-	//This is how to implement a combo box, which is important in A1
+    	//This is how to implement a combo box, which is important in A1
         new Label(anotherWindow, "Combo box", "sans-bold");
         ComboBox *combo = new ComboBox(anotherWindow, { "flat shaded", "smooth shaded in wireframe", "shaded with mesh edges"} );
         combo->setCallback([&](int value) {
@@ -407,7 +409,7 @@ public:
         panel->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 20));
 
-	//Fancy slider that has a callback function to update another interface element
+	    //Fancy slider that has a callback function to update another interface element
         Slider *slider = new Slider(panel);
         slider->setValue(0.5f);
         slider->setFixedWidth(80);
@@ -428,7 +430,7 @@ public:
         quitBtn->setCallback([&] {
             nanogui::shutdown();
         });
-	//Method to assemble the interface defined before it is called
+	    //Method to assemble the interface defined before it is called
         performLayout();
     }
 
@@ -437,7 +439,7 @@ public:
     virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Vector2i &rel, int button, int modifiers) override {
         if (button == GLFW_MOUSE_BUTTON_3 ) {
 	    //Get right click drag mouse event, print x and y coordinates only if right button pressed
-	    cout << p.x() << "     " << p.y() << "\n";
+	        cout << p.x() << "     " << p.y() << "\n";
             return true;
         }
         return false;
@@ -448,7 +450,7 @@ public:
     }
 
     virtual void draw(NVGcontext *ctx) {
-	/* Animate the scrollbar */
+	    /* Animate the scrollbar */
         mProgress->setValue(std::fmod((float) glfwGetTime() / 10, 1.0f));
 
         /* Draw the user interface */
@@ -465,12 +467,12 @@ int main(int /* argc */, char ** /* argv */) {
     try {
         nanogui::init();
 
-            /* scoped variables */ {
-            nanogui::ref<ExampleApplication> app = new ExampleApplication();
-            app->drawAll();
-            app->setVisible(true);
-            nanogui::mainloop();
-        }
+        /* scoped variables */ {
+        nanogui::ref<ExampleApplication> app = new ExampleApplication();
+        app->drawAll();
+        app->setVisible(true);
+        nanogui::mainloop();
+    }
 
         nanogui::shutdown();
     } catch (const std::runtime_error &e) {
