@@ -6,6 +6,7 @@
 #include <string>
 #include <ctime>
 #include <float.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <Eigen/Geometry>
@@ -14,6 +15,8 @@
 
 using namespace std;
 
+const float PI = 3.14159265359;
+
 bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) {
 	if (edge1->start < edge2->start)
 		return true;
@@ -21,6 +24,53 @@ bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) 
 		return false;
 	else
 		return edge1->end < edge2->end;
+}
+
+Vector3f sdLoopVertex(Vertex* v) {
+    Vector3f vec(0, 0, 0);
+	int k = 0;
+	float beta = 0;
+	float q = 0;
+
+	W_edge *e0 = v->edge->end == v ? v->edge->right_next : v->edge;
+	W_edge *edge = e0;
+    
+	do {
+		if (edge->end == v) {
+			edge = edge->right_next;
+		} else {
+			edge = edge->left_next;
+		}
+		k++;
+	} while (edge != e0);
+    
+	if (k == 0) throw "Subdivision Error. K is 0";
+	beta = 1.0f / k * (5.0f / 8.0f - pow(3.0f / 8.0f + 1.0f / 4.0f * cos(2.0f * PI / k), 2));
+	q = 1 - k * beta;
+
+	vec += v->p * q;
+
+	do {
+		if (edge->end == v) {
+			vec += edge->start->p * beta;
+			edge = edge->right_next;
+		} else {
+			vec += edge->end->p * beta;
+			edge = edge->left_next;
+		}
+	} while (edge != e0);
+
+	return vec; 
+}
+
+Vector3f sdLoopEdge(W_edge* w_edge) {
+	Vector3f vec(0, 0, 0);
+	vec += 3.0f / 8.0f * w_edge->start->p;
+	vec += 3.0f / 8.0f * w_edge->end->p;
+	vec += 1.0f / 8.0f * w_edge->right_next->end->p;
+	vec += 1.0f / 8.0f * w_edge->left_next->end->p;
+
+	return vec;
 }
 
 MatrixXf WingedEdge::getPositions() {
@@ -100,6 +150,47 @@ void WingedEdge::writeObj(string fileName) {
 		outputFile << ss.str();
 		outputFile.close();
 	}
+}
+
+SdBuffer WingedEdge::sdPool() {
+	SdBuffer sd;
+	sd.nVertices = nVertices + lW_edges / 2;
+	sd.mFaces = mFaces * 4;
+	sd.center = center;
+	sd.scale = scale;
+	sd.vertices = new Vector3f[sd.nVertices];
+	sd.faces = new Vector3i[sd.mFaces];
+
+	int vi = 0;
+	for (; vi < nVertices; vi++) {
+		sd.vertices[vi] = sdLoopVertex(vertices + vi);
+	}
+
+	for (int j = 0; j < lW_edges; j++) {
+		if (w_edges[j].edgeVertex == NULL) {
+			sd.vertices[vi] = sdLoopEdge(w_edges + j);
+			w_edges[j].edgeVertex = sd.vertices + vi;
+			w_edges[j].leftW_edge()->edgeVertex = sd.vertices + vi;
+			vi++;
+		}
+	}
+
+	int v1, v2, v3, v4, v5, v6;
+	for (int k = 0; k < mFaces; k++) {
+		v1 = faces[k].edge->start - vertices + 1;
+		v2 = faces[k].edge->end - vertices + 1;
+		v3 = faces[k].edge->right_next->end - vertices + 1;
+		v4 = faces[k].edge->edgeVertex - sd.vertices + 1;
+		v5 = faces[k].edge->right_next->edgeVertex - sd.vertices + 1;
+		v6 = faces[k].edge->right_prev->edgeVertex - sd.vertices + 1;
+
+		sd.faces[k * 4] << 1, 6, 4;
+		sd.faces[k * 4 + 1] << 3, 5, 6;
+		sd.faces[k * 4 + 2] << 2, 4, 5;
+		sd.faces[k * 4 + 3] << 4, 6, 5;
+	}
+
+	return sd;
 }
 
 void WingedEdge::readObj(string filename) {

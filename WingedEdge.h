@@ -15,6 +15,13 @@ struct W_edge
 	struct Face* left; Face* right;
 	W_edge* left_prev; W_edge* left_next;
 	W_edge* right_prev; W_edge* right_next;
+
+	// Used in Subdivision
+	Vector3f* edgeVertex = NULL;
+
+	W_edge* leftW_edge() {
+		return left_prev->right_next;
+	}
 };
 
 struct Vertex
@@ -30,12 +37,13 @@ struct Face
 
 struct SdBuffer
 {
-	Vector3f* vertices;
-	Vector3i* faces;
 	int nVertices;
 	int mFaces;
 	Vector3f center;
 	float scale;
+
+	Vector3f* vertices;
+	Vector3i* faces;
 };
 
 class WingedEdge
@@ -61,7 +69,7 @@ public:
 	MatrixXf getSmoothNormals(MatrixXf normals);
 	MatrixXf getColors();
 	void writeObj(string fileName);
-	
+	SdBuffer sdPool();
 private:
 	int nVertices = 0;
 	int mFaces = 0;
