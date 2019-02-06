@@ -3,6 +3,7 @@
 
 using namespace std;
 using nanogui::Vector3f;
+using nanogui::Vector3i;
 using nanogui::MatrixXf;
 
 #ifndef WINGEDEDGE_H
@@ -27,11 +28,26 @@ struct Face
 	W_edge *edge;
 };
 
+struct SdParams
+{
+	Vector3f* vertices;
+	Vector3i* faces;
+	int nVertices;
+	int mFaces;
+	Vector3f center;
+	float scale;
+};
+
 class WingedEdge
 {
 public:
 	WingedEdge(string fileName) {
 		readObj(fileName);
+		constructLeft();
+		findCenterScale();
+	}
+	WingedEdge(SdParams params) {
+		readSd(params);
 		constructLeft();
 		findCenterScale();
 	}
@@ -58,6 +74,7 @@ private:
 	float scale;
 
 	void readObj(string filename);
+	void readSd(SdParams params);
 	void constructLeft();
 	void findCenterScale();
 

@@ -93,21 +93,6 @@ void WingedEdge::writeObj(string fileName) {
 	for (int i = 0; i < mFaces; i++) {
 		ss << "f " << faces[i].edge->end - vertices + 1 << " " << faces[i].edge->start - vertices + 1 << " " << faces[i].edge->right_prev->start - vertices + 1 << endl;
 	}
-	// for(int i = 0; i < NOFF; i ++)
-	// {
-	// 	output = output + "f";
-	// 	for(int j = 0; j < NVONF; j++)
-	// 	{
-	// 		if(FACES[i][j] != 0)
-	// 		{
-	// 			char tempbuf[16];
-	// 			sprintf(tempbuf, "%d", FACES[i][j] + 1);
-	// 			strdup(tempbuf);
-	// 			output = output + " " + tempbuf + "//" + tempbuf;
-	// 		}
-	// 	}
-	// 	output = output + "\n";
-	// }
 
 	ofstream outputFile(fileName);
 	if (outputFile.is_open())
@@ -116,7 +101,6 @@ void WingedEdge::writeObj(string fileName) {
 		outputFile.close();
 	}
 }
-
 
 void WingedEdge::readObj(string filename) {
 	string line;
@@ -190,6 +174,56 @@ void WingedEdge::readObj(string filename) {
 				facei++;
 			}
 		}
+	}
+}
+
+void WingedEdge::readSd(SdParams params) {
+	nVertices = params.nVertices;
+	mFaces = params.mFaces;
+	lW_edges = params.mFaces * 3;
+
+	vertices = new Vertex[nVertices];
+	faces = new Face[mFaces];
+	w_edges = new W_edge[lW_edges];
+
+	center = params.center;
+	scale = params.scale;
+
+	for (int vertexi = 0; vertexi < nVertices; vertexi++) {
+		vertices[vertexi].p = params.vertices[vertexi];
+	}
+
+	int w_edgei = 0;
+	int vns [3] = {0, 0, 0};
+	for (int facei = 0; facei < mFaces; facei++) {
+		int start_w_edgei = w_edgei;
+		int start_vn = 0;
+		vns[0] = params.faces[facei].x();
+		vns[1] = params.faces[facei].y();
+		vns[2] = params.faces[facei].z();
+
+		for (auto vn : vns) {
+			// obj file is counterclockwise, while winged-edge structure is clock wise
+			w_edges[w_edgei].end = vertices + vn - 1;
+			w_edges[w_edgei].right = faces + facei;
+			vertices[vn - 1].edge = w_edges + w_edgei;
+
+			if (start_vn == 0) {
+				start_vn = vn;
+			} else {
+				w_edges[w_edgei - 1].start = vertices + vn - 1;
+				w_edges[w_edgei].right_next = w_edges + w_edgei - 1;
+				w_edges[w_edgei - 1].right_prev = w_edges + w_edgei;
+			}
+
+			w_edgei++;
+		}
+		
+		w_edges[w_edgei - 1].start = vertices + start_vn - 1;
+		w_edges[start_w_edgei].right_next = w_edges + w_edgei - 1;
+		w_edges[w_edgei - 1].right_prev = w_edges + start_w_edgei;
+
+		faces[facei].edge = w_edges + start_w_edgei;
 	}
 }
 
