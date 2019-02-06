@@ -122,6 +122,12 @@ public:
 
     void loadObj(string fileName) {
         mWe = new WingedEdge(fileName);
+        
+        // Temp code
+        SdBuffer buffer = mWe->sdPool();
+        // delete mWe;
+        mWe = new WingedEdge(buffer);
+
         positions = mWe->getPositions();
         normals = mWe->getNormals(positions);
         smoothNormals = mWe->getSmoothNormals(normals);
