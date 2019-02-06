@@ -177,20 +177,20 @@ void WingedEdge::readObj(string filename) {
 	}
 }
 
-void WingedEdge::readSd(SdParams params) {
-	nVertices = params.nVertices;
-	mFaces = params.mFaces;
-	lW_edges = params.mFaces * 3;
+void WingedEdge::readSd(SdBuffer buffer) {
+	nVertices = buffer.nVertices;
+	mFaces = buffer.mFaces;
+	lW_edges = buffer.mFaces * 3;
 
 	vertices = new Vertex[nVertices];
 	faces = new Face[mFaces];
 	w_edges = new W_edge[lW_edges];
 
-	center = params.center;
-	scale = params.scale;
+	center = buffer.center;
+	scale = buffer.scale;
 
 	for (int vertexi = 0; vertexi < nVertices; vertexi++) {
-		vertices[vertexi].p = params.vertices[vertexi];
+		vertices[vertexi].p = buffer.vertices[vertexi];
 	}
 
 	int w_edgei = 0;
@@ -198,9 +198,9 @@ void WingedEdge::readSd(SdParams params) {
 	for (int facei = 0; facei < mFaces; facei++) {
 		int start_w_edgei = w_edgei;
 		int start_vn = 0;
-		vns[0] = params.faces[facei].x();
-		vns[1] = params.faces[facei].y();
-		vns[2] = params.faces[facei].z();
+		vns[0] = buffer.faces[facei].x();
+		vns[1] = buffer.faces[facei].y();
+		vns[2] = buffer.faces[facei].z();
 
 		for (auto vn : vns) {
 			// obj file is counterclockwise, while winged-edge structure is clock wise
@@ -225,6 +225,9 @@ void WingedEdge::readSd(SdParams params) {
 
 		faces[facei].edge = w_edges + start_w_edgei;
 	}
+
+	delete []buffer.vertices;
+	delete []buffer.faces;
 }
 
 void WingedEdge::constructLeft() {

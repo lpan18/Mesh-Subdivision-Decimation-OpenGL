@@ -28,7 +28,7 @@ struct Face
 	W_edge *edge;
 };
 
-struct SdParams
+struct SdBuffer
 {
 	Vector3f* vertices;
 	Vector3i* faces;
@@ -46,8 +46,8 @@ public:
 		constructLeft();
 		findCenterScale();
 	}
-	WingedEdge(SdParams params) {
-		readSd(params);
+	WingedEdge(SdBuffer buffer) {
+		readSd(buffer);
 		constructLeft();
 		findCenterScale();
 	}
@@ -61,6 +61,7 @@ public:
 	MatrixXf getSmoothNormals(MatrixXf normals);
 	MatrixXf getColors();
 	void writeObj(string fileName);
+	
 private:
 	int nVertices = 0;
 	int mFaces = 0;
@@ -74,7 +75,7 @@ private:
 	float scale;
 
 	void readObj(string filename);
-	void readSd(SdParams params);
+	void readSd(SdBuffer buffer);
 	void constructLeft();
 	void findCenterScale();
 
