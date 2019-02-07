@@ -70,6 +70,7 @@ public:
 	MatrixXf getColors();
 	void writeObj(string fileName);
 	SdBuffer sdPool();
+	SdBuffer sdBtfl();
 private:
 	int nVertices = 0;
 	int mFaces = 0;

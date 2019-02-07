@@ -124,9 +124,11 @@ public:
         mWe = new WingedEdge(fileName);
         
         // Temp code
-        SdBuffer buffer = mWe->sdPool();
+        for (int i = 0; i < 5; i++) {
+        SdBuffer buffer = mWe->sdBtfl();
         delete mWe;
         mWe = new WingedEdge(buffer);
+        }
 
         positions = mWe->getPositions();
         normals = mWe->getNormals(positions);
