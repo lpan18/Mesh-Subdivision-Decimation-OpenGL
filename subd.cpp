@@ -120,14 +120,24 @@ public:
         delete mWe;
     }
 
-    void loadObj(string fileName) {
+    void loadObj(string fileName, int subdValue = 0, string divisionAlgo = "") {
         mWe = new WingedEdge(fileName);
-        
-        // Temp code
-        for (int i = 0; i < 5; i++) {
-        SdBuffer buffer = mWe->sdBtfl();
-        delete mWe;
-        mWe = new WingedEdge(buffer);
+        if(subdValue != 0){
+            if(divisionAlgo == "Loop"){
+                // Loop subdivision
+                for (int i = 1; i <= subdValue; i++) {
+                    SdBuffer buffer = mWe->sdLoop();
+                    delete mWe;
+                    mWe = new WingedEdge(buffer);
+                }
+            } else if(divisionAlgo == "Butterfly"){
+                    // Butterfly subdivision
+                    for (int i = 1; i <= subdValue; i++) {
+                    SdBuffer buffer = mWe->sdBtfl();
+                    delete mWe;
+                    mWe = new WingedEdge(buffer);
+                }
+            } 
         }
 
         positions = mWe->getPositions();
@@ -230,9 +240,9 @@ private:
 };
 
 
-class ExampleApplication : public nanogui::Screen {
+class ObjViewApp : public nanogui::Screen {
 public:
-    ExampleApplication() : nanogui::Screen(Eigen::Vector2i(1100, 600), "NanoGUI Assignment1", false) {
+    ObjViewApp() : nanogui::Screen(Eigen::Vector2i(1100, 700), "NanoGUI Assignment1", false) {
         using namespace nanogui;
 
 	    //OpenGL canvas demonstration
@@ -262,16 +272,17 @@ public:
         //widgets demonstration
         nanogui::GLShader mShader;
 
-    	//Then, we can create another window and insert other widgets into it
+    	// Create another window and insert basic widgets into it
 	    Window *anotherWindow = new Window(this, "Basic widgets");
         anotherWindow->setPosition(Vector2i(500, 15));
         anotherWindow->setLayout(new GroupLayout());
 
-	    //Here is how you can get the string that represents file paths both for opening and for saving.
-        new Label(anotherWindow, "File dialog", "sans-bold");
+	    // Open and save mesh
+        new Label(anotherWindow, "File dialog", "sans-bold", 20);
         Button *openBtn  = new Button(anotherWindow, "Open");
         openBtn->setCallback([&] {
             string fileName = file_dialog({ {"obj", "obj file"} }, false);
+            ObjViewApp::fileName = fileName;
             mCanvas->loadObj(fileName);
         });
         Button *saveBtn = new Button(anotherWindow, "Save");
@@ -280,8 +291,58 @@ public:
             mCanvas->writeObj(fileName);
         });
 
+        // Loop Subdivision panel
+	    new Label(anotherWindow, "Loop Subdivision", "sans-bold", 20);
+	    Widget *panelSubdLoop = new Widget(anotherWindow);
+        panelSubdLoop->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 2));
+        // Initiate Loop subdivision slider
+        Slider *subdLoop = new Slider(panelSubdLoop);
+        subdLoop->setValue(0.0f);
+        subdLoop->setFixedWidth(150);
+        TextBox *subdLoopTxt = new TextBox(panelSubdLoop);
+        subdLoopTxt->setFixedSize(Vector2i(60, 25));
+        subdLoopTxt->setValue("0");
+        subdLoopTxt->setUnits(" Step");
+        subdLoop->setCallback([&, subdLoopTxt](float value) {
+            int loopSubdValue = (int)round(value * 5);
+            if(loopSubdValue != prevLoopSubdValue){
+                subdLoopTxt->setValue(std::to_string(loopSubdValue));
+                mCanvas->loadObj(fileName,loopSubdValue, "Loop");
+                prevLoopSubdValue = loopSubdValue;
+            }
+        });
+        subdLoopTxt->setFixedSize(Vector2i(60,25));
+        subdLoopTxt->setFontSize(20);
+        subdLoopTxt->setAlignment(TextBox::Alignment::Right);
+
+        // Butterfly Subdivision panel
+	    new Label(anotherWindow, "Butterfly Subdivision", "sans-bold", 20);
+	    Widget *panelSubdBtfl = new Widget(anotherWindow);
+        panelSubdBtfl->setLayout(new BoxLayout(Orientation::Horizontal,
+                                       Alignment::Middle, 0, 2));
+        // Initiate Butterfly subdivision slider
+        Slider *subdBtfl = new Slider(panelSubdBtfl);
+        subdBtfl->setValue(0.0f);
+        subdBtfl->setFixedWidth(150);
+        TextBox *subdBtflTxt = new TextBox(panelSubdBtfl);
+        subdBtflTxt->setFixedSize(Vector2i(60, 25));
+        subdBtflTxt->setValue("0");
+        subdBtflTxt->setUnits(" Step");
+        subdBtfl->setCallback([&, subdBtflTxt](float value) {
+            int btflSubdValue = (int)round(value * 5);
+            if(btflSubdValue != prevBtflSubdValue){
+                subdBtflTxt->setValue(std::to_string(btflSubdValue));
+                mCanvas->loadObj(fileName, btflSubdValue, "Butterfly");
+                prevBtflSubdValue = btflSubdValue;
+            }
+        });
+        subdBtflTxt->setFixedSize(Vector2i(60,25));
+        subdBtflTxt->setFontSize(20);
+        subdBtflTxt->setAlignment(TextBox::Alignment::Right);
+
         // Rotation panel
-        new Label(anotherWindow, "Rotation", "sans-bold");
+        new Label(anotherWindow, "Rotation", "sans-bold", 20);
 	    Widget *panelRot = new Widget(anotherWindow);
         panelRot->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
@@ -325,7 +386,7 @@ public:
         });
 
         // Translation panel
-        new Label(anotherWindow, "Translation", "sans-bold");
+        new Label(anotherWindow, "Translation", "sans-bold", 20);
 	    Widget *panelTrans = new Widget(anotherWindow);
         panelTrans->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
@@ -371,19 +432,14 @@ public:
         mCanvas->setTranslation(nanogui::Vector3f(0, 0, 0));
 
         // Zomming panel
-	    new Label(anotherWindow, "Zoom", "sans-bold");
+	    new Label(anotherWindow, "Zoom", "sans-bold", 20);
 	    Widget *panelZoom = new Widget(anotherWindow);
         panelZoom->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
-
         // Initiate zooming slider
         Slider *zoom = new Slider(panelZoom);
         zoom->setValue(0.5f);
         zoom->setFixedWidth(150);
-        // zoom->setCallback([&](float value) {
-	    //     mCanvas->setZooming(value);
-        // });
-
         TextBox *zoomTxt = new TextBox(panelZoom);
         zoomTxt->setFixedSize(Vector2i(60, 25));
         zoomTxt->setValue("50");
@@ -397,8 +453,8 @@ public:
         zoomTxt->setAlignment(TextBox::Alignment::Right);
 
 
-    	//This is how to implement a combo box, which is important in A1
-        new Label(anotherWindow, "Shading Mode", "sans-bold");
+    	// Mesh presentation combo box 
+        new Label(anotherWindow, "Shading Mode", "sans-bold", 20);
         Widget *panelCombo = new Widget(anotherWindow);
         panelCombo->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
@@ -408,9 +464,11 @@ public:
             mCanvas->setShadingMode(value);
         });	
 
-        new Label(anotherWindow, "Progress bar", "sans-bold");
+        // Progress bar
+        new Label(anotherWindow, "Progress bar", "sans-bold", 20);
         mProgress = new ProgressBar(anotherWindow);
 
+        // Quit button
         Button *quitBtn = new Button(anotherWindow, "Quit");
         quitBtn->setCallback([&] {
             auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Quit", "Are you sure to shut down?", "No", "Yes", true);
@@ -419,19 +477,9 @@ public:
                     nanogui::shutdown();
                 }});
         });
+
 	    //Method to assemble the interface defined before it is called
         performLayout();
-    }
-
-    //This is how you capture mouse events in the screen. If you want to implement the arcball instead of using
-    //sliders, then you need to map the right click drag motions to suitable rotation matrices
-    virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Vector2i &rel, int button, int modifiers) override {
-        if (button == GLFW_MOUSE_BUTTON_3 ) {
-	    //Get right click drag mouse event, print x and y coordinates only if right button pressed
-	        cout << p.x() << "     " << p.y() << "\n";
-            return true;
-        }
-        return false;
     }
 
     virtual void drawContents() override {
@@ -450,6 +498,9 @@ public:
 private:
     nanogui::ProgressBar *mProgress;
     MyGLCanvas *mCanvas;
+    string fileName;
+    int prevBtflSubdValue = 0;
+    int prevLoopSubdValue = 0;
 };
 
 int main(int /* argc */, char ** /* argv */) {
@@ -457,13 +508,13 @@ int main(int /* argc */, char ** /* argv */) {
         nanogui::init();
 
         /* scoped variables */ {
-        nanogui::ref<ExampleApplication> app = new ExampleApplication();
+        nanogui::ref<ObjViewApp> app = new ObjViewApp();
         app->drawAll();
         app->setVisible(true);
         nanogui::mainloop();
     }
-
         nanogui::shutdown();
+
     } catch (const std::runtime_error &e) {
         std::string error_msg = std::string("Caught a fatal error: ") + std::string(e.what());
         #if defined(_WIN32)

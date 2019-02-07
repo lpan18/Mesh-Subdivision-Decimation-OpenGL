@@ -69,7 +69,7 @@ public:
 	MatrixXf getSmoothNormals(MatrixXf normals);
 	MatrixXf getColors();
 	void writeObj(string fileName);
-	SdBuffer sdPool();
+	SdBuffer sdLoop();
 	SdBuffer sdBtfl();
 private:
 	int nVertices = 0;

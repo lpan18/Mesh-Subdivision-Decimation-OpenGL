@@ -241,7 +241,7 @@ void WingedEdge::writeObj(string fileName) {
 	}
 }
 
-SdBuffer WingedEdge::sdPool() {
+SdBuffer WingedEdge::sdLoop() {
 	SdBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
 	sd.mFaces = mFaces * 4;

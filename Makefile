@@ -144,17 +144,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named obj_view
+# Target rules for targets named subd
 
 # Build rule for target.
-obj_view: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 obj_view
-.PHONY : obj_view
+subd: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 subd
+.PHONY : subd
 
 # fast build rule for target.
-obj_view/fast:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/build
-.PHONY : obj_view/fast
+subd/fast:
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/build
+.PHONY : subd/fast
 
 #=============================================================================
 # Target rules for targets named example2
@@ -328,7 +328,7 @@ WingedEdge.o: WingedEdge.cpp.o
 
 # target to build an object file
 WingedEdge.cpp.o:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/WingedEdge.cpp.o
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/WingedEdge.cpp.o
 .PHONY : WingedEdge.cpp.o
 
 WingedEdge.i: WingedEdge.cpp.i
@@ -337,7 +337,7 @@ WingedEdge.i: WingedEdge.cpp.i
 
 # target to preprocess a source file
 WingedEdge.cpp.i:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/WingedEdge.cpp.i
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/WingedEdge.cpp.i
 .PHONY : WingedEdge.cpp.i
 
 WingedEdge.s: WingedEdge.cpp.s
@@ -346,35 +346,8 @@ WingedEdge.s: WingedEdge.cpp.s
 
 # target to generate assembly for a file
 WingedEdge.cpp.s:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/WingedEdge.cpp.s
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/WingedEdge.cpp.s
 .PHONY : WingedEdge.cpp.s
-
-obj_view.o: obj_view.cpp.o
-
-.PHONY : obj_view.o
-
-# target to build an object file
-obj_view.cpp.o:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/obj_view.cpp.o
-.PHONY : obj_view.cpp.o
-
-obj_view.i: obj_view.cpp.i
-
-.PHONY : obj_view.i
-
-# target to preprocess a source file
-obj_view.cpp.i:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/obj_view.cpp.i
-.PHONY : obj_view.cpp.i
-
-obj_view.s: obj_view.cpp.s
-
-.PHONY : obj_view.s
-
-# target to generate assembly for a file
-obj_view.cpp.s:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/obj_view.cpp.s
-.PHONY : obj_view.cpp.s
 
 shader/frag.glsl.o: shader/frag.glsl.c.o
 
@@ -382,7 +355,7 @@ shader/frag.glsl.o: shader/frag.glsl.c.o
 
 # target to build an object file
 shader/frag.glsl.c.o:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.o
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/shader/frag.glsl.c.o
 .PHONY : shader/frag.glsl.c.o
 
 shader/frag.glsl.i: shader/frag.glsl.c.i
@@ -391,7 +364,7 @@ shader/frag.glsl.i: shader/frag.glsl.c.i
 
 # target to preprocess a source file
 shader/frag.glsl.c.i:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.i
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/shader/frag.glsl.c.i
 .PHONY : shader/frag.glsl.c.i
 
 shader/frag.glsl.s: shader/frag.glsl.c.s
@@ -400,7 +373,7 @@ shader/frag.glsl.s: shader/frag.glsl.c.s
 
 # target to generate assembly for a file
 shader/frag.glsl.c.s:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/frag.glsl.c.s
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/shader/frag.glsl.c.s
 .PHONY : shader/frag.glsl.c.s
 
 shader/vert.glsl.o: shader/vert.glsl.c.o
@@ -409,7 +382,7 @@ shader/vert.glsl.o: shader/vert.glsl.c.o
 
 # target to build an object file
 shader/vert.glsl.c.o:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.o
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/shader/vert.glsl.c.o
 .PHONY : shader/vert.glsl.c.o
 
 shader/vert.glsl.i: shader/vert.glsl.c.i
@@ -418,7 +391,7 @@ shader/vert.glsl.i: shader/vert.glsl.c.i
 
 # target to preprocess a source file
 shader/vert.glsl.c.i:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.i
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/shader/vert.glsl.c.i
 .PHONY : shader/vert.glsl.c.i
 
 shader/vert.glsl.s: shader/vert.glsl.c.s
@@ -427,8 +400,35 @@ shader/vert.glsl.s: shader/vert.glsl.c.s
 
 # target to generate assembly for a file
 shader/vert.glsl.c.s:
-	$(MAKE) -f CMakeFiles/obj_view.dir/build.make CMakeFiles/obj_view.dir/shader/vert.glsl.c.s
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/shader/vert.glsl.c.s
 .PHONY : shader/vert.glsl.c.s
+
+subd.o: subd.cpp.o
+
+.PHONY : subd.o
+
+# target to build an object file
+subd.cpp.o:
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/subd.cpp.o
+.PHONY : subd.cpp.o
+
+subd.i: subd.cpp.i
+
+.PHONY : subd.i
+
+# target to preprocess a source file
+subd.cpp.i:
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/subd.cpp.i
+.PHONY : subd.cpp.i
+
+subd.s: subd.cpp.s
+
+.PHONY : subd.s
+
+# target to generate assembly for a file
+subd.cpp.s:
+	$(MAKE) -f CMakeFiles/subd.dir/build.make CMakeFiles/subd.dir/subd.cpp.s
+.PHONY : subd.cpp.s
 
 # Help Target
 help:
@@ -438,7 +438,7 @@ help:
 	@echo "... depend"
 	@echo "... install"
 	@echo "... list_install_components"
-	@echo "... obj_view"
+	@echo "... subd"
 	@echo "... install/local"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
@@ -457,15 +457,15 @@ help:
 	@echo "... WingedEdge.o"
 	@echo "... WingedEdge.i"
 	@echo "... WingedEdge.s"
-	@echo "... obj_view.o"
-	@echo "... obj_view.i"
-	@echo "... obj_view.s"
 	@echo "... shader/frag.glsl.o"
 	@echo "... shader/frag.glsl.i"
 	@echo "... shader/frag.glsl.s"
 	@echo "... shader/vert.glsl.o"
 	@echo "... shader/vert.glsl.i"
 	@echo "... shader/vert.glsl.s"
+	@echo "... subd.o"
+	@echo "... subd.i"
+	@echo "... subd.s"
 .PHONY : help
 
 
