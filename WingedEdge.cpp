@@ -60,7 +60,7 @@ Vector3f sdLoopVertex(Vertex* v) {
 		}
 	} while (edge != e0);
 
-	return vec; 
+	return vec;
 }
 
 Vector3f sdLoopEdge(W_edge* w_edge) {
@@ -184,10 +184,10 @@ SdBuffer WingedEdge::sdPool() {
 		v5 = faces[k].edge->right_next->edgeVertex - sd.vertices + 1;
 		v6 = faces[k].edge->right_prev->edgeVertex - sd.vertices + 1;
 
-		sd.faces[k * 4] << 1, 6, 4;
-		sd.faces[k * 4 + 1] << 3, 5, 6;
-		sd.faces[k * 4 + 2] << 2, 4, 5;
-		sd.faces[k * 4 + 3] << 4, 6, 5;
+		sd.faces[k * 4] << v1, v6, v4;
+		sd.faces[k * 4 + 1] << v3, v5, v6;
+		sd.faces[k * 4 + 2] << v2, v4, v5;
+		sd.faces[k * 4 + 3] << v4, v6, v5;
 	}
 
 	return sd;

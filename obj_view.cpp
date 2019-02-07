@@ -125,7 +125,7 @@ public:
         
         // Temp code
         SdBuffer buffer = mWe->sdPool();
-        // delete mWe;
+        delete mWe;
         mWe = new WingedEdge(buffer);
 
         positions = mWe->getPositions();
