@@ -111,7 +111,7 @@ public:
         
         // This the light origin position in your environment, which is totally arbitrary
         // however it is better if it is behind the observer
-        mShader.setUniform("LightPosition_worldspace", Vector3f(-2,6,-4));
+        mShader.setUniform("LightPosition_worldspace", Vector3f(2,-6,-4));
     }
 
     //flush data on call
