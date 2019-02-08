@@ -18,7 +18,7 @@ run ```cmake .
 run ```make
 run ```./subd
 click open button to open a mesh 
-Slide through Loop Subivision and Butterfly Subdivision slide bar, you can see different subdivision step results. Subdivision 1-4 step is fast. Please be mindful that subdivision 5 step is relatively slow.
+Slide through Loop Subivision and Butterfly Subdivision slide bar, you can see different subdivision step results.
 click save button to save a mesh.
 click quit button to quit the program.
 

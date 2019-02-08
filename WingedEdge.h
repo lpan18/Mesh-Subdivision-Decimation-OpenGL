@@ -65,7 +65,7 @@ public:
 		delete []w_edges;
 	}
 	MatrixXf getPositions();
-	MatrixXf getNormals(MatrixXf positions);
+	MatrixXf getNormals(MatrixXf* positions);
 	MatrixXf getSmoothNormals(MatrixXf* normals);
 	MatrixXf getColors();
 	void writeObj(string fileName);

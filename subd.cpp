@@ -142,7 +142,7 @@ public:
         }
 
         positions = mWe->getPositions();
-        normals = mWe->getNormals(positions);
+        normals = mWe->getNormals(&positions);
         smoothNormals = mWe->getSmoothNormals(&normals);
         colors = mWe->getColors();
     }

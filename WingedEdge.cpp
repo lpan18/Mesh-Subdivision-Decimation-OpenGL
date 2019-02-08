@@ -185,12 +185,12 @@ MatrixXf WingedEdge::getPositions() {
 }
 
 // get normals
-MatrixXf WingedEdge::getNormals(MatrixXf positions) {
+MatrixXf WingedEdge::getNormals(MatrixXf* positions) {
 	MatrixXf normals = MatrixXf(3, mFaces * 9);
 
 	for (int i = 0; i < mFaces; i++) {
-		Vector3f e1 = positions.col(i * 3 + 1) - positions.col(i * 3);
-		Vector3f e2 = positions.col(i * 3 + 2) - positions.col(i * 3 + 1);
+		Vector3f e1 = positions->col(i * 3 + 1) - positions->col(i * 3);
+		Vector3f e2 = positions->col(i * 3 + 2) - positions->col(i * 3 + 1);
 		Vector3f normal = (e1.cross(e2)).normalized();
 
 		normals.col(i * 3) = normals.col(i * 3 + 1) = normals.col(i * 3 + 2) = normal;
