@@ -1,16 +1,28 @@
-# NanoGUI Test
+# CMPT764 Assignment1
 
-Includes CMake build, but before you can do that you will need
-to download the dependencies using git submodule...
+## Part I Obj_view 
+unzip a1q1.zip
+open folder A1_obj_view
+run ```cmake .
+run ```make
+run ```./obj_view
+click open button to open a mesh 
+Play around with different slide bars and mesh presentation options.
+click save button to save a mesh.
+click quit button to quit the program.
 
-    git submodule update --init --recursive
+## Part II Subdivision
+unzip a1bonus.zip
+open folder subd
+run ```cmake .
+run ```make
+run ```./subd
+click open button to open a mesh 
+Slide through Loop Subivision and Butterfly Subdivision slide bar, you can see different subdivision step results. Subdivision 1-4 step is fast. Please be mindful that subdivision 5 step is relatively slow.
+click save button to save a mesh.
+click quit button to quit the program.
 
-Simple example looks like this:
-
-![Screenshot](https://raw.githubusercontent.com/darrenmothersele/nanogui-test/master/screenshot.png "Screenshot")
-
-Uses [NanoGUI](https://github.com/wjakob/nanogui), [GLFW](http://www.glfw.org/),
-[Eigen](http://eigen.tuxfamily.org/), [Embed Resource](https://github.com/cyrilcode/embed-resource),
-and raymarching template from [Raymarching.com](http://raymarching.com/).
-
+## Structure of code files
+The WingedEdge.h and WingedEdge.cpp contains the main structure of winged-edge algorithm.
+The subd.cpp and obj_view.cpp are almost the same, except that I comment out the subdivion part in obj_view.cpp. 
 

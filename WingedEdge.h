@@ -66,7 +66,7 @@ public:
 	}
 	MatrixXf getPositions();
 	MatrixXf getNormals(MatrixXf positions);
-	MatrixXf getSmoothNormals(MatrixXf normals);
+	MatrixXf getSmoothNormals(MatrixXf* normals);
 	MatrixXf getColors();
 	void writeObj(string fileName);
 	SdBuffer sdLoop();
@@ -88,6 +88,6 @@ private:
 	void constructLeft();
 	void findCenterScale();
 
-	Vector3f getVertexSN(Vertex* v, MatrixXf normals);
+	Vector3f getVertexSN(Vertex* v, MatrixXf* normals);
 };
 #endif //WINGEDEDGE_H

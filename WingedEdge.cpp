@@ -45,6 +45,7 @@ int countFaces(Vertex* v) {
 	return k;
 }
 
+// Compute loop subdivision vetex
 Vector3f sdLoopVertex(Vertex* v) {
     Vector3f vec(0, 0, 0);
 	int k = countFaces(v);
@@ -68,6 +69,7 @@ Vector3f sdLoopVertex(Vertex* v) {
 	return vec;
 }
 
+// Compute loop subdivision edge
 Vector3f sdLoopEdge(W_edge* w_edge) {
 	Vector3f vec(0, 0, 0);
 	vec += 3.0f / 8.0f * w_edge->start->p;
@@ -78,6 +80,7 @@ Vector3f sdLoopEdge(W_edge* w_edge) {
 	return vec;
 }
 
+// both sides regular
 Vector3f sdBtflEdgeBothRegular(W_edge* w_edge) {
 	Vector3f vec(0, 0, 0);
 	vec += 1.0f / 2.0f * w_edge->start->p;
@@ -99,6 +102,7 @@ float getS(int j, int k) {
 	return 1.0f / k * (0.25f + cos(2.0f * j * PI / k) + 0.5f * cos(4.0f * j * PI / k));
 }
 
+// star side regular
 Vector3f sdBtflEdgeStartRegular(W_edge* w_edge, int k) {
 	Vector3f vec(0, 0, 0);
 
@@ -140,10 +144,10 @@ Vector3f sdBtflEdgeStartRegular(W_edge* w_edge, int k) {
 		float q = 1 - sum_s;
 		vec += q * w_edge->end->p;
 	}
-
 	return vec;
 }
 
+// butterfly subdivision edge 
 Vector3f sdBtflEdge(W_edge* w_edge) {
 	Vector3f vec;
     int startCount = countFaces(w_edge->start);
@@ -162,6 +166,7 @@ Vector3f sdBtflEdge(W_edge* w_edge) {
 	return vec;
 }
 
+// get positions
 MatrixXf WingedEdge::getPositions() {
 	MatrixXf positions = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
@@ -179,6 +184,7 @@ MatrixXf WingedEdge::getPositions() {
 	return positions;
 }
 
+// get normals
 MatrixXf WingedEdge::getNormals(MatrixXf positions) {
 	MatrixXf normals = MatrixXf(3, mFaces * 9);
 
@@ -195,7 +201,7 @@ MatrixXf WingedEdge::getNormals(MatrixXf positions) {
 	return normals;
 }
 
-MatrixXf WingedEdge::getSmoothNormals(MatrixXf normals) {
+MatrixXf WingedEdge::getSmoothNormals(MatrixXf* normals) {
 	MatrixXf smoothNormals = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
 		Vertex* v1 = faces[i].edge->end;
@@ -207,7 +213,7 @@ MatrixXf WingedEdge::getSmoothNormals(MatrixXf normals) {
 		smoothNormals.col(i * 3 + 2) << getVertexSN(v3, normals);
 	}
 	for (int i = mFaces * 3; i < mFaces * 9; i++) {
-		smoothNormals.col(i) << normals.col(i);
+		smoothNormals.col(i) << normals->col(i);
 	}
 	return smoothNormals;
 }
@@ -241,6 +247,7 @@ void WingedEdge::writeObj(string fileName) {
 	}
 }
 
+// loop subdivision one step
 SdBuffer WingedEdge::sdLoop() {
 	SdBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
@@ -282,6 +289,7 @@ SdBuffer WingedEdge::sdLoop() {
 	return sd;
 }
 
+// butterfly subdivision one step
 SdBuffer WingedEdge::sdBtfl() {
 	SdBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
@@ -323,6 +331,7 @@ SdBuffer WingedEdge::sdBtfl() {
 	return sd;
 }
 
+// read Obj file
 void WingedEdge::readObj(string filename) {
 	string line;
 	int vn;
@@ -498,7 +507,7 @@ void WingedEdge::findCenterScale() {
 	scale = 1.0f / maxOffset.maxCoeff();
 }
 
-Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf normals) {
+Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     Vector3f vec(0, 0, 0);
 	int facei = -1;
 	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
@@ -512,8 +521,8 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf normals) {
 			facei = edge->left - faces;
 			edge = edge->left_next;
 		}
-		vec += normals.col(facei * 3);
+		vec += normals->col(facei * 3);
 	} while (edge != e0);
 
-	return vec.normalized(); 
+	return vec.normalized();
 }

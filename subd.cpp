@@ -120,6 +120,7 @@ public:
         delete mWe;
     }
 
+    // method to load obj (subdValue is the step of subdivision)
     void loadObj(string fileName, int subdValue = 0, string divisionAlgo = "") {
         mWe = new WingedEdge(fileName);
         if(subdValue != 0){
@@ -142,7 +143,7 @@ public:
 
         positions = mWe->getPositions();
         normals = mWe->getNormals(positions);
-        smoothNormals = mWe->getSmoothNormals(normals);
+        smoothNormals = mWe->getSmoothNormals(&normals);
         colors = mWe->getColors();
     }
 
@@ -154,20 +155,21 @@ public:
         }
     }
 
-    //Method to update the rotation on each axis
+    // Method to update the rotation on each axis
     void setRotation(nanogui::Vector3f vRotation) {
         mRotation = vRotation;
     }
 
-    //Method to update the rotation on each axis
+    // Method to update the rotation on each axis
     void setTranslation(nanogui::Vector3f vTranslation) {
         mTranslation = vTranslation;
     }
-
+    
+    // Method to set the zooming 
     void setZooming(float fZooming) {
         mZooming = fZooming;
     }
-
+    // Method to set shading mode
     void setShadingMode(float fShadingMode) {
         mShadingMode = fShadingMode;
     }
@@ -245,24 +247,24 @@ public:
     ObjViewApp() : nanogui::Screen(Eigen::Vector2i(1100, 700), "NanoGUI Assignment1", false) {
         using namespace nanogui;
 
-	    //OpenGL canvas demonstration
+	    // OpenGL canvas demonstration
 
-	    //First, we need to create a window context in which we will render both the interface and OpenGL canvas
+	    // Create a window context in which we will render both the interface and OpenGL canvas
         Window *window = new Window(this, "GLCanvas Demo");
         window->setPosition(Vector2i(15, 15));
         window->setLayout(new GroupLayout());
 	
-	    //OpenGL canvas initialization, we can control the background color and also its size
+	    // OpenGL canvas initialization, we can control the background color and also its size
         mCanvas = new MyGLCanvas(window);
         mCanvas->setBackgroundColor({100, 100, 100, 255});
         mCanvas->setSize({400, 400});
 
-	    //This is how we add widgets, in this case, they are connected to the same window as the OpenGL canvas
+	    // Add widgets to connect to the same window as the OpenGL canvas
         Widget *tools = new Widget(window);
         tools->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 5));
 
-	    //then we start adding elements one by one as shown below
+	    // then we start adding elements one by one as shown below
         Button *b0 = new Button(tools, "Random Color");
         b0->setCallback([this]() { mCanvas->setBackgroundColor(Vector4i(rand() % 256, rand() % 256, rand() % 256, 255)); });
 
@@ -355,7 +357,7 @@ public:
 	    Slider *rotSlider_Z = new Slider(panelRot);
 	    new Label(panelRot, "Z");
 
-        //Rotation along X axis
+        // Rotation along X axis
         rotSlider_X->setValue(0.5f);
         rotSlider_X->setFixedWidth(80);
         rotSlider_X->setCallback([&, rotSlider_Y, rotSlider_Z](float value) {
@@ -365,7 +367,7 @@ public:
 	        mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
         });
 
-	    //Rotation along Y axis
+	    // Rotation along Y axis
         rotSlider_Y->setValue(0.5f);
         rotSlider_Y->setFixedWidth(80);
         rotSlider_Y->setCallback([&, rotSlider_X, rotSlider_Z](float value) {
@@ -375,7 +377,7 @@ public:
 	        mCanvas->setRotation(nanogui::Vector3f(radians_X, radians_Y, radians_Z));
         });
 
-	    //Rotation along Z axis
+	    // Rotation along Z axis
         rotSlider_Z->setValue(0.5f);
         rotSlider_Z->setFixedWidth(80);
         rotSlider_Z->setCallback([&, rotSlider_X, rotSlider_Y](float value) {
