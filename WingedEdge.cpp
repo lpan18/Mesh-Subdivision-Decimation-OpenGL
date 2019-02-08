@@ -17,6 +17,7 @@ using namespace std;
 
 const float PI = 3.14159265359;
 
+// Function for sorting w_edges
 bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) {
 	if (edge1->start < edge2->start)
 		return true;
@@ -26,6 +27,7 @@ bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) 
 		return edge1->end < edge2->end;
 }
 
+// Number of faces at Vertex v
 int countFaces(Vertex* v) {
 	int k = 0;
 	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
@@ -45,7 +47,7 @@ int countFaces(Vertex* v) {
 	return k;
 }
 
-// Compute loop subdivision vetex
+// Loop Subdivision, update the positions of existing vertices
 Vector3f sdLoopVertex(Vertex* v) {
     Vector3f vec(0, 0, 0);
 	int k = countFaces(v);
@@ -69,7 +71,7 @@ Vector3f sdLoopVertex(Vertex* v) {
 	return vec;
 }
 
-// Compute loop subdivision edge
+// Loop Subdivision, new vertices at edges
 Vector3f sdLoopEdge(W_edge* w_edge) {
 	Vector3f vec(0, 0, 0);
 	vec += 3.0f / 8.0f * w_edge->start->p;
@@ -80,7 +82,7 @@ Vector3f sdLoopEdge(W_edge* w_edge) {
 	return vec;
 }
 
-// both sides regular
+// Butterfly Subdivision, both sides regular
 Vector3f sdBtflEdgeBothRegular(W_edge* w_edge) {
 	Vector3f vec(0, 0, 0);
 	vec += 1.0f / 2.0f * w_edge->start->p;
@@ -102,7 +104,7 @@ float getS(int j, int k) {
 	return 1.0f / k * (0.25f + cos(2.0f * j * PI / k) + 0.5f * cos(4.0f * j * PI / k));
 }
 
-// star side regular
+// Butterfly Subdivision, start vertex regular
 Vector3f sdBtflEdgeStartRegular(W_edge* w_edge, int k) {
 	Vector3f vec(0, 0, 0);
 
@@ -147,7 +149,7 @@ Vector3f sdBtflEdgeStartRegular(W_edge* w_edge, int k) {
 	return vec;
 }
 
-// butterfly subdivision edge 
+// Butterfly Subdivision, new vertices at edges
 Vector3f sdBtflEdge(W_edge* w_edge) {
 	Vector3f vec;
     int startCount = countFaces(w_edge->start);
@@ -166,7 +168,7 @@ Vector3f sdBtflEdge(W_edge* w_edge) {
 	return vec;
 }
 
-// get positions
+// Get mesh vertex positions
 MatrixXf WingedEdge::getPositions() {
 	MatrixXf positions = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
@@ -184,7 +186,7 @@ MatrixXf WingedEdge::getPositions() {
 	return positions;
 }
 
-// get normals
+// Get normals for flat shading
 MatrixXf WingedEdge::getNormals(MatrixXf* positions) {
 	MatrixXf normals = MatrixXf(3, mFaces * 9);
 
@@ -201,6 +203,7 @@ MatrixXf WingedEdge::getNormals(MatrixXf* positions) {
 	return normals;
 }
 
+// Get normals for smooth shading
 MatrixXf WingedEdge::getSmoothNormals(MatrixXf* normals) {
 	MatrixXf smoothNormals = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
@@ -229,6 +232,7 @@ MatrixXf WingedEdge::getColors() {
 	return colors;
 }
 
+// Write mesh to an obj file
 void WingedEdge::writeObj(string fileName) {
 	stringstream ss;
 	ss << "# " << nVertices << " " << mFaces << endl;
@@ -247,7 +251,7 @@ void WingedEdge::writeObj(string fileName) {
 	}
 }
 
-// loop subdivision one step
+// Loop subdivision
 SdBuffer WingedEdge::sdLoop() {
 	SdBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
@@ -289,7 +293,7 @@ SdBuffer WingedEdge::sdLoop() {
 	return sd;
 }
 
-// butterfly subdivision one step
+// Butterfly subdivision
 SdBuffer WingedEdge::sdBtfl() {
 	SdBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
@@ -331,7 +335,7 @@ SdBuffer WingedEdge::sdBtfl() {
 	return sd;
 }
 
-// read Obj file
+// Read Obj file
 void WingedEdge::readObj(string filename) {
 	string line;
 	int vn;
@@ -406,7 +410,7 @@ void WingedEdge::readObj(string filename) {
 		}
 	}
 }
-
+// Read intermediate data of subdivision
 void WingedEdge::readSd(SdBuffer buffer) {
 	nVertices = buffer.nVertices;
 	mFaces = buffer.mFaces;
@@ -459,7 +463,7 @@ void WingedEdge::readSd(SdBuffer buffer) {
 	delete []buffer.vertices;
 	delete []buffer.faces;
 }
-
+// Fill in left parameters (left_prev, left_next, and left) of W_edge
 void WingedEdge::constructLeft() {
 	W_edge** w_edgeP = new W_edge*[lW_edges];
 	for (int i = 0; i < lW_edges; i++) {
@@ -506,7 +510,7 @@ void WingedEdge::findCenterScale() {
 	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
 	scale = 1.0f / maxOffset.maxCoeff();
 }
-
+// Get vertex normals for smooth shading
 Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     Vector3f vec(0, 0, 0);
 	int facei = -1;
