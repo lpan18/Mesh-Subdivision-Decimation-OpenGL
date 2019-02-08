@@ -16,15 +16,19 @@ embed_resources(MyResources shader/vert.glsl shader/frag.glsl)
 # add_executable(mytest test.cpp ${MyResources})
 # target_link_libraries(mytest nanogui ${NANOGUI_EXTRA_LIBS})
 
-set(SOURCE_FILES
-    #obj_view.cpp
+set(OBJ_SOURCE_FILES
+    obj_view.cpp
+    WingedEdge.cpp
+    WingedEdge.h)
+
+set(SUBD_SOURCE_FILES
     subd.cpp
     WingedEdge.cpp
     WingedEdge.h)
 
-#add_executable(obj_view ${SOURCE_FILES} ${MyResources})
-#target_link_libraries(obj_view nanogui ${NANOGUI_EXTRA_LIBS})
+add_executable(obj_view ${OBJ_SOURCE_FILES} ${MyResources})
+target_link_libraries(obj_view nanogui ${NANOGUI_EXTRA_LIBS})
 
-add_executable(subd ${SOURCE_FILES} ${MyResources})
+add_executable(subd ${SUBD_SOURCE_FILES} ${MyResources})
 target_link_libraries(subd nanogui ${NANOGUI_EXTRA_LIBS})
 
