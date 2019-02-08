@@ -351,7 +351,6 @@ public:
     //Method to update the mesh itself, can change the size of it dynamically, as shown later
     void updateMeshPositions(MatrixXf newPositions){
         positions = newPositions;
-
     }
 
     //OpenGL calls this method constantly to update the screen.

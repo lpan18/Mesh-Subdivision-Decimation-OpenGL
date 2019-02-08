@@ -60,9 +60,9 @@ public:
 		findCenterScale();
 	}
 	~WingedEdge() {
-		delete []vertices;
-		delete []faces;
-		delete []w_edges;
+		delete[] vertices;
+		delete[] faces;
+		delete[] w_edges;
 	}
 	MatrixXf getPositions();
 	MatrixXf getNormals(MatrixXf* positions);

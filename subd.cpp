@@ -120,25 +120,27 @@ public:
         delete mWe;
     }
 
-    // method to load obj (subdValue is the step of subdivision)
-    void loadObj(string fileName, int subdValue = 0, string divisionAlgo = "") {
+    // method to load obj (sdLevel is the step of subdivision)
+    void loadObj(string fileName, int sdLevel = 0, int sdMode = -1) {
+        delete mWe;
         mWe = new WingedEdge(fileName);
-        if(subdValue != 0){
-            if(divisionAlgo == "Loop"){
+
+        if(sdLevel != 0){
+            if (sdMode == 0){
                 // Loop subdivision
-                for (int i = 1; i <= subdValue; i++) {
+                for (int i = 0; i < sdLevel; i++) {
                     SdBuffer buffer = mWe->sdLoop();
                     delete mWe;
                     mWe = new WingedEdge(buffer);
                 }
-            } else if(divisionAlgo == "Butterfly"){
+            } else if(sdMode == 1){
                     // Butterfly subdivision
-                    for (int i = 1; i <= subdValue; i++) {
+                    for (int i = 0; i < sdLevel; i++) {
                     SdBuffer buffer = mWe->sdBtfl();
                     delete mWe;
                     mWe = new WingedEdge(buffer);
                 }
-            } 
+            }
         }
 
         positions = mWe->getPositions();
@@ -229,7 +231,7 @@ public:
 //Instantiation of the variables that can be acessed outside of this class to interact with the interface
 //Need to be updated if a interface element is interacting with something that is inside the scope of MyGLCanvas
 private:
-    WingedEdge *mWe;
+    WingedEdge *mWe = NULL;
     MatrixXf positions;
     MatrixXf normals;
     MatrixXf smoothNormals;
@@ -247,39 +249,23 @@ public:
     ObjViewApp() : nanogui::Screen(Eigen::Vector2i(1100, 700), "NanoGUI Assignment1", false) {
         using namespace nanogui;
 
-	    // OpenGL canvas demonstration
-
-	    // Create a window context in which we will render both the interface and OpenGL canvas
-        Window *window = new Window(this, "GLCanvas Demo");
+	    // Create a window context in which we will render the OpenGL canvas
+        Window *window = new Window(this, "Obj Viewer");
         window->setPosition(Vector2i(15, 15));
         window->setLayout(new GroupLayout());
 	
-	    // OpenGL canvas initialization, we can control the background color and also its size
+	    // OpenGL canvas initialization
         mCanvas = new MyGLCanvas(window);
         mCanvas->setBackgroundColor({100, 100, 100, 255});
         mCanvas->setSize({400, 400});
 
-	    // Add widgets to connect to the same window as the OpenGL canvas
-        Widget *tools = new Widget(window);
-        tools->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 5));
 
-	    // then we start adding elements one by one as shown below
-        Button *b0 = new Button(tools, "Random Color");
-        b0->setCallback([this]() { mCanvas->setBackgroundColor(Vector4i(rand() % 256, rand() % 256, rand() % 256, 255)); });
-
-        Button *b1 = new Button(tools, "Random Rotation");
-        b1->setCallback([this]() { mCanvas->setRotation(nanogui::Vector3f((rand() % 100) / 100.0f, (rand() % 100) / 100.0f, (rand() % 100) / 100.0f)); });
-
-        //widgets demonstration
-        nanogui::GLShader mShader;
-
-    	// Create another window and insert basic widgets into it
-	    Window *anotherWindow = new Window(this, "Basic widgets");
+    	// Create another window and insert widgets into it
+	    Window *anotherWindow = new Window(this, "Widgets");
         anotherWindow->setPosition(Vector2i(500, 15));
         anotherWindow->setLayout(new GroupLayout());
 
-	    // Open and save mesh
+	    // Open and save obj file
         new Label(anotherWindow, "File dialog", "sans-bold", 20);
         Button *openBtn  = new Button(anotherWindow, "Open");
         openBtn->setCallback([&] {
@@ -293,55 +279,38 @@ public:
             mCanvas->writeObj(fileName);
         });
 
-        // Loop Subdivision panel
-	    new Label(anotherWindow, "Loop Subdivision", "sans-bold", 20);
-	    Widget *panelSubdLoop = new Widget(anotherWindow);
-        panelSubdLoop->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 2));
-        // Initiate Loop subdivision slider
-        Slider *subdLoop = new Slider(panelSubdLoop);
-        subdLoop->setValue(0.0f);
-        subdLoop->setFixedWidth(150);
-        TextBox *subdLoopTxt = new TextBox(panelSubdLoop);
-        subdLoopTxt->setFixedSize(Vector2i(60, 25));
-        subdLoopTxt->setValue("0");
-        subdLoopTxt->setUnits(" Step");
-        subdLoop->setCallback([&, subdLoopTxt](float value) {
-            int loopSubdValue = (int)round(value * 5);
-            if(loopSubdValue != prevLoopSubdValue){
-                subdLoopTxt->setValue(std::to_string(loopSubdValue));
-                mCanvas->loadObj(fileName,loopSubdValue, "Loop");
-                prevLoopSubdValue = loopSubdValue;
-            }
+        // Subdivision
+        new Label(anotherWindow, "Subdivision Option", "sans-bold", 20);
+        ComboBox *comboSd = new ComboBox(anotherWindow, { "Loop", "Butterfly" } );
+        comboSd->setCallback([&](int value) {
+            sdMode = value;
         });
-        subdLoopTxt->setFixedSize(Vector2i(60,25));
-        subdLoopTxt->setFontSize(20);
-        subdLoopTxt->setAlignment(TextBox::Alignment::Right);
 
-        // Butterfly Subdivision panel
-	    new Label(anotherWindow, "Butterfly Subdivision", "sans-bold", 20);
-	    Widget *panelSubdBtfl = new Widget(anotherWindow);
-        panelSubdBtfl->setLayout(new BoxLayout(Orientation::Horizontal,
-                                       Alignment::Middle, 0, 2));
-        // Initiate Butterfly subdivision slider
-        Slider *subdBtfl = new Slider(panelSubdBtfl);
-        subdBtfl->setValue(0.0f);
-        subdBtfl->setFixedWidth(150);
-        TextBox *subdBtflTxt = new TextBox(panelSubdBtfl);
-        subdBtflTxt->setFixedSize(Vector2i(60, 25));
-        subdBtflTxt->setValue("0");
-        subdBtflTxt->setUnits(" Step");
-        subdBtfl->setCallback([&, subdBtflTxt](float value) {
-            int btflSubdValue = (int)round(value * 5);
-            if(btflSubdValue != prevBtflSubdValue){
-                subdBtflTxt->setValue(std::to_string(btflSubdValue));
-                mCanvas->loadObj(fileName, btflSubdValue, "Butterfly");
-                prevBtflSubdValue = btflSubdValue;
-            }
+        // Loop Subdivision panel
+	    Widget *panelSdLevel = new Widget(anotherWindow);
+        panelSdLevel->setLayout(new BoxLayout(Orientation::Horizontal,
+                                        Alignment::Middle, 0, 2));
+        // Initiate Loop subdivision slider
+        Slider *sldSdLevel = new Slider(panelSdLevel);
+        sldSdLevel->setValue(0.0f);
+        sldSdLevel->setFixedWidth(220);
+        TextBox *sldSdLevelTxt = new TextBox(panelSdLevel);
+        sldSdLevelTxt->setFixedSize(Vector2i(60, 25));
+        sldSdLevelTxt->setValue("0");
+        sldSdLevelTxt->setUnits(" Step");
+        sldSdLevelTxt->setFixedSize(Vector2i(60,25));
+        sldSdLevelTxt->setFontSize(20);
+        sldSdLevelTxt->setAlignment(TextBox::Alignment::Right);
+
+        sldSdLevel->setCallback([&, sldSdLevelTxt](float value) {
+            sdLevel = (int)round(value * 5);
+            sldSdLevelTxt->setValue(std::to_string(sdLevel));
         });
-        subdBtflTxt->setFixedSize(Vector2i(60,25));
-        subdBtflTxt->setFontSize(20);
-        subdBtflTxt->setAlignment(TextBox::Alignment::Right);
+
+        Button *btnRunSd = new Button(anotherWindow, "Run Subdivision");
+        btnRunSd->setCallback([&] {
+            mCanvas->loadObj(fileName, sdLevel, sdMode);
+        });
 
         // Rotation panel
         new Label(anotherWindow, "Rotation", "sans-bold", 20);
@@ -349,7 +318,7 @@ public:
         panelRot->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
 
-        // Initiate rotation slider
+        // Initiate rotation sliders
 	    Slider *rotSlider_X = new Slider(panelRot);
 	    new Label(panelRot, "X");
         Slider *rotSlider_Y = new Slider(panelRot);
@@ -393,7 +362,7 @@ public:
         panelTrans->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
 
-        // Initiate translation slider
+        // Initiate translation sliders
 	    Slider *tranSlider_X = new Slider(panelTrans);
 	    new Label(panelTrans, "X");
         Slider *tranSlider_Y = new Slider(panelTrans);
@@ -438,6 +407,7 @@ public:
 	    Widget *panelZoom = new Widget(anotherWindow);
         panelZoom->setLayout(new BoxLayout(Orientation::Horizontal,
                                        Alignment::Middle, 0, 2));
+
         // Initiate zooming slider
         Slider *zoom = new Slider(panelZoom);
         zoom->setValue(0.5f);
@@ -454,8 +424,7 @@ public:
         zoomTxt->setFontSize(20);
         zoomTxt->setAlignment(TextBox::Alignment::Right);
 
-
-    	// Mesh presentation combo box 
+    	// Shading mode
         new Label(anotherWindow, "Shading Mode", "sans-bold", 20);
         Widget *panelCombo = new Widget(anotherWindow);
         panelCombo->setLayout(new BoxLayout(Orientation::Horizontal,
@@ -464,13 +433,10 @@ public:
         ComboBox *combo = new ComboBox(anotherWindow, { "Flat", "Smooth", "Wireframe", "Flat+Wireframe", "Smooth+Wireframe"} );
         combo->setCallback([&](int value) {
             mCanvas->setShadingMode(value);
-        });	
-
-        // Progress bar
-        new Label(anotherWindow, "Progress bar", "sans-bold", 20);
-        mProgress = new ProgressBar(anotherWindow);
+        });
 
         // Quit button
+        new Label(anotherWindow, "Quit", "sans-bold", 20);
         Button *quitBtn = new Button(anotherWindow, "Quit");
         quitBtn->setCallback([&] {
             auto dlg = new MessageDialog(this, MessageDialog::Type::Warning, "Quit", "Are you sure to shut down?", "No", "Yes", true);
@@ -489,20 +455,16 @@ public:
     }
 
     virtual void draw(NVGcontext *ctx) {
-	    /* Animate the scrollbar */
-        mProgress->setValue(std::fmod((float) glfwGetTime() / 10, 1.0f));
-
         /* Draw the user interface */
         Screen::draw(ctx);
     }
 
 
 private:
-    nanogui::ProgressBar *mProgress;
     MyGLCanvas *mCanvas;
     string fileName;
-    int prevBtflSubdValue = 0;
-    int prevLoopSubdValue = 0;
+    int sdMode = 0;
+    int sdLevel = 0;
 };
 
 int main(int /* argc */, char ** /* argv */) {
