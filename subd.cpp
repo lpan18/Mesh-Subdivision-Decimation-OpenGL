@@ -204,27 +204,14 @@ public:
 	    // If enabled, does depth comparisons and update the depth buffer.
 	    // Avoid changing if you are unsure of what this means.
         glEnable(GL_DEPTH_TEST);
-	
-        /* Draw 12 triangles starting at index 0 of your indices matrix */
-	    /* Try changing the first input with GL_LINES, this will be useful in the assignment */
-	    /* Take a look at this link to better understand OpenGL primitives */
-	    /* https://www.khronos.org/opengl/wiki/Primitive */
 
-	    //12 triangles, each has three vertices
-	    // mShader.drawArray(GL_TRIANGLES, 0, positions.cols());
         if (mShadingMode != 2) {
             mShader.drawArray(GL_TRIANGLES, 0, positions.cols() / 3);
         }
         if (mShadingMode != 0 && mShadingMode != 1) {
-            mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
+            mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols() / 3 * 2);
         }
-        // mShader.drawArray(GL_LINES, positions.cols() / 3, positions.cols());
 
-	    //2 triangles, each has 3 lines, each line has 2 vertices
-	    //mShader.drawArray(GL_LINES, 12*3, 2*3*2);
-
-        //mShader.drawIndexed(GL_TRIANGLES, 0, 12);
-	    //mShader.drawIndexed(GL_LINES, 12, 12);
         glDisable(GL_DEPTH_TEST);
     }
 
@@ -286,11 +273,11 @@ public:
             sdMode = value;
         });
 
-        // Loop Subdivision panel
+        // Subdivision panel
 	    Widget *panelSdLevel = new Widget(anotherWindow);
         panelSdLevel->setLayout(new BoxLayout(Orientation::Horizontal,
                                         Alignment::Middle, 0, 2));
-        // Initiate Loop subdivision slider
+        // Initiate subdivision slider
         Slider *sldSdLevel = new Slider(panelSdLevel);
         sldSdLevel->setValue(0.0f);
         sldSdLevel->setFixedWidth(220);
