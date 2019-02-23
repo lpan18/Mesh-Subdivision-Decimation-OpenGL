@@ -21,14 +21,6 @@ set(OBJ_SOURCE_FILES
     WingedEdge.cpp
     WingedEdge.h)
 
-set(SUBD_SOURCE_FILES
-    subd.cpp
-    WingedEdge.cpp
-    WingedEdge.h)
-
 add_executable(obj_view ${OBJ_SOURCE_FILES} ${MyResources})
 target_link_libraries(obj_view nanogui ${NANOGUI_EXTRA_LIBS})
-
-add_executable(subd ${SUBD_SOURCE_FILES} ${MyResources})
-target_link_libraries(subd nanogui ${NANOGUI_EXTRA_LIBS})
 
