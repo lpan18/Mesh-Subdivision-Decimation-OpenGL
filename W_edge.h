@@ -4,6 +4,7 @@
 
 using namespace std;
 using nanogui::Vector3f;
+using nanogui::Vector4f;
 using nanogui::Vector3i;
 using nanogui::MatrixXf;
 
@@ -33,13 +34,18 @@ struct Vertex
 	W_edge *edge;
 
     vector<Face*> getFaces();
-    vector<W_edge*> getEdges();
+    vector<W_edge*> getW_edges();
     int countFaces();
 };
 
 struct Face
 {
 	W_edge *edge;
+
+	vector<W_edge*> getW_edges();
+	vector<Vertex*> getVertices();
+	Vector3f getNormal();
+	Vector4f getP();
 };
 
 #endif //W_EDGE_H
