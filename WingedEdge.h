@@ -1,6 +1,7 @@
 #include <nanogui/common.h>
 #include <string>
 #include "W_edge.h"
+#include "Subdivision.h"
 
 using namespace std;
 using nanogui::Vector3f;
@@ -20,6 +21,8 @@ struct ObjBuffer
 
 	Vector3f* vertices;
 	Vector3i* faces;
+
+	void setCenterAndScale();
 };
 
 // Main WingedEdge class

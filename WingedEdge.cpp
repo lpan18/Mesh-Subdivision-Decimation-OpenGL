@@ -11,13 +11,9 @@
 #include <stdlib.h>
 #include <Eigen/Geometry>
 
-#include "W_edge.h"
 #include "WingedEdge.h"
 
 using namespace std;
-
-const float PI = 3.14159265359;
-const float MAXVALUE = 99999999;
 
 // Function for sorting w_edges
 bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) {
@@ -29,145 +25,24 @@ bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) 
 		return edge1->end < edge2->end;
 }
 
-void setCenterAndScale(ObjBuffer* buffer) {
+void ObjBuffer::setCenterAndScale() {
 	float maxX, maxY, maxZ;
 	float minX, minY, minZ;
 	maxX = maxY = maxZ = -MAXVALUE;
 	minX = minY = minZ = MAXVALUE;
 
-	for (int i = 0; i < buffer->nVertices; i++) {
-		maxX = buffer->vertices[i].x() > maxX ? buffer->vertices[i].x() : maxX;
-		maxY = buffer->vertices[i].y() > maxY ? buffer->vertices[i].y() : maxY;
-		maxZ = buffer->vertices[i].z() > maxZ ? buffer->vertices[i].z() : maxZ;
-		minX = buffer->vertices[i].x() < minX ? buffer->vertices[i].x() : minX;
-		minY = buffer->vertices[i].y() < minY ? buffer->vertices[i].y() : minY;
-		minZ = buffer->vertices[i].z() < minZ ? buffer->vertices[i].z() : minZ;
+	for (int i = 0; i < nVertices; i++) {
+		maxX = vertices[i].x() > maxX ? vertices[i].x() : maxX;
+		maxY = vertices[i].y() > maxY ? vertices[i].y() : maxY;
+		maxZ = vertices[i].z() > maxZ ? vertices[i].z() : maxZ;
+		minX = vertices[i].x() < minX ? vertices[i].x() : minX;
+		minY = vertices[i].y() < minY ? vertices[i].y() : minY;
+		minZ = vertices[i].z() < minZ ? vertices[i].z() : minZ;
 	}
 
-	buffer->center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
-	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - buffer->center;
-	buffer->scale = 1.0f / maxOffset.maxCoeff();
-}
-
-// Loop Subdivision, update the positions of existing vertices
-Vector3f sdLoopVertex(Vertex* v) {
-    Vector3f vec(0, 0, 0);
-	int k = v->countFaces();
-	// Pre-calculate beta to improve efficiency
-	float beta = 1.0f / k * (5.0f / 8.0f - pow(3.0f / 8.0f + 1.0f / 4.0f * cos(2.0f * PI / k), 2));
-	float q = 1 - k * beta;
-
-	vec += v->p * q;
-	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
-	W_edge *edge = e0;
-	do {
-		if (edge->end == v) {
-			vec += edge->start->p * beta;
-			edge = edge->right_next;
-		} else {
-			vec += edge->end->p * beta;
-			edge = edge->left_next;
-		}
-	} while (edge != e0);
-
-	return vec;
-}
-
-// Loop Subdivision, new vertices at edges
-Vector3f sdLoopEdge(W_edge* w_edge) {
-	Vector3f vec(0, 0, 0);
-	vec += 3.0f / 8.0f * w_edge->start->p;
-	vec += 3.0f / 8.0f * w_edge->end->p;
-	vec += 1.0f / 8.0f * w_edge->right_next->end->p;
-	vec += 1.0f / 8.0f * w_edge->left_next->end->p;
-
-	return vec;
-}
-
-// Butterfly Subdivision, both sides regular
-Vector3f sdBtflEdgeBothRegular(W_edge* w_edge) {
-	Vector3f vec(0, 0, 0);
-	vec += 1.0f / 2.0f * w_edge->start->p;
-	vec += 1.0f / 2.0f * w_edge->end->p;
-	vec += 1.0f / 8.0f * w_edge->right_next->end->p;
-	vec += 1.0f / 8.0f * w_edge->left_next->end->p;
-	vec += -1.0f / 16.0f * w_edge->right_next->left_next->end->p;
-	vec += -1.0f / 16.0f * w_edge->right_prev->left_next->end->p;
-	vec += -1.0f / 16.0f * w_edge->left_next->left_next->end->p;
-	vec += -1.0f / 16.0f * w_edge->left_prev->left_next->end->p;
-	
-	return vec;
-}
-
-float getS(int j, int k) {
-	if (j >= k) throw "Invalid j";
-	if (k <= 4) throw "Invalid k";
-
-	return 1.0f / k * (0.25f + cos(2.0f * j * PI / k) + 0.5f * cos(4.0f * j * PI / k));
-}
-
-// Butterfly Subdivision, start vertex regular
-Vector3f sdBtflEdgeStartRegular(W_edge* w_edge, int k) {
-	Vector3f vec(0, 0, 0);
-
-	if (k == 3) {
-		// v0
-		vec += 5.0f / 12.0f * w_edge->start->p;
-		// v1
-		vec += -1.0f / 12.0f * w_edge->right_next->end->p;
-		// v2
-		vec += -1.0f / 12.0f * w_edge->right_next->left_next->end->p;
-		// vq
-		vec += 3.0f / 4.0f * w_edge->end->p;
-	} else if (k == 4) {
-		// v0
-		vec += 3.0f / 8.0f * w_edge->start->p;
-		// v1 is 0
-		// v2
-		vec += -1.0f / 8.0f * w_edge->right_next->left_next->end->p;
-		// v3 is 0
-		// vq
-		vec += 3.0f / 4.0f * w_edge->end->p;
-	} else {
-		float s = 0;
-		float sum_s = 0;
-
-		s = getS(0, k);
-		vec += s * w_edge->start->p;
-		sum_s += s;
-
-		W_edge* btflEdge = w_edge->right_next;
-		for (int j = 1; j < k; j++) {
-			s = getS(j, k);
-			vec += s * btflEdge->end->p;
-			sum_s += s;
-
-			btflEdge = btflEdge->left_next;
-		}
-
-		float q = 1 - sum_s;
-		vec += q * w_edge->end->p;
-	}
-	return vec;
-}
-
-// Butterfly Subdivision, new vertices at edges
-Vector3f sdBtflEdge(W_edge* w_edge) {
-	Vector3f vec;
-    int startCount = w_edge->start->countFaces();
-	int endCount = w_edge->end->countFaces();
-
-	if (startCount == 6 && endCount == 6) {
-		vec = sdBtflEdgeBothRegular(w_edge);
-	} else if (startCount == 6) {
-		vec = sdBtflEdgeStartRegular(w_edge, endCount);
-	} else if (endCount == 6) {
-		vec = sdBtflEdgeStartRegular(w_edge->leftW_edge(), startCount);
-	} else {
-		vec = sdBtflEdgeStartRegular(w_edge, endCount) / 2.0f + sdBtflEdgeStartRegular(w_edge->leftW_edge(), startCount) / 2.0f;
-	}
-
-	return vec;
+	center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
+	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
+	scale = 1.0f / maxOffset.maxCoeff();
 }
 
 // Get mesh vertex positions
@@ -386,7 +261,7 @@ ObjBuffer WingedEdge::readObj(string filename) {
 	}
 
 	// Set Center and Scale
-	setCenterAndScale(&buffer);
+	buffer.setCenterAndScale();
 
 	return buffer;
 }

@@ -20,6 +20,8 @@ set(OBJ_SOURCE_FILES
     obj_view.cpp
     WingedEdge.cpp
     WingedEdge.h
+    Subdivision.cpp
+    Subdivision.h
     W_edge.cpp
     W_edge.h)
 

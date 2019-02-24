@@ -10,6 +10,9 @@ using nanogui::MatrixXf;
 #ifndef W_EDGE_H
 #define W_EDGE_H
 
+const float PI = 3.14159265359;
+const float MAXVALUE = 99999999;
+
 struct W_edge
 {
 	struct Vertex* start; Vertex* end;
