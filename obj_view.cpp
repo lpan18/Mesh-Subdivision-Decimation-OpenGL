@@ -61,6 +61,7 @@
 #  include <windows.h>
 #endif
 
+#include "W_edge.h"
 #include "WingedEdge.h"
 
 using std::cout;

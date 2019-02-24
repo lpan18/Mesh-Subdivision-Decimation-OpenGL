@@ -1,0 +1,42 @@
+#include <nanogui/common.h>
+#include <string>
+#include <vector>
+
+using namespace std;
+using nanogui::Vector3f;
+using nanogui::Vector3i;
+using nanogui::MatrixXf;
+
+#ifndef W_EDGE_H
+#define W_EDGE_H
+
+struct W_edge
+{
+	struct Vertex* start; Vertex* end;
+	struct Face* left; Face* right;
+	W_edge* left_prev; W_edge* left_next;
+	W_edge* right_prev; W_edge* right_next;
+	// Used in Subdivision
+	Vector3f* edgeVertex = NULL;
+	// The left W_edge
+	W_edge* leftW_edge() {
+        return left_prev->right_next;
+    }
+};
+
+struct Vertex
+{
+	Vector3f p;
+	W_edge *edge;
+
+    vector<Face*> getFaces();
+    vector<W_edge*> getEdges();
+    int countFaces();
+};
+
+struct Face
+{
+	W_edge *edge;
+};
+
+#endif //W_EDGE_H

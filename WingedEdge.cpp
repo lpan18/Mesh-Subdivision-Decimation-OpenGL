@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <Eigen/Geometry>
 
+#include "W_edge.h"
 #include "WingedEdge.h"
 
 using namespace std;
@@ -26,50 +27,6 @@ bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) 
 		return false;
 	else
 		return edge1->end < edge2->end;
-}
-
-vector<Face*> getFaces(Vertex* v) {
-	vector<Face*> vec;
-	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
-	W_edge *edge = e0;
-    
-	do {
-		if (edge->end == v) {
-			vec.push_back(edge->right);
-			edge = edge->right_next;
-		} else {
-			vec.push_back(edge->left);
-			edge = edge->left_next;
-		}
-	} while (edge != e0);
-
-	if (vec.size() == 0) throw "No face at vertex v";
-
-	return vec;
-}
-
-vector<W_edge*> getEdges(Vertex* v) {
-	vector<W_edge*> vec;
-	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
-	W_edge *edge = e0;
-    
-	do {
-		vec.push_back(edge);
-		if (edge->end == v) {
-			edge = edge->right_next;
-		} else {
-			edge = edge->left_next;
-		}
-	} while (edge != e0);
-
-	if (vec.size() == 0) throw "No edge at vertex v";
-
-	return vec;
-}
-
-// Number of faces at Vertex v
-int countFaces(Vertex* v) {
-	return (int)getFaces(v).size();
 }
 
 void setCenterAndScale(ObjBuffer* buffer) {
@@ -95,7 +52,7 @@ void setCenterAndScale(ObjBuffer* buffer) {
 // Loop Subdivision, update the positions of existing vertices
 Vector3f sdLoopVertex(Vertex* v) {
     Vector3f vec(0, 0, 0);
-	int k = countFaces(v);
+	int k = v->countFaces();
 	// Pre-calculate beta to improve efficiency
 	float beta = 1.0f / k * (5.0f / 8.0f - pow(3.0f / 8.0f + 1.0f / 4.0f * cos(2.0f * PI / k), 2));
 	float q = 1 - k * beta;
@@ -197,8 +154,8 @@ Vector3f sdBtflEdgeStartRegular(W_edge* w_edge, int k) {
 // Butterfly Subdivision, new vertices at edges
 Vector3f sdBtflEdge(W_edge* w_edge) {
 	Vector3f vec;
-    int startCount = countFaces(w_edge->start);
-	int endCount = countFaces(w_edge->end);
+    int startCount = w_edge->start->countFaces();
+	int endCount = w_edge->end->countFaces();
 
 	if (startCount == 6 && endCount == 6) {
 		vec = sdBtflEdgeBothRegular(w_edge);
@@ -520,7 +477,7 @@ void WingedEdge::constructLeft() {
 // Get vertex normals for smooth shading
 Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     Vector3f vec(0, 0, 0);
-	vector<Face*> vfs = getFaces(v);
+	vector<Face*> vfs = v->getFaces();
 	int facei = -1;
 
 	for (auto f : vfs) {
