@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <ctime>
+#include <vector>
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
@@ -28,24 +28,48 @@ bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) 
 		return edge1->end < edge2->end;
 }
 
-// Number of faces at Vertex v
-int countFaces(Vertex* v) {
-	int k = 0;
+vector<Face*> getFaces(Vertex* v) {
+	vector<Face*> vec;
 	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
 	W_edge *edge = e0;
     
 	do {
 		if (edge->end == v) {
+			vec.push_back(edge->right);
+			edge = edge->right_next;
+		} else {
+			vec.push_back(edge->left);
+			edge = edge->left_next;
+		}
+	} while (edge != e0);
+
+	if (vec.size() == 0) throw "No face at vertex v";
+
+	return vec;
+}
+
+vector<W_edge*> getEdges(Vertex* v) {
+	vector<W_edge*> vec;
+	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
+	W_edge *edge = e0;
+    
+	do {
+		vec.push_back(edge);
+		if (edge->end == v) {
 			edge = edge->right_next;
 		} else {
 			edge = edge->left_next;
 		}
-		k++;
 	} while (edge != e0);
 
-	if (k == 0) throw "Face count 0";
+	if (vec.size() == 0) throw "No edge at vertex v";
 
-	return k;
+	return vec;
+}
+
+// Number of faces at Vertex v
+int countFaces(Vertex* v) {
+	return (int)getFaces(v).size();
 }
 
 void setCenterAndScale(ObjBuffer* buffer) {
@@ -409,8 +433,9 @@ ObjBuffer WingedEdge::readObj(string filename) {
 
 	return buffer;
 }
-// Read intermediate data of subdivision
-void WingedEdge::readSd(ObjBuffer buffer) {
+
+// Read obj buffer
+void WingedEdge::readObjBuffer(ObjBuffer buffer) {
 	nVertices = buffer.nVertices;
 	mFaces = buffer.mFaces;
 	lW_edges = buffer.mFaces * 3;
@@ -495,20 +520,13 @@ void WingedEdge::constructLeft() {
 // Get vertex normals for smooth shading
 Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     Vector3f vec(0, 0, 0);
+	vector<Face*> vfs = getFaces(v);
 	int facei = -1;
-	W_edge *e0 = v->edge->end == v ? v->edge->leftW_edge() : v->edge;
-	W_edge *edge = e0;
-    
-	do {
-		if (edge->end == v) {
-			facei = edge->right - faces;
-			edge = edge->right_next;
-		} else {
-			facei = edge->left - faces;
-			edge = edge->left_next;
-		}
-		vec += normals->col(facei * 3);
-	} while (edge != e0);
 
-	return vec.normalized();
+	for (auto f : vfs) {
+		facei = f - faces;
+		vec += normals->col(facei * 3);
+	}
+
+    return vec.normalized();
 }

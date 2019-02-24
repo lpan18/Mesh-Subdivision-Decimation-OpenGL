@@ -53,12 +53,12 @@ public:
     // Regular constructor
 	WingedEdge(string fileName) {
 		ObjBuffer buffer = readObj(fileName);
-		readSd(buffer);
+		readObjBuffer(buffer);
 		constructLeft();
 	}
 	// Constructor used in subdivision
 	WingedEdge(ObjBuffer buffer) {
-		readSd(buffer);
+		readObjBuffer(buffer);
 		constructLeft();
 	}
 	~WingedEdge() {
@@ -72,6 +72,7 @@ public:
 	MatrixXf getNormals(MatrixXf* positions);
 	// Get normals for smooth shading
 	MatrixXf getSmoothNormals(MatrixXf* normals);
+	// Get colors
 	MatrixXf getColors();
 	// Write mesh to an obj file
 	void writeObj(string fileName);
@@ -101,8 +102,8 @@ private:
 	
 	// Read obj file
 	ObjBuffer readObj(string filename);
-	// Read intermediate data of subdivision
-	void readSd(ObjBuffer buffer);
+	// Read obj buffer
+	void readObjBuffer(ObjBuffer buffer);
 	// Fill in left parameters (left_prev, left_next, and left) of W_edge
 	void constructLeft();
 	// Get vertex normals for smooth shading
