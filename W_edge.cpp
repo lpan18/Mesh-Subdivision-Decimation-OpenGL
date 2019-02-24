@@ -93,3 +93,8 @@ Vector4f Face::getP() {
 	Vector4f p = Vector4f(normal.x(), normal.y(), normal.z(), d);
 	return p;
 }
+
+Matrix4f Face::getK_p() {
+	Vector4f p = getP();
+	return p * p.transpose();
+}

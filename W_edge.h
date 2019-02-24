@@ -4,8 +4,9 @@
 
 using namespace std;
 using nanogui::Vector3f;
-using nanogui::Vector4f;
 using nanogui::Vector3i;
+using nanogui::Vector4f;
+using nanogui::Matrix4f;
 using nanogui::MatrixXf;
 
 #ifndef W_EDGE_H
@@ -46,6 +47,7 @@ struct Face
 	vector<Vertex*> getVertices();
 	Vector3f getNormal();
 	Vector4f getP();
+	Matrix4f getK_p();
 };
 
 #endif //W_EDGE_H
