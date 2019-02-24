@@ -35,7 +35,7 @@ struct Face
 };
 
 // Intermediate data of subdivision
-struct SdBuffer
+struct ObjBuffer
 {
 	int nVertices;
 	int mFaces;
@@ -52,15 +52,14 @@ class WingedEdge
 public:
     // Regular constructor
 	WingedEdge(string fileName) {
-		readObj(fileName);
-		constructLeft();
-		findCenterScale();
-	}
-	// Constructor used in subdivision
-	WingedEdge(SdBuffer buffer) {
+		ObjBuffer buffer = readObj(fileName);
 		readSd(buffer);
 		constructLeft();
-		findCenterScale();
+	}
+	// Constructor used in subdivision
+	WingedEdge(ObjBuffer buffer) {
+		readSd(buffer);
+		constructLeft();
 	}
 	~WingedEdge() {
 		delete[] vertices;
@@ -77,9 +76,9 @@ public:
 	// Write mesh to an obj file
 	void writeObj(string fileName);
 	// Loop subdivision
-	SdBuffer sdLoop();
+	ObjBuffer sdLoop();
 	// Butterfly subdivision
-	SdBuffer sdBtfl();
+	ObjBuffer sdBtfl();
 private:
     // Number of vertices
 	int nVertices = 0;
@@ -101,13 +100,11 @@ private:
 	float scale;
 	
 	// Read obj file
-	void readObj(string filename);
+	ObjBuffer readObj(string filename);
 	// Read intermediate data of subdivision
-	void readSd(SdBuffer buffer);
+	void readSd(ObjBuffer buffer);
 	// Fill in left parameters (left_prev, left_next, and left) of W_edge
 	void constructLeft();
-	// Find the center and scale
-	void findCenterScale();
 	// Get vertex normals for smooth shading
 	Vector3f getVertexSN(Vertex* v, MatrixXf* normals);
 };

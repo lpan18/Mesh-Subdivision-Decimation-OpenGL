@@ -129,14 +129,14 @@ public:
             if (sdMode == 0){
                 // Loop subdivision
                 for (int i = 0; i < sdLevel; i++) {
-                    SdBuffer buffer = mWe->sdLoop();
+                    ObjBuffer buffer = mWe->sdLoop();
                     delete mWe;
                     mWe = new WingedEdge(buffer);
                 }
             } else if(sdMode == 1){
                     // Butterfly subdivision
                     for (int i = 0; i < sdLevel; i++) {
-                    SdBuffer buffer = mWe->sdBtfl();
+                    ObjBuffer buffer = mWe->sdBtfl();
                     delete mWe;
                     mWe = new WingedEdge(buffer);
                 }

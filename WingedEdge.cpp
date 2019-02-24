@@ -16,6 +16,7 @@
 using namespace std;
 
 const float PI = 3.14159265359;
+const float MAXVALUE = 99999999;
 
 // Function for sorting w_edges
 bool sortByStartVertexThenByEndVertex(const W_edge* edge1, const W_edge* edge2) {
@@ -45,6 +46,26 @@ int countFaces(Vertex* v) {
 	if (k == 0) throw "Face count 0";
 
 	return k;
+}
+
+void setCenterAndScale(ObjBuffer* buffer) {
+	float maxX, maxY, maxZ;
+	float minX, minY, minZ;
+	maxX = maxY = maxZ = -MAXVALUE;
+	minX = minY = minZ = MAXVALUE;
+
+	for (int i = 0; i < buffer->nVertices; i++) {
+		maxX = buffer->vertices[i].x() > maxX ? buffer->vertices[i].x() : maxX;
+		maxY = buffer->vertices[i].y() > maxY ? buffer->vertices[i].y() : maxY;
+		maxZ = buffer->vertices[i].z() > maxZ ? buffer->vertices[i].z() : maxZ;
+		minX = buffer->vertices[i].x() < minX ? buffer->vertices[i].x() : minX;
+		minY = buffer->vertices[i].y() < minY ? buffer->vertices[i].y() : minY;
+		minZ = buffer->vertices[i].z() < minZ ? buffer->vertices[i].z() : minZ;
+	}
+
+	buffer->center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
+	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - buffer->center;
+	buffer->scale = 1.0f / maxOffset.maxCoeff();
 }
 
 // Loop Subdivision, update the positions of existing vertices
@@ -252,8 +273,8 @@ void WingedEdge::writeObj(string fileName) {
 }
 
 // Loop subdivision
-SdBuffer WingedEdge::sdLoop() {
-	SdBuffer sd;
+ObjBuffer WingedEdge::sdLoop() {
+	ObjBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
 	sd.mFaces = mFaces * 4;
 	sd.center = center;
@@ -294,8 +315,8 @@ SdBuffer WingedEdge::sdLoop() {
 }
 
 // Butterfly subdivision
-SdBuffer WingedEdge::sdBtfl() {
-	SdBuffer sd;
+ObjBuffer WingedEdge::sdBtfl() {
+	ObjBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
 	sd.mFaces = mFaces * 4;
 	sd.center = center;
@@ -336,82 +357,60 @@ SdBuffer WingedEdge::sdBtfl() {
 }
 
 // Read Obj file
-void WingedEdge::readObj(string filename) {
+ObjBuffer WingedEdge::readObj(string filename) {
 	string line;
-	int vn;
+	int vn = 0, fm = 0;
 
-	// Read the file and get the numbers of vertices, faces, and w_edges.
+	// Read the file and get the numbers of vertices and faces.
 	ifstream fin(filename);
 	while (getline(fin, line)) {
 		if (line.length() > 1) {
 			if (line[0] == 'v' && line[1] == ' ') {
-				nVertices++;
+				vn++;
 			}
 			else if (line[0] == 'f' && line[1] == ' ') {
-				mFaces++;
-				string str = line.substr(2, line.size() - 1);
-				istringstream iss(str);
-				while (iss >> vn) {
-					lW_edges++;
-				}
+				fm++;
 			}
 		}
 	}
 
-	// Generate vertex, face, and w_edge arrays
-	vertices = new Vertex[nVertices];
-	faces = new Face[mFaces];
-	w_edges = new W_edge[lW_edges];
+	ObjBuffer buffer;
+	buffer.nVertices = vn;
+	buffer.mFaces = fm;
+	buffer.vertices = new Vector3f[buffer.nVertices];
+	buffer.faces = new Vector3i[buffer.mFaces];
 
 	// read the file again and initialize vertices, faces, and w_edges.
 	ifstream fin1(filename);
-	int vertexi = 0;
-	int facei = 0;
-	int w_edgei = 0;
+	int vi = 0, fi = 0;
+	float x, y, z;
+	int v1, v2, v3;
 
 	while (getline(fin1, line)) {
 		if (line.length() > 0) {
 			if (line[0] == 'v' && line[1] == ' ') {
 				string str = line.substr(2, line.size() - 1);
 				istringstream iss(str);
-				float x, y, z;
 				iss >> x >> y >> z;
-				vertices[vertexi].p = Vector3f(x,y,z);
-				vertexi++;
+				buffer.vertices[vi] = Vector3f(x, y, z);
+				vi++;
 			} else if (line[0] == 'f' && line[1] == ' ') {
 				string str = line.substr(2, line.size() - 1);
 				istringstream iss(str);
-				int start_w_edgei = w_edgei;
-				int start_vn = 0;
-				while (iss >> vn) {
-					// obj file is counterclockwise, while winged-edge structure is clock wise
-					w_edges[w_edgei].end = vertices + vn - 1;
-					w_edges[w_edgei].right = faces + facei;
-					vertices[vn - 1].edge = w_edges + w_edgei;
-
-					if (start_vn == 0) {
-						start_vn = vn;
-					} else {
-						w_edges[w_edgei - 1].start = vertices + vn - 1;
-						w_edges[w_edgei].right_next = w_edges + w_edgei - 1;
-						w_edges[w_edgei - 1].right_prev = w_edges + w_edgei;
-					}
-
-					w_edgei++;
-				}
-
-				w_edges[w_edgei - 1].start = vertices + start_vn - 1;
-				w_edges[start_w_edgei].right_next = w_edges + w_edgei - 1;
-				w_edges[w_edgei - 1].right_prev = w_edges + start_w_edgei;
-
-				faces[facei].edge = w_edges + start_w_edgei;
-				facei++;
+				iss >> v1 >> v2 >> v3;
+				buffer.faces[fi] = Vector3i(v1, v2, v3);
+				fi++;
 			}
 		}
 	}
+
+	// Set Center and Scale
+	setCenterAndScale(&buffer);
+
+	return buffer;
 }
 // Read intermediate data of subdivision
-void WingedEdge::readSd(SdBuffer buffer) {
+void WingedEdge::readSd(ObjBuffer buffer) {
 	nVertices = buffer.nVertices;
 	mFaces = buffer.mFaces;
 	lW_edges = buffer.mFaces * 3;
@@ -493,23 +492,6 @@ void WingedEdge::constructLeft() {
 	}
 }
 
-void WingedEdge::findCenterScale() {
-	float maxX, maxY, maxZ = numeric_limits<float>::min();
-	float minX, minY, minZ = numeric_limits<float>::max();
-
-	for (int i = 0; i < nVertices; i++) {
-		if (vertices[i].p.x() > maxX) maxX = vertices[i].p.x();
-		if (vertices[i].p.y() > maxY) maxY = vertices[i].p.y();
-		if (vertices[i].p.z() > maxZ) maxZ = vertices[i].p.z();
-		if (vertices[i].p.x() < minX) minX = vertices[i].p.x();
-		if (vertices[i].p.y() < minY) minY = vertices[i].p.y();
-		if (vertices[i].p.z() < minZ) minZ = vertices[i].p.z();
-	}
-
-	center = Vector3f(maxX / 2.0f + minX / 2.0f, maxY / 2.0f + minY / 2.0f, maxZ / 2.0f + minZ / 2.0f);
-	Vector3f maxOffset = Vector3f(maxX, maxY, maxZ) - center;
-	scale = 1.0f / maxOffset.maxCoeff();
-}
 // Get vertex normals for smooth shading
 Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     Vector3f vec(0, 0, 0);
