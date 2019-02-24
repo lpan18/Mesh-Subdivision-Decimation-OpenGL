@@ -37,6 +37,7 @@ struct Vertex
     vector<Face*> getFaces();
     vector<W_edge*> getW_edges();
     int countFaces();
+	Matrix4f getQ();
 };
 
 struct Face

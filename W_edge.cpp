@@ -42,6 +42,15 @@ vector<W_edge*> Vertex::getW_edges() {
 	return vec;
 }
 
+Matrix4f Vertex::getQ() {
+	Matrix4f q = Matrix4f::Zero();
+	vector<Face*> faces = getFaces();
+	for (auto f : faces) {
+		q += f->getK_p();
+	}
+	return q;
+}
+
 // Number of faces at Vertex v
 int Vertex::countFaces() {
 	return (int)getFaces().size();
