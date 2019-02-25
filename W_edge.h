@@ -23,10 +23,13 @@ struct W_edge
 	W_edge* right_prev; W_edge* right_next;
 	// Used in Subdivision
 	Vector3f* edgeVertex = NULL;
+
 	// The left W_edge
 	W_edge* leftW_edge() {
         return left_prev->right_next;
     }
+	
+	Vector3f getOptimalV();
 };
 
 struct Vertex

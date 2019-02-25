@@ -1,7 +1,29 @@
-#include "W_edge.h"
+#include <cmath>
 #include <Eigen/Geometry>
+#include <iostream>
+
+#include "W_edge.h"
 
 using namespace std;
+
+Vector3f W_edge::getOptimalV() {
+	Matrix4f q = start->getQ() + end->getQ();
+	Matrix4f drv;
+	drv << q(0, 0), q(0, 1), q(0, 2), q(0, 3),
+	       q(0, 1), q(1, 1), q(1, 2), q(1, 3),
+		   q(0, 2), q(1, 2), q(2, 2), q(2, 3),
+		   0, 0, 0, 1;
+	Matrix4f drv_inv = drv.inverse();
+
+	if (drv_inv.hasNaN()) {
+		// Temp code, return mid-point
+		// cout << start->p * 0.5 + end->p * 0.5 << endl << endl;
+		return start->p * 0.5 + end->p * 0.5;
+	} else {
+		Vector4f v = drv_inv * Vector4f(0, 0, 0, 1);
+		return v.head(3);
+	}
+}
 
 vector<Face*> Vertex::getFaces() {
 	vector<Face*> vec;
