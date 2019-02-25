@@ -120,8 +120,19 @@ public:
         delete mWe;
     }
 
+    // method to load obj
+    void loadObj(string fileName) {
+        delete mWe;
+        mWe = new WingedEdge(fileName);
+
+        positions = mWe->getPositions();
+        normals = mWe->getNormals(&positions);
+        smoothNormals = mWe->getSmoothNormals(&normals);
+        colors = mWe->getColors();
+    }
+
     // method to load obj (sdLevel is the step of subdivision)
-    void loadObj(string fileName, int sdLevel = 0, int sdMode = -1) {
+    void loadObjSd(string fileName, int sdLevel = 0, int sdMode = -1) {
         delete mWe;
         mWe = new WingedEdge(fileName);
 
@@ -142,6 +153,21 @@ public:
                 }
             }
         }
+
+        positions = mWe->getPositions();
+        normals = mWe->getNormals(&positions);
+        smoothNormals = mWe->getSmoothNormals(&normals);
+        colors = mWe->getColors();
+    }
+
+    void loadObjMcd(string fileName, int k, int countCollapse) {
+        delete mWe;
+        mWe = new WingedEdge(fileName);
+        
+        // To be uncommented
+        ObjBuffer buffer = mWe->mcd(k, countCollapse);
+        // delete mWe;
+        // mWe = new WingedEdge(buffer);
 
         positions = mWe->getPositions();
         normals = mWe->getNormals(&positions);
@@ -246,7 +272,6 @@ public:
         mCanvas->setBackgroundColor({100, 100, 100, 255});
         mCanvas->setSize({400, 400});
 
-
     	// Create another window and insert widgets into it
 	    Window *anotherWindow = new Window(this, "Widgets");
         anotherWindow->setPosition(Vector2i(500, 15));
@@ -296,7 +321,7 @@ public:
 
         Button *btnRunSd = new Button(anotherWindow, "Run Subdivision");
         btnRunSd->setCallback([&] {
-            mCanvas->loadObj(fileName, sdLevel, sdMode);
+            mCanvas->loadObjSd(fileName, sdLevel, sdMode);
         });
 
         // Rotation panel
@@ -433,6 +458,15 @@ public:
                 }});
         });
 
+        // Create another window and insert widgets into it
+	    Window *mcdWindow = new Window(this, "Mesh Decimation");
+        mcdWindow->setPosition(Vector2i(900, 15));
+        mcdWindow->setLayout(new GroupLayout());
+
+        Button *mcdButton  = new Button(mcdWindow, "Test Run");
+        mcdButton->setCallback([&] {
+            mCanvas->loadObjMcd(fileName, 8, 10);
+        });
 	    //Method to assemble the interface defined before it is called
         performLayout();
     }

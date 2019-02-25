@@ -59,6 +59,8 @@ public:
 	ObjBuffer sdLoop();
 	// Butterfly subdivision
 	ObjBuffer sdBtfl();
+	// Multiple choices decimation
+	ObjBuffer mcd(int k, int countCollapse);
 private:
     // Number of vertices
 	int nVertices = 0;

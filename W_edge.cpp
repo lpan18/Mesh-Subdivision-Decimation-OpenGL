@@ -115,17 +115,12 @@ Vector3f Face::getNormal() {
 	return normal;
 }
 
-Vector4f Face::getP() {
+Matrix4f Face::getK_p() {
 	vector<Vertex*> vertices = getVertices();
 	Vector3f e1 = vertices[2]->p - vertices[0]->p;
 	Vector3f e2 = vertices[1]->p - vertices[0]->p;
 	Vector3f normal = (e1.cross(e2)).normalized();
 	float d = (Vector3f::Zero() - vertices[0]->p).dot(normal);
 	Vector4f p = Vector4f(normal.x(), normal.y(), normal.z(), d);
-	return p;
-}
-
-Matrix4f Face::getK_p() {
-	Vector4f p = getP();
 	return p * p.transpose();
 }

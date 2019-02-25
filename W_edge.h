@@ -50,7 +50,6 @@ struct Face
 	vector<W_edge*> getW_edges();
 	vector<Vertex*> getVertices();
 	Vector3f getNormal();
-	Vector4f getP();
 	Matrix4f getK_p();
 };
 

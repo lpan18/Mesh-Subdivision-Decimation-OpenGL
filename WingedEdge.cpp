@@ -212,6 +212,12 @@ ObjBuffer WingedEdge::sdBtfl() {
 	return sd;
 }
 
+ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
+	ObjBuffer buffer;
+	// To be completed
+	return buffer;
+}
+
 // Read Obj file
 ObjBuffer WingedEdge::readObj(string filename) {
 	string line;
