@@ -29,7 +29,7 @@ struct W_edge
         return left_prev->right_next;
     }
 	
-	Vector3f getOptimalV();
+	Vector4f getOptimalV();
 };
 
 struct Vertex

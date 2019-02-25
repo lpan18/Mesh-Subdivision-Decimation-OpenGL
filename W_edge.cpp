@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Vector3f W_edge::getOptimalV() {
+Vector4f W_edge::getOptimalV() {
 	Matrix4f q = start->getQ() + end->getQ();
 	Matrix4f drv;
 	drv << q(0, 0), q(0, 1), q(0, 2), q(0, 3),
@@ -17,11 +17,11 @@ Vector3f W_edge::getOptimalV() {
 
 	if (drv_inv.hasNaN()) {
 		// Temp code, return mid-point
-		// cout << start->p * 0.5 + end->p * 0.5 << endl << endl;
-		return start->p * 0.5 + end->p * 0.5;
+		Vector3f mp = start->p * 0.5 + end->p * 0.5;
+		cout << "drv is not invertible" << mp << endl;
+		return Vector4f(mp.x(), mp.y(), mp.z(), 1);
 	} else {
-		Vector4f v = drv_inv * Vector4f(0, 0, 0, 1);
-		return v.head(3);
+		return drv_inv * Vector4f(0, 0, 0, 1);
 	}
 }
 
