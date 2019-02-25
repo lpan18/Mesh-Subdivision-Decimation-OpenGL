@@ -89,5 +89,7 @@ private:
 	void constructLeft();
 	// Get vertex normals for smooth shading
 	Vector3f getVertexSN(Vertex* v, MatrixXf* normals);
+	// One step of multiple choices decimation
+	void mcdOneStep(int k, vector<W_edge*>* validW_edges);
 };
 #endif //WINGEDEDGE_H

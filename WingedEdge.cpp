@@ -213,6 +213,20 @@ ObjBuffer WingedEdge::sdBtfl() {
 }
 
 ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
+	if (k <= 0) throw "k must be great than 0";
+	if (countCollapse >= lW_edges / 2) throw "countCollapse must be smaller than the number of edges";
+
+	// Initialize valid W_edges
+	vector<W_edge*> validW_edges;
+	validW_edges.reserve(lW_edges);
+	for (int i = 0; i < lW_edges; i++) {
+		validW_edges.push_back(w_edges + i);
+	}
+
+	for (int i = 0; i < countCollapse; i++) {
+		mcdOneStep(k, &validW_edges);
+	}
+
 	ObjBuffer buffer;
 	// To be completed
 	return buffer;
@@ -353,6 +367,7 @@ void WingedEdge::constructLeft() {
 			bi = i + 1;
 		}
 	}
+	delete w_edgeP;
 }
 
 // Get vertex normals for smooth shading
@@ -367,4 +382,8 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
 	}
 
     return vec.normalized();
+}
+
+void WingedEdge::mcdOneStep(int k, vector<W_edge*>* validW_edges) {
+
 }
