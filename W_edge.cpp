@@ -45,13 +45,14 @@ vector<Face*> Vertex::getFaces() {
 	return vec;
 }
 
-vector<W_edge*> Vertex::getW_edges() {
+vector<W_edge*> Vertex::getAllW_edges() {
 	vector<W_edge*> vec;
 	W_edge *e0 = edge->end == this ? edge->leftW_edge() : edge;
 	W_edge *e = e0;
     
 	do {
 		vec.push_back(e);
+		vec.push_back(e->leftW_edge());
 		if (e->end == this) {
 			e = e->right_next;
 		} else {

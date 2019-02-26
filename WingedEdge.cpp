@@ -385,5 +385,5 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
 }
 
 void WingedEdge::mcdOneStep(int k, vector<W_edge*>* validW_edges) {
-
+	
 }
