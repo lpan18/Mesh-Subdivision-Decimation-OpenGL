@@ -7,7 +7,7 @@
 using namespace std;
 
 Vector4f W_edge::getOptimalV() {
-	Matrix4f q = start->getQ() + end->getQ();
+	Matrix4f q = start->q + end->q;
 	Matrix4f drv;
 	drv << q(0, 0), q(0, 1), q(0, 2), q(0, 3),
 	       q(0, 1), q(1, 1), q(1, 2), q(1, 3),
@@ -65,13 +65,12 @@ vector<W_edge*> Vertex::getAllW_edges() {
 	return vec;
 }
 
-Matrix4f Vertex::getQ() {
-	Matrix4f q = Matrix4f::Zero();
+void Vertex::setInitialQ() {
+	q = Matrix4f::Zero();
 	vector<Face*> faces = getFaces();
 	for (auto f : faces) {
 		q += f->getK_p();
 	}
-	return q;
 }
 
 // Number of faces at Vertex v

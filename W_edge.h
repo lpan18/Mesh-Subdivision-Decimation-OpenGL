@@ -36,11 +36,12 @@ struct Vertex
 {
 	Vector3f p;
 	W_edge *edge;
+	Matrix4f q;
 
     vector<Face*> getFaces();
     vector<W_edge*> getAllW_edges();
     int countFaces();
-	Matrix4f getQ();
+	void setInitialQ();
 };
 
 struct Face

@@ -216,6 +216,11 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 	if (k <= 0) throw "k must be great than 0";
 	if (countCollapse >= lW_edges / 2) throw "countCollapse must be smaller than the number of edges";
 
+	// Initialize Q for all vertices
+	for (int i = 0; i < nVertices; i++) {
+		vertices[i].setInitialQ();
+	}
+
 	// Initialize valid W_edges
 	vector<W_edge*> validW_edges;
 	validW_edges.reserve(lW_edges);
@@ -385,5 +390,5 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
 }
 
 void WingedEdge::mcdOneStep(int k, vector<W_edge*>* validW_edges) {
-	
+
 }
