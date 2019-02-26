@@ -227,9 +227,11 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 	for (int i = 0; i < lW_edges; i++) {
 		validW_edges.push_back(w_edges + i);
 	}
-
+    
+	// Initialize random number generator
+	srand(time(NULL));
 	for (int i = 0; i < countCollapse; i++) {
-		mcdOneStep(k, &validW_edges);
+		mcdOneStep(k, validW_edges);
 	}
 
 	ObjBuffer buffer;
@@ -389,6 +391,29 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     return vec.normalized();
 }
 
-void WingedEdge::mcdOneStep(int k, vector<W_edge*>* validW_edges) {
-
+void WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
+	// First, randomly select k elements from validW_edges and move them to the start of validW_edges.
+	// Empty W_edges are removed when detected.
+	for (int i = 0; i < k; i++) {
+		do {
+			int r = rand() % (validW_edges.size() - i) + i;
+			W_edge* re = validW_edges[r];
+			if (re->start == NULL && re->end == NULL) {
+				validW_edges.erase(validW_edges.begin() + r);
+				continue;
+			} else if (re->start != NULL && re->end != NULL) {
+				if (i == r) {
+					// DO NOTHING
+				} else {
+					// Switch the rth and ith elements in validW_edges
+					W_edge* temp = validW_edges[r];
+					validW_edges[r] = validW_edges[i];
+					validW_edges[i] = temp;
+				}
+				break;
+			} else {
+				throw "Invalid W_edge state. start and end must be both null, or not null.";
+			}
+		} while (true);
+	}
 }
