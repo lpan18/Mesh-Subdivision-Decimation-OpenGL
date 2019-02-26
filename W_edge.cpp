@@ -6,8 +6,12 @@
 
 using namespace std;
 
+Matrix4f W_edge::getQ() {
+	return start->q + end->q;
+}
+
 Vector4f W_edge::getOptimalV() {
-	Matrix4f q = start->q + end->q;
+	Matrix4f q = getQ();
 	Matrix4f drv;
 	drv << q(0, 0), q(0, 1), q(0, 2), q(0, 3),
 	       q(0, 1), q(1, 1), q(1, 2), q(1, 3),

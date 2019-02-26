@@ -29,6 +29,7 @@ struct W_edge
         return left_prev->right_next;
     }
 	
+	Matrix4f getQ();
 	Vector4f getOptimalV();
 };
 

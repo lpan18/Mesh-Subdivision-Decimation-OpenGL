@@ -230,6 +230,8 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
     
 	// Initialize random number generator
 	srand(time(NULL));
+
+	// Main loop for mcd
 	for (int i = 0; i < countCollapse; i++) {
 		mcdOneStep(k, validW_edges);
 	}
@@ -416,4 +418,15 @@ void WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 			}
 		} while (true);
 	}
+
+	// Next, calculate the cost for each randomly selected edge
+	vector<float> errors;
+	errors.reserve(k);
+	for (int i = 0; i < k; i++) {
+		nanogui::Vector4f vo = validW_edges[i]->getOptimalV();
+		float e = vo.transpose() * validW_edges[i]->getQ() * vo;
+		errors.push_back(e);
+	}
+
+	int minElementIndex = std::min_element(errors.begin(),errors.end()) - errors.begin();
 }
