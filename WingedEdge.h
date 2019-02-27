@@ -92,5 +92,7 @@ private:
 	// One step of multiple choices decimation
 	// return true if successful, false if not
 	bool mcdOneStep(int k, vector<W_edge*>& validW_edges);
+	// Collapse a w_edge
+	void mcdCollapse(W_edge* w_edge);
 };
 #endif //WINGEDEDGE_H

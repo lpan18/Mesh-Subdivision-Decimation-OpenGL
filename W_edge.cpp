@@ -6,11 +6,21 @@
 
 using namespace std;
 
+void W_edge::PairLeftW_edge(W_edge *leftW_edge) {
+	leftW_edge->left = right;
+	leftW_edge->left_prev = right_prev;
+	leftW_edge->left_next = right_next;
+
+	left = leftW_edge->right;
+	left_prev = leftW_edge->right_prev;
+	left_next = leftW_edge->right_next;
+}
+
 Matrix4f W_edge::getQ() {
 	return start->q + end->q;
 }
 
-Vector4f W_edge::getOptimalV() {
+Vector4f W_edge::getTargetV() {
 	Matrix4f q = getQ();
 	Matrix4f drv;
 	drv << q(0, 0), q(0, 1), q(0, 2), q(0, 3),

@@ -465,7 +465,7 @@ public:
 
         Button *mcdButton  = new Button(mcdWindow, "Test Run");
         mcdButton->setCallback([&] {
-            mCanvas->loadObjMcd(fileName, 8, 10);
+            mCanvas->loadObjMcd(fileName, 8, 100);
         });
 	    //Method to assemble the interface defined before it is called
         performLayout();

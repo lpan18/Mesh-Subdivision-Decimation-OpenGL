@@ -239,6 +239,8 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 		while (true);
 	}
 
+	cout << "Temp output. MCD completed." << endl;
+
 	ObjBuffer buffer;
 	// To be completed
 	return buffer;
@@ -403,10 +405,10 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 		do {
 			int r = rand() % (validW_edges.size() - i) + i;
 			W_edge* re = validW_edges[r];
-			if (re->start == NULL && re->end == NULL) {
+			if (re->isNull()) {
 				validW_edges.erase(validW_edges.begin() + r);
 				continue;
-			} else if (re->start != NULL && re->end != NULL) {
+			} else {
 				if (i == r) {
 					// DO NOTHING
 				} else {
@@ -416,8 +418,6 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 					validW_edges[i] = temp;
 				}
 				break;
-			} else {
-				throw "Invalid W_edge state. start and end must be both null, or not null.";
 			}
 		} while (true);
 	}
@@ -427,18 +427,65 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	vector<float> errors;
 	errors.reserve(k);
 	for (int i = 0; i < k; i++) {
-		nanogui::Vector4f vo = validW_edges[i]->getOptimalV();
-		float e = vo.transpose() * validW_edges[i]->getQ() * vo;
+		nanogui::Vector4f vt = validW_edges[i]->getTargetV();
+		float e = vt.transpose() * validW_edges[i]->getQ() * vt;
 		errors.push_back(e);
 	}
 	int minEI = std::min_element(errors.begin(),errors.end()) - errors.begin();
-	W_edge* w_e = validW_edges[minEI];
+	W_edge* me = validW_edges[minEI];
 
 	// if the minimun valence of either the left face or the right face is smaller than 4,
 	// return false
-	if (w_e->left->getMinValence() < 4 || w_e->right->getMinValence() < 4) {
+	if (me->left->getMinValence() < 4 || me->right->getMinValence() < 4) {
 		return false;
+	} else {
+		mcdCollapse(me);
+		return true;
+	}
+}
+
+void WingedEdge::mcdCollapse(W_edge* w_edge) {
+	Vector4f vt = w_edge->getTargetV();
+	Vertex* v1 = w_edge->start;
+	Vertex* v2 = w_edge->end;
+	Face* f1 = w_edge->right;
+	Face* f2 = w_edge->left;
+	W_edge* e1 = w_edge->right_prev->leftW_edge();
+	W_edge* e2 = w_edge->right_next->leftW_edge();
+	W_edge* e3 = w_edge->left_next->leftW_edge();
+	W_edge* e4 = w_edge->left_prev->leftW_edge();
+	
+	// for all v1Edges, update v1 to v2
+	for (auto e : v1->getAllW_edges()) {
+		if (e->start == v1)
+			e->start = v2;
+		else if (e->end == v1)
+		    e->end = v2;
+		else
+		    throw "not a W_edge of vertex v1";
 	}
 
-	return true;
+	// Repairing e1 with e2, and e3 with e4
+	e1->PairLeftW_edge(e2);
+	e3->PairLeftW_edge(e4);
+
+	// Set W_edges on f1 and f2 to null
+	for (auto e : f1->getW_edges()) {
+		e->toNull();
+	}
+	for (auto e : f2->getW_edges()) {
+		e->toNull();
+	}
+
+	// Udpate v1 and v2
+	v2->p = vt.head(3);
+	v2->edge = e2;
+	v2->q += v1->q;
+
+	v1->p = Vector3f::Zero();
+	v1->edge = NULL;
+
+	// Update f1 and f2
+	f1->edge = NULL;
+	f2->edge = NULL;
 }

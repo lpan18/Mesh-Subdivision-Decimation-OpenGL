@@ -28,15 +28,29 @@ struct W_edge
 	W_edge* leftW_edge() {
         return left_prev->right_next;
     }
-	
+	void PairLeftW_edge(W_edge * leftW_edge);
 	Matrix4f getQ();
-	Vector4f getOptimalV();
+	Vector4f getTargetV();
+	void toNull() {
+		start = NULL;
+		end = NULL;
+	}
+	bool isNull() {
+		if (start == NULL && end == NULL) {
+			return true;
+		} else if (start != NULL && end != NULL) {
+			return false;
+		} else {
+			throw "Invalid W_edge state. start and end must be both null, or not null.";
+		}
+	}
 };
 
 struct Vertex
 {
 	Vector3f p;
 	W_edge *edge;
+	// Used in decimation
 	Matrix4f q;
 
     vector<Face*> getFaces();
