@@ -51,6 +51,7 @@ struct Face
 
 	vector<W_edge*> getW_edges();
 	vector<Vertex*> getVertices();
+	int getMinValence();
 	Vector3f getNormal();
 	Matrix4f getK_p();
 };

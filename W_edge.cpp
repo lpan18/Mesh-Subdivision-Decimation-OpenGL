@@ -110,6 +110,18 @@ vector<Vertex*> Face::getVertices() {
 	return vec;
 }
 
+int Face::getMinValence() {
+	int minV = MAXVALUE;
+	vector<Vertex*> vertices = getVertices();
+	
+	for (auto v : vertices) {
+		int vv = v->countFaces();
+		if (vv < minV) minV = vv;
+	}
+
+	return minV;
+}
+
 Vector3f Face::getNormal() {
 	vector<Vertex*> vertices = getVertices();
 	Vector3f e1 = vertices[2]->p - vertices[0]->p;

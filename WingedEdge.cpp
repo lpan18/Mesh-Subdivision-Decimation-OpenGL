@@ -233,7 +233,10 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 
 	// Main loop for mcd
 	for (int i = 0; i < countCollapse; i++) {
-		mcdOneStep(k, validW_edges);
+		do {
+			if (mcdOneStep(k, validW_edges)) break;
+		}
+		while (true);
 	}
 
 	ObjBuffer buffer;
@@ -393,7 +396,7 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     return vec.normalized();
 }
 
-void WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
+bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	// First, randomly select k elements from validW_edges and move them to the start of validW_edges.
 	// Empty W_edges are removed when detected.
 	for (int i = 0; i < k; i++) {
@@ -419,7 +422,8 @@ void WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 		} while (true);
 	}
 
-	// Next, calculate the cost for each randomly selected edge
+	// Next, calculate the cost for each randomly selected edge and find the W_edge
+	// with minimun collapse cost
 	vector<float> errors;
 	errors.reserve(k);
 	for (int i = 0; i < k; i++) {
@@ -427,6 +431,14 @@ void WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 		float e = vo.transpose() * validW_edges[i]->getQ() * vo;
 		errors.push_back(e);
 	}
+	int minEI = std::min_element(errors.begin(),errors.end()) - errors.begin();
+	W_edge* w_e = validW_edges[minEI];
 
-	int minElementIndex = std::min_element(errors.begin(),errors.end()) - errors.begin();
+	// if the minimun valence of either the left face or the right face is smaller than 4,
+	// return false
+	if (w_e->left->getMinValence() < 4 || w_e->right->getMinValence() < 4) {
+		return false;
+	}
+
+	return true;
 }
