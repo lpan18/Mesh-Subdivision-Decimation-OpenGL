@@ -369,12 +369,7 @@ void WingedEdge::constructLeft() {
 				for (int k = bi; k < i + 1; k++) {
 					if (w_edgeP[j]->start == w_edgeP[k]->right_prev->end && w_edgeP[j]->end == w_edgeP[k]->right_prev->start) {
 						// This is a match
-						w_edgeP[j]->left_prev = w_edgeP[k]->right_prev->right_prev;
-						w_edgeP[j]->left_next = w_edgeP[k]->right_prev->right_next;
-						w_edgeP[j]->left = w_edgeP[k]->right_prev->right;
-						w_edgeP[k]->right_prev->left_prev = w_edgeP[j]->right_prev;
-						w_edgeP[k]->right_prev->left_next = w_edgeP[j]->right_next;
-						w_edgeP[k]->right_prev->left = w_edgeP[j]->right;
+						w_edgeP[j]->PairLeftW_edge(w_edgeP[k]->right_prev);
 					}
 				}
 			}
