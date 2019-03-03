@@ -164,10 +164,9 @@ public:
         delete mWe;
         mWe = new WingedEdge(fileName);
         
-        // To be uncommented
         ObjBuffer buffer = mWe->mcd(k, countCollapse);
-        // delete mWe;
-        // mWe = new WingedEdge(buffer);
+        delete mWe;
+        mWe = new WingedEdge(buffer);
 
         positions = mWe->getPositions();
         normals = mWe->getNormals(&positions);

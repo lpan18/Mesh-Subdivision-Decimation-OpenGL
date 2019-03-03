@@ -240,10 +240,55 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 		while (true);
 	}
 
-	cout << "Temp output. MCD completed." << endl;
+	// Write the decimated mesh to an ObjBuffer
+	int dvCount = 0;
+	int dfCount = 0;
+	int* dvNumber = new int[nVertices];
+	for (int i = 0; i < nVertices; i++) {
+		if (vertices[i].edge != NULL) {
+			dvCount++;
+			dvNumber[i] = dvCount;
+		} else {
+			dvNumber[i] = -1;
+		}
+	}
+	for (int i = 0; i < mFaces; i++) {
+		if (faces[i].edge != NULL) {
+			dfCount++;
+		}
+	}
 
 	ObjBuffer buffer;
-	// To be completed
+	buffer.center = center;
+	buffer.scale = scale;
+	buffer.nVertices = dvCount;
+	buffer.mFaces = dfCount;
+	buffer.vertices = new Vector3f[buffer.nVertices];
+	buffer.faces = new Vector3i[buffer.mFaces];
+
+	int vi = 0;
+	for (int i = 0; i < nVertices; i++) {
+		if (vertices[i].edge != NULL) {
+			buffer.vertices[vi] = vertices[i].p;
+			vi++;
+		}
+	}
+
+	cout << "Vertices " <<  dvCount << endl;
+
+	int fi = 0;
+	for (int i = 0; i < mFaces; i++) {
+		if (faces[i].edge != NULL) {
+			int v1 = dvNumber[faces[i].edge->start - vertices];
+			int v2 = dvNumber[faces[i].edge->end - vertices];
+			int v3 = dvNumber[faces[i].edge->right_next->end -vertices];
+			buffer.faces[fi] = Vector3i(v3, v2, v1);
+			fi++;
+		}
+	}
+
+	cout << "Faces " << dfCount << endl;
+
 	return buffer;
 }
 
