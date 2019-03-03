@@ -229,12 +229,13 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 	}
     
 	// Initialize random number generator
-	srand(time(NULL));
+	srand(12345678);
 
 	// Main loop for mcd
 	for (int i = 0; i < countCollapse; i++) {
 		do {
-			if (mcdOneStep(k, validW_edges)) break;
+			bool success = mcdOneStep(k, validW_edges);
+			if (success) break;
 		}
 		while (true);
 	}
@@ -353,6 +354,7 @@ void WingedEdge::readObjBuffer(ObjBuffer buffer) {
 	delete []buffer.vertices;
 	delete []buffer.faces;
 }
+
 // Fill in left parameters (left_prev, left_next, and left) of W_edge
 void WingedEdge::constructLeft() {
 	W_edge** w_edgeP = new W_edge*[lW_edges];
@@ -443,6 +445,8 @@ void WingedEdge::mcdCollapse(W_edge* w_edge) {
 	Vector4f vt = w_edge->getTargetV();
 	Vertex* v1 = w_edge->start;
 	Vertex* v2 = w_edge->end;
+	Vertex* v3 = w_edge->right_next->end;
+	Vertex* v4 = w_edge->left_next->end;
 	Face* f1 = w_edge->right;
 	Face* f2 = w_edge->left;
 	W_edge* e1 = w_edge->right_prev->leftW_edge();
@@ -475,10 +479,13 @@ void WingedEdge::mcdCollapse(W_edge* w_edge) {
 	// Udpate v1 and v2
 	v2->p = vt.head(3);
 	v2->edge = e2;
-	v2->q += v1->q;
+	v2->q = v2->q + v1->q;
 
 	v1->p = Vector3f::Zero();
 	v1->edge = NULL;
+
+	v3->edge = e1;
+	v4->edge = e4;
 
 	// Update f1 and f2
 	f1->edge = NULL;
