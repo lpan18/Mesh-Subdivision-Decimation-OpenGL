@@ -43,7 +43,7 @@ vector<Face*> Vertex::getFaces() {
 	vector<Face*> vec;
 	W_edge *e0 = edge->end == this ? edge->leftW_edge() : edge;
 	W_edge *e = e0;
-    
+    int count = 0;
 	do {
 		if (e->end == this) {
 			vec.push_back(e->right);
@@ -52,8 +52,10 @@ vector<Face*> Vertex::getFaces() {
 			vec.push_back(e->left);
 			e = e->left_next;
 		}
-	} while (e != e0);
-
+		count++;
+	} while (e != e0 && count < 50);
+    
+	if (count >= 50) cout << "Count too big. It might be a dead loop." << endl;
 	if (vec.size() == 0) throw "No face at vertex v";
 
 	return vec;

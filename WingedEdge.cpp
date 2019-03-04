@@ -82,16 +82,44 @@ MatrixXf WingedEdge::getNormals(MatrixXf* positions) {
 
 // Get normals for smooth shading
 MatrixXf WingedEdge::getSmoothNormals(MatrixXf* normals) {
+	cout << "Size of normals: " << normals->size() << endl;
+	cout << "mFaces: " << mFaces << endl;
 	MatrixXf smoothNormals = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
 		Vertex* v1 = faces[i].edge->end;
 		Vertex* v2 = faces[i].edge->start;
 		Vertex* v3 = faces[i].edge->right_prev->start;
+		if (i == 52) {
+			cout << i << " " << v1 - vertices << " " << v2 - vertices << " " << v3 - vertices << endl;
+			cout << "v1" << v1 - vertices << " " << v1->getFaces().size() << " " << endl;
+			cout << "v2" << v2 - vertices << " " << v2->getFaces().size() << " " << endl;
+			cout << "v3" << v3 - vertices << " " << endl;
 
+			vector<Face*> vec;
+			W_edge *e0 = v3->edge->end == v3 ? v3->edge->leftW_edge() : v3->edge;
+			W_edge *e = e0;
+			
+			int count = 0;
+			do {
+				cout << "Face: " << e->right - faces + 1 << "  start: " << e->start - vertices + 1 << "  end: " << e->end - vertices + 1 <<
+				"   Vertices: " << e->right->edge->start - vertices + 1 << " " << e->right->edge->end - vertices + 1 << " " << e->right->edge->right_next->end -vertices + 1 << endl;
+				if (e->end == v3) {
+					vec.push_back(e->right);
+					e = e->right_next;
+				} else {
+					vec.push_back(e->left);
+					e = e->left_next;
+				}
+				count++;
+			}
+			while (e != e0 && count < 50);
+		}
+        
 		smoothNormals.col(i * 3) << getVertexSN(v1, normals);
 		smoothNormals.col(i * 3 + 1) << getVertexSN(v2, normals);
 		smoothNormals.col(i * 3 + 2) << getVertexSN(v3, normals);
 	}
+	cout << "Smooth Normals" << endl;
 	for (int i = mFaces * 3; i < mFaces * 9; i++) {
 		smoothNormals.col(i) << normals->col(i);
 	}
@@ -101,7 +129,11 @@ MatrixXf WingedEdge::getSmoothNormals(MatrixXf* normals) {
 MatrixXf WingedEdge::getColors() {
 	MatrixXf colors = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces * 3; i++) {
-		colors.col(i) << 1, 0, 0;
+		if (i / 3 == 57 || i / 3 == 66 || i / 3 == 75) {
+			colors.col(i) << 0, 1, 0;
+		} else {
+			colors.col(i) << 1, 0, 0;
+		}
 	}
 	for (int i = mFaces * 3; i < mFaces * 9; i++) {
 		colors.col(i) << 0, 0, 0;
