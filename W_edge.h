@@ -55,6 +55,7 @@ struct Vertex
 
     vector<Face*> getFaces();
     vector<W_edge*> getAllW_edges();
+	int countJointNeighbourVertices(Vertex* v2);
     int countFaces();
 	void setInitialQ();
 };
@@ -65,7 +66,6 @@ struct Face
 
 	vector<W_edge*> getW_edges();
 	vector<Vertex*> getVertices();
-	int getMinValence();
 	Vector3f getNormal();
 	Matrix4f getK_p();
 };

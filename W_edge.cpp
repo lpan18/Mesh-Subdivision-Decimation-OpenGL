@@ -79,6 +79,18 @@ vector<W_edge*> Vertex::getAllW_edges() {
 	return vec;
 }
 
+int Vertex::countJointNeighbourVertices(Vertex* v2) {
+	int count = 0;
+	for (auto v1e : this->getAllW_edges()) {
+		for (auto v2e : v2->getAllW_edges()) {
+			if (v1e->start == this && v2e->start == v2 && v1e->end == v2e->end) {
+				count++;
+			}
+		}
+	}
+	return count;
+}
+
 void Vertex::setInitialQ() {
 	q = Matrix4f::Zero();
 	vector<Face*> faces = getFaces();
@@ -118,18 +130,6 @@ vector<Vertex*> Face::getVertices() {
 	if (vec.size() < 3) throw "Less than 3 Vertices on face f";
 
 	return vec;
-}
-
-int Face::getMinValence() {
-	int minV = MAXVALUE;
-	vector<Vertex*> vertices = getVertices();
-	
-	for (auto v : vertices) {
-		int vv = v->countFaces();
-		if (vv < minV) minV = vv;
-	}
-
-	return minV;
 }
 
 Vector3f Face::getNormal() {

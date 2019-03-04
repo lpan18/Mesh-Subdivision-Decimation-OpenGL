@@ -476,9 +476,8 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	int minEI = std::min_element(errors.begin(),errors.end()) - errors.begin();
 	W_edge* me = validW_edges[minEI];
 
-	// if the minimun valence of either the left face or the right face is smaller than 4,
-	// return false
-	if (me->left->getMinValence() < 4 || me->right->getMinValence() < 4) {
+	// There must be exactly two joint neighbour vertices
+	if (me->start->countJointNeighbourVertices(me->end) != 2) {
 		return false;
 	} else {
 		mcdCollapse(me);
