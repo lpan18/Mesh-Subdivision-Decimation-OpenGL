@@ -6,11 +6,16 @@
 
 using namespace std;
 
+// v0, v1, and v2 are ordered clock-wise
 Vector3f calculateNormal(Vector3f v0, Vector3f v1, Vector3f v2) {
 	Vector3f e1 = v2 - v0;
 	Vector3f e2 = v1 - v0;
 	Vector3f normal = (e1.cross(e2)).normalized();
 	return normal;
+}
+
+float limitRange(float f, float low, float high) {
+	return f < low ? low : f > high ? high : f;
 }
 
 void W_edge::PairLeftW_edge(W_edge *leftW_edge) {
@@ -44,6 +49,37 @@ Vector4f W_edge::getTargetV() {
 	} else {
 		return drv_inv * Vector4f(0, 0, 0, 1);
 	}
+}
+
+void W_edge::toNull() {
+	start = NULL;
+	end = NULL;
+}
+
+bool W_edge::isNull() {
+	if (start == NULL && end == NULL) {
+		return true;
+	} else if (start != NULL && end != NULL) {
+		return false;
+	} else {
+		throw "Invalid W_edge state. start and end must be both null, or not null.";
+	}
+}
+
+float W_edge::getDiffAngleFaces(Vertex* v, Vector3f newP) {
+	Vector3f ln0 = left->getNormal();
+	Vector3f rn0 = right->getNormal();
+	float cosa0 = ln0.dot(rn0);
+	cosa0 = limitRange(cosa0, -1.0f, 1.0f);
+	float a0 = acos(cosa0);
+
+	Vector3f ln1 = left->getNewNormal(v, newP);
+	Vector3f rn1 = right->getNewNormal(v, newP);
+	float cosa1 = ln1.dot(rn1);
+	cosa1 = limitRange(cosa1, -1.0f, 1.0f);
+	float a1 = acos(cosa1);
+
+	return abs(a1 - a0);
 }
 
 vector<Face*> Vertex::getFaces() {
