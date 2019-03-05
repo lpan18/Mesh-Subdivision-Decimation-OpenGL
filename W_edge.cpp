@@ -6,6 +6,13 @@
 
 using namespace std;
 
+Vector3f calculateNormal(Vector3f v0, Vector3f v1, Vector3f v2) {
+	Vector3f e1 = v2 - v0;
+	Vector3f e2 = v1 - v0;
+	Vector3f normal = (e1.cross(e2)).normalized();
+	return normal;
+}
+
 void W_edge::PairLeftW_edge(W_edge *leftW_edge) {
 	leftW_edge->left = right;
 	leftW_edge->left_prev = right_prev;
@@ -134,18 +141,20 @@ vector<Vertex*> Face::getVertices() {
 
 Vector3f Face::getNormal() {
 	vector<Vertex*> vertices = getVertices();
-	Vector3f e1 = vertices[2]->p - vertices[0]->p;
-	Vector3f e2 = vertices[1]->p - vertices[0]->p;
-	Vector3f normal = (e1.cross(e2)).normalized();
+	return calculateNormal(vertices[0]->p, vertices[1]->p, vertices[2]->p);
+}
 
-	return normal;
+Vector3f Face::getNewNormal(Vertex* v, Vector3f newP) {
+	vector<Vertex*> vertices = getVertices();
+	Vector3f v0 = vertices[0] == v ? newP : vertices[0]->p;
+	Vector3f v1 = vertices[1] == v ? newP : vertices[1]->p;
+	Vector3f v2 = vertices[2] == v ? newP : vertices[2]->p;
+	return calculateNormal(v0, v1, v2);
 }
 
 Matrix4f Face::getK_p() {
 	vector<Vertex*> vertices = getVertices();
-	Vector3f e1 = vertices[2]->p - vertices[0]->p;
-	Vector3f e2 = vertices[1]->p - vertices[0]->p;
-	Vector3f normal = (e1.cross(e2)).normalized();
+	Vector3f normal = calculateNormal(vertices[0]->p, vertices[1]->p, vertices[2]->p);
 	float d = (Vector3f::Zero() - vertices[0]->p).dot(normal);
 	Vector4f p = Vector4f(normal.x(), normal.y(), normal.z(), d);
 	return p * p.transpose();

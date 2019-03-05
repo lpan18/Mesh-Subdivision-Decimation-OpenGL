@@ -67,6 +67,7 @@ struct Face
 	vector<W_edge*> getW_edges();
 	vector<Vertex*> getVertices();
 	Vector3f getNormal();
+	Vector3f getNewNormal(Vertex* v, Vector3f newP);
 	Matrix4f getK_p();
 };
 

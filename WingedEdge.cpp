@@ -508,7 +508,7 @@ void WingedEdge::mcdCollapse(W_edge* w_edge) {
 		    throw "not a W_edge of vertex v1";
 	}
 
-	// Repairing e1 with e2, and e3 with e4
+	// Re-pairing e1 with e2, and e3 with e4
 	e1->PairLeftW_edge(e2);
 	e3->PairLeftW_edge(e4);
 
