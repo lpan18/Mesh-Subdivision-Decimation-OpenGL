@@ -478,6 +478,10 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 
 	// There must be exactly two joint neighbour vertices
 	if (me->start->countJointNeighbourVertices(me->end) != 2) {
+		cout << "non manifold skipped" << endl;
+		return false;
+	} else if (me->detectFoldOver()) {
+		cout << "folder over skipped" << endl;
 		return false;
 	} else {
 		mcdCollapse(me);
@@ -486,7 +490,7 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 }
 
 void WingedEdge::mcdCollapse(W_edge* w_edge) {
-	Vector4f vt = w_edge->getTargetV();
+	Vector3f vt = w_edge->getTargetV().head(3);
 	Vertex* v1 = w_edge->start;
 	Vertex* v2 = w_edge->end;
 	Vertex* v3 = w_edge->right_next->end;
@@ -521,7 +525,7 @@ void WingedEdge::mcdCollapse(W_edge* w_edge) {
 	}
 
 	// Udpate v1 and v2
-	v2->p = vt.head(3);
+	v2->p = vt;
 	v2->edge = e2;
 	v2->q = v2->q + v1->q;
 

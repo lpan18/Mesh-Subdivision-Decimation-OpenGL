@@ -34,6 +34,8 @@ struct W_edge
 	void toNull();
 	bool isNull();
 	float getDiffAngleFaces(Vertex* v, Vector3f newP);
+	// Detect if fold over will occur by collapsing this edge
+	bool detectFoldOver();
 };
 
 struct Vertex
@@ -45,6 +47,7 @@ struct Vertex
 
     vector<Face*> getFaces();
     vector<W_edge*> getAllW_edges();
+	vector<W_edge*> getAllW_edgesStart();
 	int countJointNeighbourVertices(Vertex* v2);
     int countFaces();
 	void setInitialQ();

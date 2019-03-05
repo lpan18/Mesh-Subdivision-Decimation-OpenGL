@@ -82,6 +82,34 @@ float W_edge::getDiffAngleFaces(Vertex* v, Vector3f newP) {
 	return abs(a1 - a0);
 }
 
+bool W_edge::detectFoldOver() {
+	Vector3f vt = getTargetV().head(3);
+	Vertex* v1 = start;
+	Vertex* v2 = end;
+	Vertex* v3 = right_next->end;
+	Vertex* v4 = left_next->end;
+
+	vector<W_edge*> v1W_edges = v1->getAllW_edgesStart();
+	for (auto e : v1W_edges) {
+		if (e->end != v2 && e->end != v3 && e->end != v4) {
+			if (e->getDiffAngleFaces(v1, vt) > PI / 2) {
+				return true;
+			}
+		}
+	}
+
+	vector<W_edge*> v2W_edges = v2->getAllW_edgesStart();
+	for (auto e : v2W_edges) {
+		if (e->end != v1 && e->end != v3 && e->end != v4) {
+			if (e->getDiffAngleFaces(v2, vt) > PI / 2) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 vector<Face*> Vertex::getFaces() {
 	vector<Face*> vec;
 	W_edge *e0 = edge->end == this ? edge->leftW_edge() : edge;
@@ -115,6 +143,21 @@ vector<W_edge*> Vertex::getAllW_edges() {
 		} else {
 			e = e->left_next;
 		}
+	} while (e != e0);
+
+	if (vec.size() == 0) throw "No edge at vertex v";
+
+	return vec;
+}
+
+vector<W_edge*> Vertex::getAllW_edgesStart() {
+	vector<W_edge*> vec;
+	W_edge *e0 = edge->end == this ? edge->leftW_edge() : edge;
+	W_edge *e = e0;
+    
+	do {
+		vec.push_back(e);
+		e = e->left_next;
 	} while (e != e0);
 
 	if (vec.size() == 0) throw "No edge at vertex v";
