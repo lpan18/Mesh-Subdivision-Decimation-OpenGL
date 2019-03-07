@@ -212,6 +212,7 @@ ObjBuffer WingedEdge::sdBtfl() {
 	return sd;
 }
 
+// Main routine for multiple-choice decimation
 ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 	if (k <= 0) throw "k must be great than 0";
 	if (countCollapse >= lW_edges / 2) throw "countCollapse must be smaller than the number of edges";
@@ -241,8 +242,11 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 	}
 
 	// Write the decimated mesh to an ObjBuffer
+	// count of vertices after decimation
 	int dvCount = 0;
+	// count of faces after decimation
 	int dfCount = 0;
+	// An array that converts old vertex numbers to new vertex numbers
 	int* dvNumber = new int[nVertices];
 	for (int i = 0; i < nVertices; i++) {
 		if (vertices[i].edge != NULL) {
@@ -440,6 +444,7 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
     return vec.normalized();
 }
 
+// One step of multiple choice decimation
 bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	// First, randomly select k elements from validW_edges and move them to the start of validW_edges.
 	// Empty W_edges are removed when detected.
@@ -489,6 +494,7 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	}
 }
 
+// Collapse w_edge
 void WingedEdge::mcdCollapse(W_edge* w_edge) {
 	Vector3f vt = w_edge->getTargetV().head(3);
 	Vertex* v1 = w_edge->start;

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-// v0, v1, and v2 are ordered clock-wise
+// v0, v1, and v2 are ordered clock-wise.
 Vector3f calculateNormal(Vector3f v0, Vector3f v1, Vector3f v2) {
 	Vector3f e1 = v2 - v0;
 	Vector3f e2 = v1 - v0;
@@ -14,10 +14,12 @@ Vector3f calculateNormal(Vector3f v0, Vector3f v1, Vector3f v2) {
 	return normal;
 }
 
+// Set the value of f to [low, high].
 float limitRange(float f, float low, float high) {
 	return f < low ? low : f > high ? high : f;
 }
 
+// Pair this W_edge with its left W_edge.
 void W_edge::PairLeftW_edge(W_edge *leftW_edge) {
 	leftW_edge->left = right;
 	leftW_edge->left_prev = right_prev;
@@ -32,6 +34,7 @@ Matrix4f W_edge::getQ() {
 	return start->q + end->q;
 }
 
+// Calculate the target position that this edge will be collapsed to.
 Vector4f W_edge::getTargetV() {
 	Matrix4f q = getQ();
 	Matrix4f drv;
@@ -51,11 +54,14 @@ Vector4f W_edge::getTargetV() {
 	}
 }
 
+// Mark this W_edge as null. For simplicity, only
+// start and end are set to null.
 void W_edge::toNull() {
 	start = NULL;
 	end = NULL;
 }
 
+// Check if this W_edge is null.
 bool W_edge::isNull() {
 	if (start == NULL && end == NULL) {
 		return true;
@@ -66,6 +72,10 @@ bool W_edge::isNull() {
 	}
 }
 
+// In this method, we first calculate the angle between the left and right
+// faces of this W_edge. Then, we move the position of Vertex v (which is
+// a Vertex of both the left and right faces) to newP and re-calculate the
+// angle. It returns the difference between these two angles.
 float W_edge::getDiffAngleFaces(Vertex* v, Vector3f newP) {
 	Vector3f ln0 = left->getNormal();
 	Vector3f rn0 = right->getNormal();
@@ -82,6 +92,7 @@ float W_edge::getDiffAngleFaces(Vertex* v, Vector3f newP) {
 	return abs(a1 - a0);
 }
 
+// Detect if fold over will occur by collapsing this edge
 bool W_edge::detectFoldOver() {
 	Vector3f vt = getTargetV().head(3);
 	Vertex* v1 = start;
@@ -150,6 +161,7 @@ vector<W_edge*> Vertex::getAllW_edges() {
 	return vec;
 }
 
+// Get all the W_edges who start from this vertex
 vector<W_edge*> Vertex::getAllW_edgesStart() {
 	vector<W_edge*> vec;
 	W_edge *e0 = edge->end == this ? edge->leftW_edge() : edge;
@@ -165,6 +177,8 @@ vector<W_edge*> Vertex::getAllW_edgesStart() {
 	return vec;
 }
 
+// Count the total number of vertices who are neighbours of
+// both this vertex and vertex v2
 int Vertex::countJointNeighbourVertices(Vertex* v2) {
 	int count = 0;
 	for (auto v1e : this->getAllW_edges()) {
@@ -177,6 +191,7 @@ int Vertex::countJointNeighbourVertices(Vertex* v2) {
 	return count;
 }
 
+// Set the initial value of Q
 void Vertex::setInitialQ() {
 	q = Matrix4f::Zero();
 	vector<Face*> faces = getFaces();
@@ -223,6 +238,7 @@ Vector3f Face::getNormal() {
 	return calculateNormal(vertices[0]->p, vertices[1]->p, vertices[2]->p);
 }
 
+// Get the new normal for this face when Vertex v moves to newP
 Vector3f Face::getNewNormal(Vertex* v, Vector3f newP) {
 	vector<Vertex*> vertices = getVertices();
 	Vector3f v0 = vertices[0] == v ? newP : vertices[0]->p;

@@ -160,6 +160,8 @@ public:
         colors = mWe->getColors();
     }
 
+    // method to load obj (k is the number of multiple choices; countCollapse is the
+    // total count of edge collapses)
     void loadObjMcd(string fileName, int k, int countCollapse) {
         delete mWe;
         mWe = new WingedEdge(fileName);
@@ -462,10 +464,12 @@ public:
         mcdWindow->setPosition(Vector2i(900, 15));
         mcdWindow->setLayout(new GroupLayout());
 
+        // Edge collapses
         Button *mcdButton  = new Button(mcdWindow, "Test Run");
         mcdButton->setCallback([&] {
             mCanvas->loadObjMcd(fileName, 8, 19000);
         });
+
 	    //Method to assemble the interface defined before it is called
         performLayout();
     }
