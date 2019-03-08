@@ -36,10 +36,10 @@ CMakeFiles/
 testfiles/
 CMakeCache
 Makefile
-cmake_install.cmake
 mytest
+python/
+.vscode/
+subd
+mcaq
+cmake_install.cmake
 
-# python/
-# .vscode/
-# subd
-# mcaq
