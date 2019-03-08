@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <Eigen/Geometry>
 
-#include "WingedEdge.h"
+#include "Mesh.h"
 
 using namespace std;
 
@@ -46,7 +46,7 @@ void ObjBuffer::setCenterAndScale() {
 }
 
 // Get mesh vertex positions
-MatrixXf WingedEdge::getPositions() {
+MatrixXf Mesh::getPositions() {
 	MatrixXf positions = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
 		positions.col(i * 3) << (faces[i].edge->end->p - center) * scale;
@@ -64,7 +64,7 @@ MatrixXf WingedEdge::getPositions() {
 }
 
 // Get normals for flat shading
-MatrixXf WingedEdge::getNormals(MatrixXf* positions) {
+MatrixXf Mesh::getNormals(MatrixXf* positions) {
 	MatrixXf normals = MatrixXf(3, mFaces * 9);
 
 	for (int i = 0; i < mFaces; i++) {
@@ -81,7 +81,7 @@ MatrixXf WingedEdge::getNormals(MatrixXf* positions) {
 }
 
 // Get normals for smooth shading
-MatrixXf WingedEdge::getSmoothNormals(MatrixXf* normals) {
+MatrixXf Mesh::getSmoothNormals(MatrixXf* normals) {
 	MatrixXf smoothNormals = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces; i++) {
 		Vertex* v1 = faces[i].edge->end;
@@ -98,7 +98,7 @@ MatrixXf WingedEdge::getSmoothNormals(MatrixXf* normals) {
 	return smoothNormals;
 }
 
-MatrixXf WingedEdge::getColors() {
+MatrixXf Mesh::getColors() {
 	MatrixXf colors = MatrixXf(3, mFaces * 9);
 	for (int i = 0; i < mFaces * 3; i++) {
 		colors.col(i) << 1, 0, 0;
@@ -110,7 +110,7 @@ MatrixXf WingedEdge::getColors() {
 }
 
 // Write mesh to an obj file
-void WingedEdge::writeObj(string fileName) {
+void Mesh::writeObj(string fileName) {
 	stringstream ss;
 	ss << "# " << nVertices << " " << mFaces << endl;
 	for (int i = 0; i < nVertices; i++) {
@@ -129,7 +129,7 @@ void WingedEdge::writeObj(string fileName) {
 }
 
 // Loop subdivision
-ObjBuffer WingedEdge::sdLoop() {
+ObjBuffer Mesh::sdLoop() {
 	ObjBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
 	sd.mFaces = mFaces * 4;
@@ -171,7 +171,7 @@ ObjBuffer WingedEdge::sdLoop() {
 }
 
 // Butterfly subdivision
-ObjBuffer WingedEdge::sdBtfl() {
+ObjBuffer Mesh::sdBtfl() {
 	ObjBuffer sd;
 	sd.nVertices = nVertices + lW_edges / 2;
 	sd.mFaces = mFaces * 4;
@@ -213,7 +213,7 @@ ObjBuffer WingedEdge::sdBtfl() {
 }
 
 // Main routine for multiple-choice decimation
-ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
+ObjBuffer Mesh::mcd(int k, int countCollapse) {
 	if (k <= 0) throw "k must be great than 0";
 	if (countCollapse >= lW_edges / 2) throw "countCollapse must be smaller than the number of edges";
 
@@ -297,7 +297,7 @@ ObjBuffer WingedEdge::mcd(int k, int countCollapse) {
 }
 
 // Read Obj file
-ObjBuffer WingedEdge::readObj(string filename) {
+ObjBuffer Mesh::readObj(string filename) {
 	string line;
 	int vn = 0, fm = 0;
 
@@ -351,7 +351,7 @@ ObjBuffer WingedEdge::readObj(string filename) {
 }
 
 // Read obj buffer
-void WingedEdge::readObjBuffer(ObjBuffer buffer) {
+void Mesh::readObjBuffer(ObjBuffer buffer) {
 	nVertices = buffer.nVertices;
 	mFaces = buffer.mFaces;
 	lW_edges = buffer.mFaces * 3;
@@ -405,7 +405,7 @@ void WingedEdge::readObjBuffer(ObjBuffer buffer) {
 }
 
 // Fill in left parameters (left_prev, left_next, and left) of W_edge
-void WingedEdge::constructLeft() {
+void Mesh::constructLeft() {
 	W_edge** w_edgeP = new W_edge*[lW_edges];
 	for (int i = 0; i < lW_edges; i++) {
 		w_edgeP[i] = w_edges + i;
@@ -431,7 +431,7 @@ void WingedEdge::constructLeft() {
 }
 
 // Get vertex normals for smooth shading
-Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
+Vector3f Mesh::getVertexSN(Vertex* v, MatrixXf* normals) {
     Vector3f vec(0, 0, 0);
 	vector<Face*> vfs = v->getFaces();
 	int facei = -1;
@@ -445,7 +445,7 @@ Vector3f WingedEdge::getVertexSN(Vertex* v, MatrixXf* normals) {
 }
 
 // One step of multiple choice decimation
-bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
+bool Mesh::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	// First, randomly select k elements from validW_edges and move them to the start of validW_edges.
 	// Empty W_edges are removed when detected.
 	for (int i = 0; i < k; i++) {
@@ -495,7 +495,7 @@ bool WingedEdge::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 }
 
 // Collapse w_edge
-void WingedEdge::mcdCollapse(W_edge* w_edge) {
+void Mesh::mcdCollapse(W_edge* w_edge) {
 	Vector3f vt = w_edge->getTargetV().head(3);
 	Vertex* v1 = w_edge->start;
 	Vertex* v2 = w_edge->end;

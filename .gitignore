@@ -32,9 +32,14 @@
 *.app
 
 lib
-CMakeFiles
-testfiles
+CMakeFiles/
+testfiles/
 CMakeCache
 Makefile
 cmake_install.cmake
 mytest
+
+# python/
+# .vscode/
+# subd
+# mcaq

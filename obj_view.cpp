@@ -61,7 +61,7 @@
 #  include <windows.h>
 #endif
 
-#include "WingedEdge.h"
+#include "Mesh.h"
 
 using std::cout;
 using std::cerr;
@@ -123,7 +123,7 @@ public:
     // method to load obj
     void loadObj(string fileName) {
         delete mWe;
-        mWe = new WingedEdge(fileName);
+        mWe = new Mesh(fileName);
 
         positions = mWe->getPositions();
         normals = mWe->getNormals(&positions);
@@ -134,7 +134,7 @@ public:
     // method to load obj (sdLevel is the step of subdivision)
     void loadObjSd(string fileName, int sdLevel = 0, int sdMode = -1) {
         delete mWe;
-        mWe = new WingedEdge(fileName);
+        mWe = new Mesh(fileName);
 
         if(sdLevel != 0){
             if (sdMode == 0){
@@ -142,14 +142,14 @@ public:
                 for (int i = 0; i < sdLevel; i++) {
                     ObjBuffer buffer = mWe->sdLoop();
                     delete mWe;
-                    mWe = new WingedEdge(buffer);
+                    mWe = new Mesh(buffer);
                 }
             } else if(sdMode == 1){
                     // Butterfly subdivision
                     for (int i = 0; i < sdLevel; i++) {
                     ObjBuffer buffer = mWe->sdBtfl();
                     delete mWe;
-                    mWe = new WingedEdge(buffer);
+                    mWe = new Mesh(buffer);
                 }
             }
         }
@@ -164,11 +164,11 @@ public:
     // total count of edge collapses)
     void loadObjMcd(string fileName, int k, int countCollapse) {
         delete mWe;
-        mWe = new WingedEdge(fileName);
+        mWe = new Mesh(fileName);
         
         ObjBuffer buffer = mWe->mcd(k, countCollapse);
         delete mWe;
-        mWe = new WingedEdge(buffer);
+        mWe = new Mesh(buffer);
 
         positions = mWe->getPositions();
         normals = mWe->getNormals(&positions);
@@ -245,7 +245,7 @@ public:
 //Instantiation of the variables that can be acessed outside of this class to interact with the interface
 //Need to be updated if a interface element is interacting with something that is inside the scope of MyGLCanvas
 private:
-    WingedEdge *mWe = NULL;
+    Mesh *mWe = NULL;
     MatrixXf positions;
     MatrixXf normals;
     MatrixXf smoothNormals;
@@ -467,7 +467,7 @@ public:
         // Edge collapses
         Button *mcdButton  = new Button(mcdWindow, "Test Run");
         mcdButton->setCallback([&] {
-            mCanvas->loadObjMcd(fileName, 8, 19000);
+            mCanvas->loadObjMcd(fileName, 8, 100);
         });
 
 	    //Method to assemble the interface defined before it is called

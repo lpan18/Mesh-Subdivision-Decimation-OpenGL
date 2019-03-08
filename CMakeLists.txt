@@ -18,13 +18,13 @@ embed_resources(MyResources shader/vert.glsl shader/frag.glsl)
 
 set(OBJ_SOURCE_FILES
     obj_view.cpp
-    WingedEdge.cpp
-    WingedEdge.h
+    Mesh.cpp
+    Mesh.h
     Subdivision.cpp
     Subdivision.h
     W_edge.cpp
     W_edge.h)
 
-add_executable(obj_view ${OBJ_SOURCE_FILES} ${MyResources})
-target_link_libraries(obj_view nanogui ${NANOGUI_EXTRA_LIBS})
+add_executable(mcaq ${OBJ_SOURCE_FILES} ${MyResources})
+target_link_libraries(mcaq nanogui ${NANOGUI_EXTRA_LIBS})
 

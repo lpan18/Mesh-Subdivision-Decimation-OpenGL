@@ -23,5 +23,5 @@ Click save button to save the current mesh to an obj file.
 Click quit button to quit the program.          
 
 ## Structure of code files        
-The WingedEdge.h and WingedEdge.cpp contains the main structure of winged-edge algorithm.           
+The Mesh.h and Mesh.cpp contains the main structure of winged-edge algorithm.           
 The subd.cpp and obj_view.cpp are the same.            

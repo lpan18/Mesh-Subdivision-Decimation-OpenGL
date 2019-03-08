@@ -8,8 +8,8 @@ using nanogui::Vector3f;
 using nanogui::Vector3i;
 using nanogui::MatrixXf;
 
-#ifndef WINGEDEDGE_H
-#define WINGEDEDGE_H
+#ifndef MESH_H
+#define MESH_H
 
 // Intermediate data of subdivision
 struct ObjBuffer
@@ -25,22 +25,22 @@ struct ObjBuffer
 	void setCenterAndScale();
 };
 
-// Main WingedEdge class
-class WingedEdge
+// Main Mesh class
+class Mesh
 {
 public:
     // Regular constructor
-	WingedEdge(string fileName) {
+	Mesh(string fileName) {
 		ObjBuffer buffer = readObj(fileName);
 		readObjBuffer(buffer);
 		constructLeft();
 	}
 	// Constructor used in subdivision
-	WingedEdge(ObjBuffer buffer) {
+	Mesh(ObjBuffer buffer) {
 		readObjBuffer(buffer);
 		constructLeft();
 	}
-	~WingedEdge() {
+	~Mesh() {
 		delete[] vertices;
 		delete[] faces;
 		delete[] w_edges;
@@ -95,4 +95,4 @@ private:
 	// Collapse a w_edge
 	void mcdCollapse(W_edge* w_edge);
 };
-#endif //WINGEDEDGE_H
+#endif //MESH_H
