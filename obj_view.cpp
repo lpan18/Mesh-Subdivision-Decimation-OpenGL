@@ -62,6 +62,7 @@
 #endif
 
 #include "Mesh.h"
+#include "MeshSd.h"
 
 using std::cout;
 using std::cerr;
@@ -117,68 +118,68 @@ public:
     //flush data on call
     ~MyGLCanvas() {
         mShader.free();
-        delete mWe;
+        delete mMesh;
     }
 
     // method to load obj
     void loadObj(string fileName) {
-        delete mWe;
-        mWe = new Mesh(fileName);
+        delete mMesh;
+        mMesh = new Mesh(fileName);
 
-        positions = mWe->getPositions();
-        normals = mWe->getNormals(&positions);
-        smoothNormals = mWe->getSmoothNormals(&normals);
-        colors = mWe->getColors();
+        positions = mMesh->getPositions();
+        normals = mMesh->getNormals(&positions);
+        smoothNormals = mMesh->getSmoothNormals(&normals);
+        colors = mMesh->getColors();
     }
 
     // method to load obj (sdLevel is the step of subdivision)
     void loadObjSd(string fileName, int sdLevel = 0, int sdMode = -1) {
-        delete mWe;
-        mWe = new Mesh(fileName);
+        delete mMesh;
+        mMesh = new Mesh(fileName);
 
         if(sdLevel != 0){
             if (sdMode == 0){
                 // Loop subdivision
                 for (int i = 0; i < sdLevel; i++) {
-                    ObjBuffer buffer = mWe->sdLoop();
-                    delete mWe;
-                    mWe = new Mesh(buffer);
+                    ObjBuffer buffer = ((MeshSd*)mMesh)->sdLoop();
+                    delete mMesh;
+                    mMesh = new Mesh(buffer);
                 }
             } else if(sdMode == 1){
-                    // Butterfly subdivision
-                    for (int i = 0; i < sdLevel; i++) {
-                    ObjBuffer buffer = mWe->sdBtfl();
-                    delete mWe;
-                    mWe = new Mesh(buffer);
+                // Butterfly subdivision
+                for (int i = 0; i < sdLevel; i++) {
+                    ObjBuffer buffer = ((MeshSd*)mMesh)->sdBtfl();
+                    delete mMesh;
+                    mMesh = new Mesh(buffer);
                 }
             }
         }
 
-        positions = mWe->getPositions();
-        normals = mWe->getNormals(&positions);
-        smoothNormals = mWe->getSmoothNormals(&normals);
-        colors = mWe->getColors();
+        positions = mMesh->getPositions();
+        normals = mMesh->getNormals(&positions);
+        smoothNormals = mMesh->getSmoothNormals(&normals);
+        colors = mMesh->getColors();
     }
 
     // method to load obj (k is the number of multiple choices; countCollapse is the
     // total count of edge collapses)
     void loadObjMcd(string fileName, int k, int countCollapse) {
-        delete mWe;
-        mWe = new Mesh(fileName);
+        delete mMesh;
+        mMesh = new Mesh(fileName);
         
-        ObjBuffer buffer = mWe->mcd(k, countCollapse);
-        delete mWe;
-        mWe = new Mesh(buffer);
+        ObjBuffer buffer = mMesh->mcd(k, countCollapse);
+        delete mMesh;
+        mMesh = new Mesh(buffer);
 
-        positions = mWe->getPositions();
-        normals = mWe->getNormals(&positions);
-        smoothNormals = mWe->getSmoothNormals(&normals);
-        colors = mWe->getColors();
+        positions = mMesh->getPositions();
+        normals = mMesh->getNormals(&positions);
+        smoothNormals = mMesh->getSmoothNormals(&normals);
+        colors = mMesh->getColors();
     }
 
     void writeObj(string fileName) {
-        if (mWe != NULL) {
-            mWe->writeObj(fileName);
+        if (mMesh != NULL) {
+            mMesh->writeObj(fileName);
         } else {
             cout << "No object in scene" << endl;
         }
@@ -206,7 +207,7 @@ public:
     //OpenGL calls this method constantly to update the screen.
     virtual void drawGL() override {
         using namespace nanogui;
-        if (mWe == NULL) return;
+        if (mMesh == NULL) return;
         
 	    //refer to the previous explanation of mShader.bind();
         mShader.bind();
@@ -245,7 +246,7 @@ public:
 //Instantiation of the variables that can be acessed outside of this class to interact with the interface
 //Need to be updated if a interface element is interacting with something that is inside the scope of MyGLCanvas
 private:
-    Mesh *mWe = NULL;
+    Mesh *mMesh = NULL;
     MatrixXf positions;
     MatrixXf normals;
     MatrixXf smoothNormals;

@@ -1,11 +1,12 @@
 #include <nanogui/common.h>
 #include <string>
 #include "W_edge.h"
-#include "Subdivision.h"
 
 using namespace std;
 using nanogui::Vector3f;
 using nanogui::Vector3i;
+using nanogui::Vector4f;
+using nanogui::Matrix4f;
 using nanogui::MatrixXf;
 
 #ifndef MESH_H
@@ -55,13 +56,9 @@ public:
 	MatrixXf getColors();
 	// Write mesh to an obj file
 	void writeObj(string fileName);
-	// Loop subdivision
-	ObjBuffer sdLoop();
-	// Butterfly subdivision
-	ObjBuffer sdBtfl();
 	// Multiple choices decimation
 	ObjBuffer mcd(int k, int countCollapse);
-private:
+protected:
     // Number of vertices
 	int nVertices = 0;
 	// Number of faces

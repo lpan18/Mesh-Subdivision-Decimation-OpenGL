@@ -20,8 +20,8 @@ set(OBJ_SOURCE_FILES
     obj_view.cpp
     Mesh.cpp
     Mesh.h
-    Subdivision.cpp
-    Subdivision.h
+    MeshSd.cpp
+    MeshSd.h
     W_edge.cpp
     W_edge.h)
 

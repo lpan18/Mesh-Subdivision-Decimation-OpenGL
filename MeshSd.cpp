@@ -1,4 +1,4 @@
-#include "Subdivision.h"
+#include "MeshSd.h"
 
 // Loop Subdivision, update the positions of existing vertices
 Vector3f sdLoopVertex(Vertex* v) {
@@ -119,4 +119,88 @@ Vector3f sdBtflEdge(W_edge* w_edge) {
 	}
 
 	return vec;
+}
+
+// Loop subdivision
+ObjBuffer MeshSd::sdLoop() {
+	ObjBuffer sd;
+	sd.nVertices = nVertices + lW_edges / 2;
+	sd.mFaces = mFaces * 4;
+	sd.center = center;
+	sd.scale = scale;
+	sd.vertices = new Vector3f[sd.nVertices];
+	sd.faces = new Vector3i[sd.mFaces];
+
+	int vi = 0;
+	for (; vi < nVertices; vi++) {
+		sd.vertices[vi] = sdLoopVertex(vertices + vi);
+	}
+
+	for (int j = 0; j < lW_edges; j++) {
+		if (w_edges[j].edgeVertex == NULL) {
+			sd.vertices[vi] = sdLoopEdge(w_edges + j);
+			w_edges[j].edgeVertex = sd.vertices + vi;
+			w_edges[j].leftW_edge()->edgeVertex = sd.vertices + vi;
+			vi++;
+		}
+	}
+
+	int v1, v2, v3, v4, v5, v6;
+	for (int k = 0; k < mFaces; k++) {
+		v1 = faces[k].edge->start - vertices + 1;
+		v2 = faces[k].edge->end - vertices + 1;
+		v3 = faces[k].edge->right_next->end - vertices + 1;
+		v4 = faces[k].edge->edgeVertex - sd.vertices + 1;
+		v5 = faces[k].edge->right_next->edgeVertex - sd.vertices + 1;
+		v6 = faces[k].edge->right_prev->edgeVertex - sd.vertices + 1;
+
+		sd.faces[k * 4] << v1, v6, v4;
+		sd.faces[k * 4 + 1] << v3, v5, v6;
+		sd.faces[k * 4 + 2] << v2, v4, v5;
+		sd.faces[k * 4 + 3] << v4, v6, v5;
+	}
+
+	return sd;
+}
+
+// Butterfly subdivision
+ObjBuffer MeshSd::sdBtfl() {
+	ObjBuffer sd;
+	sd.nVertices = nVertices + lW_edges / 2;
+	sd.mFaces = mFaces * 4;
+	sd.center = center;
+	sd.scale = scale;
+	sd.vertices = new Vector3f[sd.nVertices];
+	sd.faces = new Vector3i[sd.mFaces];
+
+	int vi = 0;
+	for (; vi < nVertices; vi++) {
+		sd.vertices[vi] = vertices[vi].p;
+	}
+
+	for (int j = 0; j < lW_edges; j++) {
+		if (w_edges[j].edgeVertex == NULL) {
+			sd.vertices[vi] = sdBtflEdge(w_edges + j);
+			w_edges[j].edgeVertex = sd.vertices + vi;
+			w_edges[j].leftW_edge()->edgeVertex = sd.vertices + vi;
+			vi++;
+		}
+	}
+
+	int v1, v2, v3, v4, v5, v6;
+	for (int k = 0; k < mFaces; k++) {
+		v1 = faces[k].edge->start - vertices + 1;
+		v2 = faces[k].edge->end - vertices + 1;
+		v3 = faces[k].edge->right_next->end - vertices + 1;
+		v4 = faces[k].edge->edgeVertex - sd.vertices + 1;
+		v5 = faces[k].edge->right_next->edgeVertex - sd.vertices + 1;
+		v6 = faces[k].edge->right_prev->edgeVertex - sd.vertices + 1;
+
+		sd.faces[k * 4] << v1, v6, v4;
+		sd.faces[k * 4 + 1] << v3, v5, v6;
+		sd.faces[k * 4 + 2] << v2, v4, v5;
+		sd.faces[k * 4 + 3] << v4, v6, v5;
+	}
+
+	return sd;
 }
