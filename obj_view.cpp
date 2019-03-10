@@ -63,6 +63,7 @@
 
 #include "Mesh.h"
 #include "MeshSd.h"
+#include "MeshMcd.h"
 
 using std::cout;
 using std::cerr;
@@ -167,7 +168,7 @@ public:
         delete mMesh;
         mMesh = new Mesh(fileName);
         
-        ObjBuffer buffer = mMesh->mcd(k, countCollapse);
+        ObjBuffer buffer = ((MeshMcd*)mMesh)->mcd(k, countCollapse);
         delete mMesh;
         mMesh = new Mesh(buffer);
 

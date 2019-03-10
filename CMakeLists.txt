@@ -18,10 +18,12 @@ embed_resources(MyResources shader/vert.glsl shader/frag.glsl)
 
 set(OBJ_SOURCE_FILES
     obj_view.cpp
-    Mesh.cpp
-    Mesh.h
+    MeshMcd.cpp
+    MeshMcd.h
     MeshSd.cpp
     MeshSd.h
+    Mesh.cpp
+    Mesh.h
     W_edge.cpp
     W_edge.h)
 

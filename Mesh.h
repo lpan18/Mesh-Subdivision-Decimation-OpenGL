@@ -56,8 +56,6 @@ public:
 	MatrixXf getColors();
 	// Write mesh to an obj file
 	void writeObj(string fileName);
-	// Multiple choices decimation
-	ObjBuffer mcd(int k, int countCollapse);
 protected:
     // Number of vertices
 	int nVertices = 0;
@@ -86,10 +84,5 @@ protected:
 	void constructLeft();
 	// Get vertex normals for smooth shading
 	Vector3f getVertexSN(Vertex* v, MatrixXf* normals);
-	// One step of multiple choices decimation
-	// return true if successful, false if not
-	bool mcdOneStep(int k, vector<W_edge*>& validW_edges);
-	// Collapse a w_edge
-	void mcdCollapse(W_edge* w_edge);
 };
 #endif //MESH_H
