@@ -33,7 +33,6 @@ struct W_edge
 	Vector4f getTargetV();
 	void toNull();
 	bool isNull();
-	float getDiffAngleFaces(Vertex* v, Vector3f newP);
 	// Detect if fold over will occur by collapsing this edge
 	bool detectFoldOver();
 };
@@ -61,6 +60,7 @@ struct Face
 	vector<Vertex*> getVertices();
 	Vector3f getNormal();
 	Vector3f getNewNormal(Vertex* v, Vector3f newP);
+	bool detectFoldOver(Vertex* v, Vector3f newP);
 	Matrix4f getK_p();
 };
 

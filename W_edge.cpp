@@ -19,6 +19,13 @@ float limitRange(float f, float low, float high) {
 	return f < low ? low : f > high ? high : f;
 }
 
+// get the angle between two unit vectors v1 and v2
+float getAngleUnitVectors(Vector3f v1, Vector3f v2) {
+	float cosa = v1.dot(v2);
+	cosa = limitRange(cosa, -1.0f, 1.0f);
+	return acos(cosa);
+}
+
 // Pair this W_edge with its left W_edge.
 void W_edge::PairLeftW_edge(W_edge *leftW_edge) {
 	leftW_edge->left = right;
@@ -72,49 +79,23 @@ bool W_edge::isNull() {
 	}
 }
 
-// In this method, we first calculate the angle between the left and right
-// faces of this W_edge. Then, we move the position of Vertex v (which is
-// a Vertex of both the left and right faces) to newP and re-calculate the
-// angle. It returns the difference between these two angles.
-float W_edge::getDiffAngleFaces(Vertex* v, Vector3f newP) {
-	Vector3f ln0 = left->getNormal();
-	Vector3f rn0 = right->getNormal();
-	float cosa0 = ln0.dot(rn0);
-	cosa0 = limitRange(cosa0, -1.0f, 1.0f);
-	float a0 = acos(cosa0);
-
-	Vector3f ln1 = left->getNewNormal(v, newP);
-	Vector3f rn1 = right->getNewNormal(v, newP);
-	float cosa1 = ln1.dot(rn1);
-	cosa1 = limitRange(cosa1, -1.0f, 1.0f);
-	float a1 = acos(cosa1);
-
-	return abs(a1 - a0);
-}
-
 // Detect if fold over will occur by collapsing this edge
 bool W_edge::detectFoldOver() {
 	Vector3f vt = getTargetV().head(3);
-	Vertex* v1 = start;
-	Vertex* v2 = end;
-	Vertex* v3 = right_next->end;
-	Vertex* v4 = left_next->end;
 
-	vector<W_edge*> v1W_edges = v1->getAllW_edgesStart();
-	for (auto e : v1W_edges) {
-		if (e->end != v2 && e->end != v3 && e->end != v4) {
-			if (e->getDiffAngleFaces(v1, vt) > PI / 2) {
-				return true;
-			}
+	vector<Face*> startFaces = start->getFaces();
+	for (auto f : startFaces) {
+		if (f != left && f != right
+		&& f->detectFoldOver(start, vt)) {
+			return true;
 		}
 	}
 
-	vector<W_edge*> v2W_edges = v2->getAllW_edgesStart();
-	for (auto e : v2W_edges) {
-		if (e->end != v1 && e->end != v3 && e->end != v4) {
-			if (e->getDiffAngleFaces(v2, vt) > PI / 2) {
-				return true;
-			}
+	vector<Face*> endFaces = end->getFaces();
+	for (auto f : endFaces) {
+		if (f != left && f != right
+		&& f->detectFoldOver(end, vt)) {
+			return true;
 		}
 	}
 
@@ -245,6 +226,13 @@ Vector3f Face::getNewNormal(Vertex* v, Vector3f newP) {
 	Vector3f v1 = vertices[1] == v ? newP : vertices[1]->p;
 	Vector3f v2 = vertices[2] == v ? newP : vertices[2]->p;
 	return calculateNormal(v0, v1, v2);
+}
+
+bool Face::detectFoldOver(Vertex* v, Vector3f newP) {
+	Vector3f n1 = getNormal();
+	Vector3f n2 = getNewNormal(v, newP);
+	float a = getAngleUnitVectors(n1, n2);
+	return a > PI / 2 ? true : false;
 }
 
 Matrix4f Face::getK_p() {
