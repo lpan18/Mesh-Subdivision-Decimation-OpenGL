@@ -128,7 +128,7 @@ void Mesh::writeObj(string fileName) {
 	}
 }
 
-// Read Obj file
+// Read Obj file to ObjBuffer
 ObjBuffer Mesh::readObj(string filename) {
 	string line;
 	int vn = 0, fm = 0;

@@ -12,7 +12,7 @@ using nanogui::MatrixXf;
 #ifndef MESH_H
 #define MESH_H
 
-// Intermediate data of subdivision
+// An in-memory representation of obj file
 struct ObjBuffer
 {
 	int nVertices;
@@ -26,7 +26,7 @@ struct ObjBuffer
 	void setCenterAndScale();
 };
 
-// Main Mesh class
+// Base class of mesh
 class Mesh
 {
 public:
@@ -36,7 +36,7 @@ public:
 		readObjBuffer(buffer);
 		constructLeft();
 	}
-	// Constructor used in subdivision
+	// Constructor used in subdivision and mesh decimation
 	Mesh(ObjBuffer buffer) {
 		readObjBuffer(buffer);
 		constructLeft();

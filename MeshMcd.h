@@ -17,11 +17,10 @@ using nanogui::MatrixXf;
 
 class MeshMcd : public Mesh {
 public:
-    // Regular constructor
 	MeshMcd(string fileName)
     : Mesh(fileName) {
 	}
-	// Constructor used in mesh decimation
+    
 	MeshMcd(ObjBuffer buffer)
     : Mesh(buffer) {
 	}
