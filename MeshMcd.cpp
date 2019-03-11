@@ -89,6 +89,13 @@ bool MeshMcd::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 	// First, randomly select k elements from validW_edges and move them to the start of validW_edges.
 	// Empty W_edges are removed when detected.
 	for (int i = 0; i < k; i++) {
+		// i must be smaller than validW_edges.size()
+		if (i >= validW_edges.size()) {
+			// This is very rare. It happens only when (the number of edges to collapse) + k > original number of vertices
+			k = i;
+			break;
+		}
+
 		do {
 			int r = rand() % (validW_edges.size() - i) + i;
 			W_edge* re = validW_edges[r];

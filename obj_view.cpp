@@ -170,7 +170,7 @@ public:
         
         if (k > mMesh->getVertexCount() - 10) {
             cout << "The value of k " << k << " is too big." << endl;
-        } else if (countCollapse + k > mMesh->getVertexCount() - 10) {
+        } else if (countCollapse > mMesh->getVertexCount() - 10) {
             cout << "The number of edges to collapse " << countCollapse << " is too big." << endl;
         } else {
             ObjBuffer buffer = ((MeshMcd*)mMesh)->mcd(k, countCollapse);
