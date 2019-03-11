@@ -168,9 +168,15 @@ public:
         delete mMesh;
         mMesh = new Mesh(fileName);
         
-        ObjBuffer buffer = ((MeshMcd*)mMesh)->mcd(k, countCollapse);
-        delete mMesh;
-        mMesh = new Mesh(buffer);
+        if (k > mMesh->getVertexCount() - 10) {
+            cout << "The value of k " << k << " is too big." << endl;
+        } else if (countCollapse + k > mMesh->getVertexCount() - 10) {
+            cout << "The number of edges to collapse " << countCollapse << " is too big." << endl;
+        } else {
+            ObjBuffer buffer = ((MeshMcd*)mMesh)->mcd(k, countCollapse);
+            delete mMesh;
+            mMesh = new Mesh(buffer);
+        }
 
         positions = mMesh->getPositions();
         normals = mMesh->getNormals(&positions);
@@ -277,7 +283,7 @@ public:
 
     	// Create another window and insert widgets into it
 	    Window *anotherWindow = new Window(this, "Widgets");
-        anotherWindow->setPosition(Vector2i(500, 15));
+        anotherWindow->setPosition(Vector2i(485, 15));
         anotherWindow->setLayout(new GroupLayout());
 
 	    // Open and save obj file
@@ -463,32 +469,34 @@ public:
 
         // Create another window and insert widgets into it
 	    Window *mcdWindow = new Window(this, "Mesh Decimation");
-        mcdWindow->setPosition(Vector2i(900, 15));
+        mcdWindow->setPosition(Vector2i(865, 15));
         mcdWindow->setLayout(new GroupLayout());
 
 	    Widget *panelK = new Widget(mcdWindow);
         panelK->setLayout(new BoxLayout(Orientation::Horizontal,
                                         Alignment::Middle, 0, 10));
         Label *lbK = new Label(panelK, "k");
+        lbK->setFixedSize(Vector2i(75, 20));
         TextBox *txtK = new TextBox(panelK);
-        txtK->setFixedSize(Vector2i(60, 25));
+        txtK->setFixedSize(Vector2i(90, 25));
+        txtK->setEditable(true);
         txtK->setValue("8");
 
         Widget *panelN = new Widget(mcdWindow);
         panelN->setLayout(new BoxLayout(Orientation::Horizontal,
                                         Alignment::Middle, 0, 10));
-        Label *lbN = new Label(panelN, "N");
+        Label *lbN = new Label(panelN, "N to Collapse");
+        lbN->setFixedSize(Vector2i(75, 20));
         TextBox *txtN = new TextBox(panelN);
-        txtN->setFixedSize(Vector2i(60, 25));
+        txtN->setFixedSize(Vector2i(90, 25));
+        txtN->setEditable(true);
         txtN->setValue("100");
 
         // Edge collapses
-        Button *mcdButton  = new Button(mcdWindow, "Run Decimation");
-        mcdButton->setCallback([&] {
-            //int k = stoi(txtK->value());
-            //int n = stoi(txtN->value());
-            int k = stoi("8");
-            int n = stoi("100");
+        Button *mcdButton  = new Button(mcdWindow, "Decimate");
+        mcdButton->setCallback([&, txtK, txtN] {
+            int k = stoi(txtK->value());
+            int n = stoi(txtN->value());
             mCanvas->loadObjMcd(fileName, k, n);
         });
 

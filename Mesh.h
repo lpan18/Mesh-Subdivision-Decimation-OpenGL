@@ -54,6 +54,10 @@ public:
 	MatrixXf getSmoothNormals(MatrixXf* normals);
 	// Get colors
 	MatrixXf getColors();
+	// Get vertex count
+	int getVertexCount() {
+		return nVertices;
+	}
 	// Write mesh to an obj file
 	void writeObj(string fileName);
 protected:
