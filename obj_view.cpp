@@ -466,10 +466,30 @@ public:
         mcdWindow->setPosition(Vector2i(900, 15));
         mcdWindow->setLayout(new GroupLayout());
 
+	    Widget *panelK = new Widget(mcdWindow);
+        panelK->setLayout(new BoxLayout(Orientation::Horizontal,
+                                        Alignment::Middle, 0, 10));
+        Label *lbK = new Label(panelK, "k");
+        TextBox *txtK = new TextBox(panelK);
+        txtK->setFixedSize(Vector2i(60, 25));
+        txtK->setValue("8");
+
+        Widget *panelN = new Widget(mcdWindow);
+        panelN->setLayout(new BoxLayout(Orientation::Horizontal,
+                                        Alignment::Middle, 0, 10));
+        Label *lbN = new Label(panelN, "N");
+        TextBox *txtN = new TextBox(panelN);
+        txtN->setFixedSize(Vector2i(60, 25));
+        txtN->setValue("100");
+
         // Edge collapses
-        Button *mcdButton  = new Button(mcdWindow, "Test Run");
+        Button *mcdButton  = new Button(mcdWindow, "Run Decimation");
         mcdButton->setCallback([&] {
-            mCanvas->loadObjMcd(fileName, 8, 100);
+            //int k = stoi(txtK->value());
+            //int n = stoi(txtN->value());
+            int k = stoi("8");
+            int n = stoi("100");
+            mCanvas->loadObjMcd(fileName, k, n);
         });
 
 	    //Method to assemble the interface defined before it is called
