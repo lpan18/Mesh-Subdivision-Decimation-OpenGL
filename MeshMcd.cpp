@@ -66,8 +66,6 @@ ObjBuffer MeshMcd::mcd(int k, int countCollapse) {
 		}
 	}
 
-	cout << "Vertices " <<  dvCount << endl;
-
 	int fi = 0;
 	for (int i = 0; i < mFaces; i++) {
 		if (faces[i].edge != NULL) {
@@ -78,8 +76,6 @@ ObjBuffer MeshMcd::mcd(int k, int countCollapse) {
 			fi++;
 		}
 	}
-
-	cout << "Faces " << dfCount << endl;
 
 	return buffer;
 }
@@ -130,10 +126,8 @@ bool MeshMcd::mcdOneStep(int k, vector<W_edge*>& validW_edges) {
 
 	// There must be exactly two joint neighbour vertices
 	if (me->start->countJointNeighbourVertices(me->end) != 2) {
-		cout << "non manifold skipped" << endl;
 		return false;
 	} else if (me->detectFoldOver()) {
-		cout << "folder over skipped" << endl;
 		return false;
 	} else {
 		mcdCollapse(me);

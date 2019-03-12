@@ -52,10 +52,20 @@ Vector4f W_edge::getTargetV() {
 	Matrix4f drv_inv = drv.inverse();
 
 	if (drv_inv.hasNaN()) {
-		// Temp code, return mid-point
-		Vector3f mp = start->p * 0.5 + end->p * 0.5;
-		cout << "drv is not invertible" << mp << endl;
-		return Vector4f(mp.x(), mp.y(), mp.z(), 1);
+		Vector4f sp = Vector4f(start->p.x(), start->p.y(), start->p.z(), 1.0f);
+		Vector4f ep = Vector4f(end->p.x(), end->p.y(), end->p.z(), 1.0f);
+		Vector4f mp = sp * 0.5f + ep * 0.5f;
+		float se = sp.transpose() * q * sp;
+		float ee = ep.transpose() * q * ep;
+		float me = mp.transpose() * q * mp;
+
+		if (se < ee && se < me) {
+			return sp;
+		} else if (ee < se && ee < me) {
+			return ep;
+		} else {
+			return mp;
+		}
 	} else {
 		return drv_inv * Vector4f(0, 0, 0, 1);
 	}
