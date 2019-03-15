@@ -1,27 +1,17 @@
-# CMPT764 Assignment1
+# CMPT764 Assignment2
 
-## Part I Obj_view 
-unzip a1q1.zip  
-open folder A1_obj_view   
-run ```cmake . ```  
-run ```make```   
-run ```./obj_view```   
-Click open button to open an obj file.   
-Play around with different slide bars and mesh presentation options.   
-Click save button to save the current mesh to an obj file.    
-Click quit button to quit the program.    
-
-## Part II Subdivision   
-unzip a1bonus.zip      
-open folder subd        
+## Mesh Decimation
+unzip file      
 run ```cmake . ```          
 run ```make```         
-run ```./subd```          
+run ```./mcaq```          
 Click open button to open an obj file.      
-Select a subdivision mode in the combobox, move the slider to set level of subdivision, and then click button "Run Subdivision".        
-Click save button to save the current mesh to an obj file.           
+Enter the k value and Number of vertices you want to collaspe in the textbox, and then click button "Decimate".        
+Click save button to save the decimated mesh to an obj file.           
 Click quit button to quit the program.          
 
 ## Structure of code files        
-The Mesh.h and Mesh.cpp contains the main structure of winged-edge algorithm.           
-The subd.cpp and obj_view.cpp are the same.            
+The MeshMcd.h and MeshMcd.cpp contains the main structure of mesh decimation algorithm.     
+The MeshSd.h and MeshSd.cpp contains the main structure of mesh subdivision algorithm.     
+The W_edge.h, W_edge.cpp, Mesh.h, Mesh.cpp contains the main structure of winged edge and mesh structure.           
+The obj_view.cpp contains the user interface.            
