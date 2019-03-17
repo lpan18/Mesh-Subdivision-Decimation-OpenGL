@@ -168,9 +168,9 @@ public:
         delete mMesh;
         mMesh = new Mesh(fileName);
         
-        if (k > mMesh->getVertexCount() - 10) {
+        if (k > mMesh->getVertexCount()) {
             cout << "The value of k " << k << " is too big." << endl;
-        } else if (countCollapse > mMesh->getVertexCount() - 10) {
+        } else if (countCollapse > mMesh->getVertexCount()) {
             cout << "The number of edges to collapse " << countCollapse << " is too big." << endl;
         } else {
             ObjBuffer buffer = ((MeshMcd*)mMesh)->mcd(k, countCollapse);
@@ -268,7 +268,7 @@ private:
 
 class ObjViewApp : public nanogui::Screen {
 public:
-    ObjViewApp() : nanogui::Screen(Eigen::Vector2i(1100, 700), "NanoGUI Assignment1", false) {
+    ObjViewApp() : nanogui::Screen(Eigen::Vector2i(1100, 700), "Assignment 2", false) {
         using namespace nanogui;
 
 	    // Create a window context in which we will render the OpenGL canvas
