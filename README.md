@@ -1,6 +1,4 @@
-# CMPT764 Assignment2
-
-## Mesh Decimation
+# Mesh Decimation
 unzip file      
 run ```cmake . ```          
 run ```make```         
@@ -10,7 +8,7 @@ Enter the k value and Number of vertices you want to collaspe in the textbox, an
 Click save button to save the decimated mesh to an obj file.           
 Click quit button to quit the program.          
 
-## Structure of code files        
+# Structure of code files        
 The MeshMcd.h and MeshMcd.cpp contains the main structure of mesh decimation algorithm.     
 The MeshSd.h and MeshSd.cpp contains the main structure of mesh subdivision algorithm.     
 The W_edge.h, W_edge.cpp, Mesh.h, Mesh.cpp contains the main structure of winged edge and mesh structure.           
